@@ -36,7 +36,7 @@ jobs:
           dotnet-version: '9.0.x'
       
       - name: Build
-        run: dotnet build Definition/Community.PowerToys.Run.Plugin.Definition.csproj -c Release -p:Platform="${{ matrix.platform }}"
+        run: dotnet build Definition/Community.PowerToys.Run.Plugin.Definition/Community.PowerToys.Run.Plugin.Definition.csproj -c Release -p:Platform="${{ matrix.platform }}"
       
       - name: Get version
         id: get_version
