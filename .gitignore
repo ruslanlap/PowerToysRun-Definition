@@ -98,6 +98,10 @@ StyleCopReport.xml
 *.svclog
 *.scc
 
+# Windows Zone.Identifier files
+*:Zone.Identifier
+*Zone.Identifier*
+
 # Chutzpah Test files
 _Chutzpah*
 
