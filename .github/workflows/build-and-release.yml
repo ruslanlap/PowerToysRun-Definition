@@ -190,7 +190,7 @@ jobs:
           cat > release_notes.md << 'EOL'
           # 🔍 Definition Plugin v${{ steps.get_version.outputs.VERSION }}
           
-          ![Definition Plugin Logo](https://raw.githubusercontent.com/ruslanlap/PowerToysRun-Definition/main/data/definition.logo.png)
+          ![Definition Plugin Logo](https://raw.githubusercontent.com/ruslanlap/PowerToysRun-Definition/refs/heads/master/data/definition.logo.png))
           
           ## ✨ What's New
           
