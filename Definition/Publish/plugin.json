@@ -1,0 +1,14 @@
+{
+  "ID": "AF6979212B9D429489F115EE3390D608",
+  "ActionKeyword": "def",
+  "IsGlobal": false,
+  "Name": "Definition",
+  "Author": "ruslanlap",
+  "Version": "0.90.1",
+  "Language": "csharp",
+  "Website": "https://github.com/ruslanlap/PowerToysRun-Definition",
+  "ExecuteFileName": "Community.PowerToys.Run.Plugin.Definition.dll",
+  "IcoPathDark": "Images\\definition.dark.png",
+  "IcoPathLight": "Images\\definition.light.png",
+  "DynamicLoading": false
+}
