@@ -10,34 +10,45 @@
   <img src="data/demo-definition.gif" alt="Definition Plugin Demo" width="650">
 </div>
 
-<p align="center">
+<div align="center">
+  <!-- Badges -->
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/actions/workflows/build-and-release.yml">
+    <img src="https://github.com/ruslanlap/PowerToysRun-Definition/actions/workflows/build-and-release.yml/badge.svg" alt="Build Status">
+  </a>
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
-    <img src="https://img.shields.io/github/v/release/ruslanlap/PowerToysRun-Definition?style=flat-square" alt="Latest Release">
+    <img src="https://img.shields.io/github/v/release/ruslanlap/PowerToysRun-Definition?label=latest" alt="Latest Release">
   </a>
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/actions/workflows/build.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/ruslanlap/PowerToysRun-Definition/build.yml?branch=main&style=flat-square" alt="Build Status">
-  </a>
-  <img src="https://img.shields.io/badge/.NET-9.0-blue?style=flat-square" alt=".NET 9.0">
-  <img src="https://img.shields.io/badge/C%23-.NET-512BD4?style=flat-square" alt="C#">
-  <img src="https://img.shields.io/badge/Platform-Windows-lightgrey?style=flat-square" alt="Windows">
-  <a href="https://opensource.org/licenses/MIT">
-    <img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square" alt="License MIT">
-  </a>
-  <img src="https://img.shields.io/badge/PowerToys-Compatible-blue?style=flat-square" alt="PowerToys Compatible">
-  <img src="https://img.shields.io/badge/Made%20with-❤️-red?style=flat-square" alt="Made with Love">
-  <img src="https://img.shields.io/maintenance/yes/2025?style=flat-square" alt="Maintenance">
-  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome">
+  <img src="https://img.shields.io/maintenance/yes/2025" alt="Maintenance">
+  <img src="https://img.shields.io/badge/C%23-.NET-512BD4" alt="C# .NET">
+  <img src="https://img.shields.io/badge/version-v0.90.1-brightgreen" alt="Version">
+  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome">
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/stargazers">
-    <img src="https://img.shields.io/github/stars/ruslanlap/PowerToysRun-Definition?style=flat-square" alt="GitHub stars">
+    <img src="https://img.shields.io/github/stars/ruslanlap/PowerToysRun-Definition" alt="GitHub stars">
   </a>
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/issues">
-    <img src="https://img.shields.io/github/issues/ruslanlap/PowerToysRun-Definition?style=flat-square" alt="GitHub issues">
+    <img src="https://img.shields.io/github/issues/ruslanlap/PowerToysRun-Definition" alt="GitHub issues">
   </a>
-</p>
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
+    <img src="https://img.shields.io/github/downloads/ruslanlap/PowerToysRun-Definition/total" alt="GitHub all releases">
+  </a>
+  <img src="https://img.shields.io/badge/Made%20with-❤️-red" alt="Made with Love">
+  <img src="https://img.shields.io/badge/Awesome-Yes-orange" alt="Awesome">
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
+    <img src="https://img.shields.io/github/v/release/ruslanlap/PowerToysRun-Definition?style=for-the-badge" alt="Latest Release">
+  </a>
+  <img src="https://img.shields.io/badge/PowerToys-Compatible-blue" alt="PowerToys Compatible">
+  <img src="https://img.shields.io/badge/platform-Windows-lightgrey" alt="Platform">
+  <a href="https://opensource.org/licenses/MIT">
+    <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
+  </a>
+</div>
 
 <div align="center">
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
-    <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-DEFINITION_PLUGIN-blue?style=for-the-badge&logo=github" alt="Download Definition Plugin">
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v0.90.1/Definition-v0.90.1-x64.zip">
+    <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-x64-blue?style=for-the-badge&logo=github" alt="Download x64">
+  </a>
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v0.90.1/Definition-v0.90.1-arm64.zip">
+    <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-ARM64-blue?style=for-the-badge&logo=github" alt="Download ARM64">
   </a>
 </div>
 
