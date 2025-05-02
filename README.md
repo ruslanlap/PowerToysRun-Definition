@@ -274,32 +274,36 @@ Currently, the plugin UI is in English. Localization support is planned for futu
 
 ## 📸 Screenshots
 
-<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:20px;">
-  <figure style="margin:0;">
-    <img src="data/demo1.png" width="300" alt="Word Definition">
-    <figcaption style="text-align:center;">Word Definition</figcaption>
-  </figure>
-  <figure style="margin:0;">
-    <img src="data/demo2.png" width="300" alt="Phonetics Display">
-    <figcaption style="text-align:center;">Phonetics Display</figcaption>
-  </figure>
-  <figure style="margin:0;">
-    <img src="data/demo3.png" width="300" alt="Context Menu">
-    <figcaption style="text-align:center;">Context Menu</figcaption>
-  </figure>
-  <figure style="margin:0;">
-    <img src="data/demo4.png" width="300" alt="Antonyms Feature">
-    <figcaption style="text-align:center;">Antonyms Feature</figcaption>
-  </figure>
-  <figure style="margin:0;">
-    <img src="data/demo5.png" width="300" alt="Audio Pronunciation">
-    <figcaption style="text-align:center;">Audio Pronunciation</figcaption>
-  </figure>
-  <figure style="margin:0;">
-    <img src="data/demo6.png" width="300" alt="Delayed Execution">
-    <figcaption style="text-align:center;">Delayed Execution</figcaption>
-  </figure>
-</div>
+<table style="width:100%;border-collapse:collapse;">
+  <tr>
+    <td align="center" style="padding:10px;">
+      <img src="data/demo1.png" width="250" alt="Word Definition"><br>
+      <strong>Word Definition</strong>
+    </td>
+    <td align="center" style="padding:10px;">
+      <img src="data/demo2.png" width="250" alt="Phonetics Display"><br>
+      <strong>Phonetics Display</strong>
+    </td>
+    <td align="center" style="padding:10px;">
+      <img src="data/demo3.png" width="250" alt="Context Menu"><br>
+      <strong>Context Menu</strong>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" style="padding:10px;">
+      <img src="data/demo4.png" width="250" alt="Antonyms Feature"><br>
+      <strong>Antonyms Feature</strong>
+    </td>
+    <td align="center" style="padding:10px;">
+      <img src="data/demo5.png" width="250" alt="Audio Pronunciation"><br>
+      <strong>Audio Pronunciation</strong>
+    </td>
+    <td align="center" style="padding:10px;">
+      <img src="data/demo6.png" width="250" alt="Delayed Execution"><br>
+      <strong>Delayed Execution</strong>
+    </td>
+  </tr>
+</table>
 
 ## 📄 License
 
