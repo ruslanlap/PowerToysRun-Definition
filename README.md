@@ -254,6 +254,18 @@ Currently, the plugin UI is in English. Localization support is planned for futu
     <img src="data/demo3.png" width="350" alt="Demo: Context Menu">
     <figcaption>Context Menu</figcaption>
   </figure>
+  <figure>
+    <img src="data/demo4.png" width="350" alt="Demo: Antonyms Feature">
+    <figcaption>Antonyms Feature - Find opposite words with ease</figcaption>
+  </figure>
+  <figure>
+    <img src="data/demo5.png" width="350" alt="Demo: Audio Pronunciation">
+    <figcaption>Audio Pronunciation - Listen to correct word pronunciation</figcaption>
+  </figure>
+  <figure>
+    <img src="data/demo6.png" width="350" alt="Demo: Delayed Execution">
+    <figcaption>Delayed Execution - See loading indicator while fetching results</figcaption>
+  </figure>
 </div>
 
 ## 📄 License
