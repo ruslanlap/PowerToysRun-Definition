@@ -83,12 +83,13 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 
 - 🔍 **Instant Definitions**: Get definitions in real-time via `dictionaryapi.dev`.
 - 🔊 **Pronunciation Audio**: Play phonetic audio directly from your results.
-- 📚 **Phonetics & Synonyms**: View phonetic spelling and synonyms (if available).
+- 📚 **Phonetics & Synonyms**: View phonetic spelling, synonyms, and antonyms.
+- 📝 **Usage Examples**: See real-world examples of how words are used.
 - ⏱️ **Delayed Execution**: Shows loading indicator before fetching results.
-- 💾 **Caching**: In-memory cache for repeat lookups to improve performance.
+- 💾 **Caching**: In-memory cache for repeat lookups (up to 100 entries) to improve performance.
 - 🌓 **Theme Awareness**: Automatically switches icons for light/dark mode.
-- 📋 **Context Menu**: Copy definitions or play pronunciation via right-click or keyboard shortcuts.
-- ⚙️ **Configurable**: Easily extend or modify via plugin.json.
+- 📋 **Context Menu**: Copy definitions, play pronunciation, open source URL, or search for related words via right-click or keyboard shortcuts.
+- 🔄 **Cancellable Requests**: Automatically cancels previous requests when typing new queries.
 
 ## 🎬 Demo
 
@@ -100,18 +101,36 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 
 ### Prerequisites
 
-- [PowerToys Run](https://github.com/microsoft/PowerToys/releases) installed
+- [PowerToys Run](https://github.com/microsoft/PowerToys/releases) installed (v0.70.0 or later)
 - Windows 10 (build 22621) or later
+- .NET 9.0 Runtime (included with Windows 11 22H2 or later)
+- Internet connection (for API access)
 
 ### Quick Install
 
-1. Download the latest release from the [Releases page](https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest).
+1. Download the appropriate ZIP for your system architecture:
+   - [x64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v0.90.1/Definition-v0.90.1-x64.zip)
+   - [ARM64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v0.90.1/Definition-v0.90.1-arm64.zip)
+
 2. Extract the ZIP to:
    ```
    %LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins\
    ```
-3. Restart PowerToys.
+   
+   Typical path: `C:\Users\YourUsername\AppData\Local\Microsoft\PowerToys\PowerToys Run\Plugins\`
+
+3. Restart PowerToys (right-click the PowerToys icon in the system tray and select "Restart").
+
 4. Open PowerToys Run (`Alt + Space`) and type `def <word>`.
+
+### Manual Verification
+
+To verify the plugin is correctly installed:
+
+1. Open PowerToys Settings
+2. Navigate to PowerToys Run > Plugins
+3. Look for "Definition" in the list of plugins
+4. Ensure it's enabled (toggle should be ON)
 
 ## 🔧 Usage
 
@@ -178,31 +197,43 @@ Please make sure to update tests as appropriate.
 
 <details>
 <summary><b>Does the plugin require internet access?</b></summary>
-<p>Yes, the plugin needs internet access to fetch definitions from dictionaryapi.dev.</p>
+<p>Yes, the plugin needs internet access to fetch definitions from dictionaryapi.dev. Results are cached in memory for subsequent lookups of the same word.</p>
 </details>
 
 <details>
 <summary><b>How do I change the plugin's theme?</b></summary>
-<p>The plugin automatically adapts to your PowerToys theme (light/dark).</p>
+<p>The plugin automatically adapts to your PowerToys theme (light/dark). Icons are dynamically loaded based on your current system theme.</p>
 </details>
 
 <details>
 <summary><b>Are definitions cached?</b></summary>
-<p>Yes, definitions are cached in memory during the current session to improve performance.</p>
+<p>Yes, definitions are cached in memory during the current session (up to 100 entries) to improve performance and reduce API calls.</p>
 </details>
 
 <details>
 <summary><b>Can I customize the dictionary source?</b></summary>
-<p>Not in the current version, but this may be added in future updates.</p>
+<p>Not in the current version, but this may be added in future updates. The plugin currently uses dictionaryapi.dev exclusively.</p>
+</details>
+
+<details>
+<summary><b>Why does the plugin show "Looking up..." before showing results?</b></summary>
+<p>The plugin implements IDelayedExecutionPlugin which shows a loading indicator while fetching results from the API. This provides immediate feedback while the request is processing.</p>
+</details>
+
+<details>
+<summary><b>How do I play the pronunciation audio?</b></summary>
+<p>Right-click on any definition result and select "Play Pronunciation" from the context menu (only available if the API provides audio for that word).</p>
 </details>
 
 ## 🧑‍💻 Tech Stack
 
 - C# / .NET 9.0
-- PowerToys Run API
-- HttpClient for API requests
-- WPF for UI components
-- GitHub Actions for CI/CD
+- PowerToys Run API (IPlugin, IDelayedExecutionPlugin, IContextMenu interfaces)
+- HttpClient for API requests with timeout handling
+- System.Text.Json for JSON parsing
+- WPF MediaPlayer for audio playback
+- System.Threading for asynchronous operations
+- GitHub Actions for CI/CD with multi-architecture builds
 
 ## 🌐 Localization
 
