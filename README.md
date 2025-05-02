@@ -90,6 +90,7 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 - 🌓 **Theme Awareness**: Automatically switches icons for light/dark mode.
 - 📋 **Context Menu**: Copy definitions, play pronunciation, open source URL, or search for related words via right-click or keyboard shortcuts.
 - 🔄 **Cancellable Requests**: Automatically cancels previous requests when typing new queries.
+- 🌐 **Wiktionary Integration**: Open any word in Wiktionary (https://en.wiktionary.org/wiki/{word}) for additional information and translations.
 
 ## 🎬 Demo
 
@@ -140,7 +141,11 @@ To verify the plugin is correctly installed:
    - `def <word>` to lookup definitions.
 3. Press <kbd>Enter</kbd> to fetch results.
 4. Use <kbd>Ctrl + C</kbd> to copy a definition.
-5. Right-click a result to play pronunciation.
+5. Right-click a result to:
+   - Copy definition with <kbd>Ctrl + C</kbd>
+   - Play pronunciation audio
+   - Open the word in Wiktionary
+   - Search for related words
 
 ## 📁 Data Storage
 
@@ -225,6 +230,11 @@ Please make sure to update tests as appropriate.
 <p>Right-click on any definition result and select "Play Pronunciation" from the context menu (only available if the API provides audio for that word).</p>
 </details>
 
+<details>
+<summary><b>How can I see more information about a word?</b></summary>
+<p>Right-click on any result and select "Open Source URL in Browser" to view the word in Wiktionary, which provides additional information, translations, and etymology.</p>
+</details>
+
 ## 🧑‍💻 Tech Stack
 
 - C# / .NET 9.0
@@ -276,6 +286,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [Microsoft PowerToys](https://github.com/microsoft/PowerToys) team for the amazing launcher
 - [dictionaryapi.dev](https://dictionaryapi.dev/) for providing the free dictionary API
+- [Wiktionary](https://en.wiktionary.org/) for comprehensive word information and translations
 - All contributors who have helped improve this plugin
 
 ## ☕ Support
