@@ -258,13 +258,15 @@ This section highlights some of the most powerful features of the Definition plu
 
 ## 🧑‍💻 Tech Stack
 
-- C# / .NET 9.0
-- PowerToys Run API (IPlugin, IDelayedExecutionPlugin, IContextMenu interfaces)
-- HttpClient for API requests with timeout handling
-- System.Text.Json for JSON parsing
-- WPF MediaPlayer for audio playback
-- System.Threading for asynchronous operations
-- GitHub Actions for CI/CD with multi-architecture builds
+| Technology | Description |
+|---|---|
+| C# / .NET 9.0 | Primary language and runtime |
+| PowerToys Run API | IPlugin, IDelayedExecutionPlugin, IContextMenu interfaces |
+| HttpClient | API requests with timeout handling |
+| System.Text.Json | JSON parsing |
+| WPF MediaPlayer | Audio playback |
+| System.Threading | Asynchronous operations |
+| GitHub Actions | CI/CD with multi-architecture builds |
 
 ## 🌐 Localization
 
