@@ -242,7 +242,9 @@ This section highlights some of the most powerful features of the Definition plu
 <div align="center">
   <figure>
     <img src="data/demo8.png" width="700" alt="Wiktionary Integration">
-    <figcaption><strong>Wiktionary Integration</strong> - Access comprehensive word information by opening any word in Wiktionary directly from the context menu. Get access to additional meanings, translations, etymologies, and related terms.</figcaption>
+    <figcaption>
+      <strong>Wiktionary Integration</strong> - Access comprehensive word information by opening any word in Wiktionary directly from the context menu. Get access to additional meanings, translations, etymologies, and related terms.
+    </figcaption>
   </figure>
   
   <figure>
