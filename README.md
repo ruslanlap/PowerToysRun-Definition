@@ -241,15 +241,18 @@ This section highlights some of the most powerful features of the Definition plu
 
 <div align="center">
   <figure>
-    <img src="data/demo8.png" width="700" alt="Wiktionary Integration">
+    <img src="data/demo8.png" width="800" alt="Wiktionary Integration">
     <figcaption>
       <strong>Wiktionary Integration</strong> - Access comprehensive word information by opening any word in Wiktionary directly from the context menu. Get access to additional meanings, translations, etymologies, and related terms.
     </figcaption>
   </figure>
   
   <figure>
-    <img src="data/demo9.png" width="700" alt="Advanced Context Menu">
-    <figcaption><strong>Rich Context Menu</strong> - The plugin offers a powerful context menu with multiple actions: copy definitions, play pronunciation audio, open source URLs, and search for related words. Right-click on any result to access these features.</figcaption>
+    <img src="data/demo9.png" width="800" alt="Advanced Context Menu">
+    <figcaption><strong>Rich Context Menu</strong> - The plugin offers a powerful context menu with multiple actions. 
+      Copy definitions, play pronunciation audio, open source URLs, and search for related words. 
+      Right-click on any result to access these features.
+    </figcaption>
   </figure>
 </div>
 
