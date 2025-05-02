@@ -272,30 +272,30 @@ Currently, the plugin UI is in English. Localization support is planned for futu
 
 ## 📸 Screenshots
 
-<div align="center">
-  <figure>
-    <img src="data/demo1.png" width="350" alt="Demo: Word Definition">
-    <figcaption>Word Definition</figcaption>
+<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:20px;">
+  <figure style="margin:0;">
+    <img src="data/demo1.png" width="300" alt="Word Definition">
+    <figcaption style="text-align:center;">Word Definition</figcaption>
   </figure>
-  <figure>
-    <img src="data/demo2.png" width="350" alt="Demo: Phonetics Display">
-    <figcaption>Phonetics Display</figcaption>
+  <figure style="margin:0;">
+    <img src="data/demo2.png" width="300" alt="Phonetics Display">
+    <figcaption style="text-align:center;">Phonetics Display</figcaption>
   </figure>
-  <figure>
-    <img src="data/demo3.png" width="350" alt="Demo: Context Menu">
-    <figcaption>Context Menu</figcaption>
+  <figure style="margin:0;">
+    <img src="data/demo3.png" width="300" alt="Context Menu">
+    <figcaption style="text-align:center;">Context Menu</figcaption>
   </figure>
-  <figure>
-    <img src="data/demo4.png" width="350" alt="Demo: Antonyms Feature">
-    <figcaption>Antonyms Feature - Find opposite words with ease</figcaption>
+  <figure style="margin:0;">
+    <img src="data/demo4.png" width="300" alt="Antonyms Feature">
+    <figcaption style="text-align:center;">Antonyms Feature</figcaption>
   </figure>
-  <figure>
-    <img src="data/demo5.png" width="350" alt="Demo: Audio Pronunciation">
-    <figcaption>Audio Pronunciation - Listen to correct word pronunciation</figcaption>
+  <figure style="margin:0;">
+    <img src="data/demo5.png" width="300" alt="Audio Pronunciation">
+    <figcaption style="text-align:center;">Audio Pronunciation</figcaption>
   </figure>
-  <figure>
-    <img src="data/demo6.png" width="350" alt="Demo: Delayed Execution">
-    <figcaption>Delayed Execution - See loading indicator while fetching results</figcaption>
+  <figure style="margin:0;">
+    <img src="data/demo6.png" width="300" alt="Delayed Execution">
+    <figcaption style="text-align:center;">Delayed Execution</figcaption>
   </figure>
 </div>
 
