@@ -20,7 +20,7 @@
   </a>
   <img src="https://img.shields.io/maintenance/yes/2025" alt="Maintenance">
   <img src="https://img.shields.io/badge/C%23-.NET-512BD4" alt="C# .NET">
-  <img src="https://img.shields.io/badge/version-v0.90.1-brightgreen" alt="Version">
+  <img src="https://img.shields.io/badge/version-v1.0.1-brightgreen" alt="Version">
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome">
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/stargazers">
     <img src="https://img.shields.io/github/stars/ruslanlap/PowerToysRun-Definition" alt="GitHub stars">
@@ -44,10 +44,10 @@
 </div>
 
 <div align="center">
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v0.90.1/Definition-v0.90.1-x64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.0.1/Definition-v1.0.1-x64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-x64-blue?style=for-the-badge&logo=github" alt="Download x64">
   </a>
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v0.90.1/Definition-v0.90.1-arm64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.0.1/Definition-v1.0.1-arm64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-ARM64-blue?style=for-the-badge&logo=github" alt="Download ARM64">
   </a>
 </div>
@@ -70,6 +70,7 @@
 - [📄 License](#-license)
 - [🙏 Acknowledgements](#-acknowledgements)
 - [☕ Support](#-support)
+- [🆕 What's New (v1.0.1)](#-whats-new-v101)
 
 ## 📋 Overview
 
@@ -110,8 +111,8 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 ### Quick Install
 
 1. Download the appropriate ZIP for your system architecture:
-   - [x64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v0.90.1/Definition-v0.90.1-x64.zip)
-   - [ARM64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v0.90.1/Definition-v0.90.1-arm64.zip)
+   - [x64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.0.1/Definition-v1.0.1-x64.zip)
+   - [ARM64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.0.1/Definition-v1.0.1-arm64.zip)
 
 2. Extract the ZIP to:
    ```
@@ -159,7 +160,7 @@ cd PowerToysRun-Definition/Definition
 dotnet build
 # To package:
 dotnet publish -c Release -r win-x64 --output ./publish
-zip -r Definition-v0.90.1-x64.zip ./publish
+zip -r Definition-v1.0.1-x64.zip ./publish
 ```
 
 ## 📊 Project Structure
@@ -317,6 +318,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 If you find this plugin useful and would like to support its development, you can buy me a coffee:
 
 [![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-☕️-FFDD00?style=for-the-badge&logo=buy-me-a-coffee)](https://ruslanlap.github.io/ruslanlap_buymeacoffe/)
+
+## 🆕 What's New (v1.0.1)
+
+- 🐞 **Fixed CS0246 error** — додано using ManagedCommon для Theme
+- 🪄 **Вікно PowerToys Run не закривається при програванні аудіо**
+- 🏗️ **Великий рефакторинг** — утилітарні класи винесені в окремі файли:
+  - IconManager.cs, AudioManager.cs, ClipboardHelper.cs, UrlHelper.cs, TextHelper.cs, ResultProcessor.cs, ContextMenuBuilder.cs, Models.cs
+- 📦 **Main.cs став меншим і чистішим**
+- 🧩 **Краща архітектура** — розділення відповідальностей, легше підтримувати
 
 ---
 

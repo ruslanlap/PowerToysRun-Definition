@@ -4,7 +4,7 @@
   "IsGlobal": false,
   "Name": "Definition",
   "Author": "ruslanlap",
-  "Version": "0.90.1",
+  "Version": "1.0.1",
   "Language": "csharp",
   "Website": "https://github.com/ruslanlap/PowerToysRun-Definition",
   "ExecuteFileName": "Community.PowerToys.Run.Plugin.Definition.dll",
