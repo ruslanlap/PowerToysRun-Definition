@@ -191,10 +191,27 @@ jobs:
           # 🔍 Definition Plugin v${{ steps.get_version.outputs.VERSION }}
           
           <img src="https://raw.githubusercontent.com/ruslanlap/PowerToysRun-Definition/refs/heads/master/data/definition.logo.png" alt="Definition Plugin Logo" width="96" height="96">
+          <img src="https://github.com/ruslanlap/PowerToysRun-Definition/blob/master/data/demo-definition-3.gif?raw=true" alt="Definition Plugin Demo" width="800">
           
-          ## ✨ What's New
+          ## ✨ What's New in v${{ steps.get_version.outputs.VERSION }}
           
-          This release brings you the power of word definitions directly to your PowerToys Run interface!
+          ### 🔧 Bug Fixes & Improvements
+          - **Fixed CS0246 error** - Added `using ManagedCommon;` for proper Theme type resolution
+          - **Fixed PowerToys Run window behavior** - Window now stays open when playing pronunciation audio
+          
+          ### 🏗️ Code Architecture Improvements  
+          - **Major refactoring** - Separated utility classes into individual files for better maintainability
+          - **New organized structure**:
+            - `IconManager.cs` - Theme-aware icon management
+            - `AudioManager.cs` - Audio playback functionality  
+            - `ClipboardHelper.cs` - Clipboard operations
+            - `UrlHelper.cs` - URL handling utilities
+            - `TextHelper.cs` - Text processing utilities
+            - `ResultProcessor.cs` - Dictionary result processing
+            - `ContextMenuBuilder.cs` - Context menu creation
+            - `Models.cs` - Data models and extensions
+          - **Reduced Main.cs complexity** - Cleaner, more focused main plugin class
+          - **Better separation of concerns** - Each component has a single responsibility
           
           ### 🚀 Highlights
           
