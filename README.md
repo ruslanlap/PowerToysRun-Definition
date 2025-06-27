@@ -321,13 +321,13 @@ If you find this plugin useful and would like to support its development, you ca
 
 ## 🆕 What's New (v1.0.1)
 
-- 🐞 **Fixed CS0246 error** — додано using ManagedCommon для Theme
-- 🪄 **Вікно PowerToys Run не закривається при програванні аудіо**
-- 🏗️ **Великий рефакторинг** — утилітарні класи винесені в окремі файли:
-  - IconManager.cs, AudioManager.cs, ClipboardHelper.cs, UrlHelper.cs, TextHelper.cs, ResultProcessor.cs, ContextMenuBuilder.cs, Models.cs
-- 📦 **Main.cs став меншим і чистішим**
-- 🧩 **Краща архітектура** — розділення відповідальностей, легше підтримувати
+- 🐞 Fixed CS0246 error — added using ManagedCommon for Theme support
+- 🪄 PowerToys Run window no longer closes when audio is playing
+- 🏗️ Major refactoring — utility classes moved to separate files:
 
+    IconManager.cs, AudioManager.cs, ClipboardHelper.cs, UrlHelper.cs, TextHelper.cs, ResultProcessor.cs, ContextMenuBuilder.cs, Models.cs
+-📦 Main.cs is now smaller and cleaner
+- 🧩 Improved architecture — better separation of concerns, easier to maintain
 ---
 
 <div align="center">
