@@ -126,15 +126,37 @@ jobs:
           }
         shell: pwsh
       
+      - name: Remove unnecessary PowerToys DLLs
+        run: |
+          $artifactDir = "artifacts/Definition-v${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
+          
+          # Remove unnecessary PowerToys DLLs that are provided by the host
+          $unnecessaryDlls = @(
+            "PowerToys.Common.UI.dll",
+            "PowerToys.ManagedCommon.dll", 
+            "PowerToys.Settings.UI.Lib.dll",
+            "Wox.Infrastructure.dll",
+            "Wox.Plugin.dll"
+          )
+          
+          foreach ($dll in $unnecessaryDlls) {
+            $dlls = Get-ChildItem -Path "$artifactDir/Definition" -Recurse -Filter $dll
+            foreach ($item in $dlls) {
+              Write-Host "Removing unnecessary DLL: $($item.FullName)"
+              Remove-Item $item.FullName -Force
+            }
+          }
+        shell: pwsh
+      
       - name: Create ZIP archive
         run: |
           $artifactDir = "artifacts/Definition-v${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
           
-          # Create the zip files with names that match the README.md download links
+          # Create the zip files with proper naming convention: <name>-<version>-<platform>.zip
           if ("${{ matrix.platform }}" -eq "x64") {
-            $zipFile = "Definition-v${{ steps.get_version.outputs.VERSION }}-x64.zip"
+            $zipFile = "Definition-${{ steps.get_version.outputs.VERSION }}-x64.zip"
           } else {
-            $zipFile = "Definition-v${{ steps.get_version.outputs.VERSION }}-arm64.zip"
+            $zipFile = "Definition-${{ steps.get_version.outputs.VERSION }}-ARM64.zip"
           }
           
           # Create the zip file
@@ -175,14 +197,29 @@ jobs:
       - name: Prepare artifacts for release
         run: |
           mkdir -p release-artifacts
-          cp downloaded-artifacts/build-artifacts-x64/*.zip release-artifacts/ || echo "Failed to copy x64 artifact"
-          cp downloaded-artifacts/build-artifacts-arm64/*.zip release-artifacts/ || echo "Failed to copy ARM64 artifact"
+          VERSION="${{ steps.get_version.outputs.VERSION }}"
+          cp downloaded-artifacts/build-artifacts-x64/Definition-${VERSION}-x64.zip release-artifacts/ || echo "Failed to copy x64 artifact"
+          cp downloaded-artifacts/build-artifacts-arm64/Definition-${VERSION}-ARM64.zip release-artifacts/ || echo "Failed to copy ARM64 artifact"
           echo "Listing release artifacts:"
           ls -la release-artifacts
       
       - name: Get version from tag
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      
+      - name: Generate SHA256 checksums
+        run: |
+          cd release-artifacts
+          VERSION="${{ steps.get_version.outputs.VERSION }}"
+          sha256sum Definition-${VERSION}-x64.zip | tr 'a-f' 'A-F' > Definition-${VERSION}-x64.zip.sha256
+          sha256sum Definition-${VERSION}-ARM64.zip | tr 'a-f' 'A-F' > Definition-${VERSION}-ARM64.zip.sha256
+          
+          # Create combined checksums.txt file
+          echo "SHA256 Checksums for Definition Plugin v${VERSION}" > checksums.txt
+          echo "Generated on: $(date -u)" >> checksums.txt
+          echo "" >> checksums.txt
+          cat Definition-${VERSION}-x64.zip.sha256 >> checksums.txt
+          cat Definition-${VERSION}-ARM64.zip.sha256 >> checksums.txt
       
       - name: Prepare Release Notes
         id: release_notes
@@ -248,6 +285,10 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            release-artifacts/*.zip
+            release-artifacts/Definition-${{ steps.get_version.outputs.VERSION }}-x64.zip
+            release-artifacts/Definition-${{ steps.get_version.outputs.VERSION }}-ARM64.zip
+            release-artifacts/Definition-${{ steps.get_version.outputs.VERSION }}-x64.zip.sha256
+            release-artifacts/Definition-${{ steps.get_version.outputs.VERSION }}-ARM64.zip.sha256
+            release-artifacts/checksums.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
