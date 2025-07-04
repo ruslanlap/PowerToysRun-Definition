@@ -44,11 +44,14 @@
 </div>
 
 <div align="center">
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.0.1/Definition-v1.0.1-x64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.0.1/Definition-1.0.1-x64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-x64-blue?style=for-the-badge&logo=github" alt="Download x64">
   </a>
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.0.1/Definition-v1.0.1-arm64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.0.1/Definition-1.0.1-ARM64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-ARM64-blue?style=for-the-badge&logo=github" alt="Download ARM64">
+  </a>
+  <a href="#-building-from-source">
+    <img src="https://img.shields.io/badge/🔨_BUILD-From%20Source-green?style=for-the-badge&logo=visualstudio" alt="Build from Source">
   </a>
 </div>
 
@@ -70,7 +73,7 @@
 - [📄 License](#-license)
 - [🙏 Acknowledgements](#-acknowledgements)
 - [☕ Support](#-support)
-- [🆕 What's New (v1.0.1)](#-whats-new-v101)
+- [🆕 What's New (1.0.1)](#-whats-new-v101)
 
 ## 📋 Overview
 
@@ -111,8 +114,8 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 ### Quick Install
 
 1. Download the appropriate ZIP for your system architecture:
-   - [x64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.0.1/Definition-v1.0.1-x64.zip)
-   - [ARM64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.0.1/Definition-v1.0.1-arm64.zip)
+   - [x64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.0.1/Definition-1.0.1-x64.zip)
+   - [ARM64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.0.1/Definition-1.0.1-ARM64.zip)
 
 2. Extract the ZIP to:
    ```
@@ -321,12 +324,20 @@ If you find this plugin useful and would like to support its development, you ca
 
 ## 🆕 What's New (v1.0.1)
 
-- 🐞 **Fixed CS0246 error** — додано using ManagedCommon для Theme
-- 🪄 **Вікно PowerToys Run не закривається при програванні аудіо**
-- 🏗️ **Великий рефакторинг** — утилітарні класи винесені в окремі файли:
-  - IconManager.cs, AudioManager.cs, ClipboardHelper.cs, UrlHelper.cs, TextHelper.cs, ResultProcessor.cs, ContextMenuBuilder.cs, Models.cs
-- 📦 **Main.cs став меншим і чистішим**
-- 🧩 **Краща архітектура** — розділення відповідальностей, легше підтримувати
+- 🐞 **Fixed CS0246 error** — Added `using ManagedCommon;` for proper Theme type resolution
+- 🪄 **Fixed PowerToys Run window behavior** — Window now stays open when playing pronunciation audio
+- 🏗️ **Major code refactoring** — Separated utility classes into individual files for better maintainability:
+  - `IconManager.cs` — Theme-aware icon management
+  - `AudioManager.cs` — Audio playback functionality  
+  - `ClipboardHelper.cs` — Clipboard operations
+  - `UrlHelper.cs` — URL handling utilities
+  - `TextHelper.cs` — Text processing utilities
+  - `ResultProcessor.cs` — Dictionary result processing
+  - `ContextMenuBuilder.cs` — Context menu creation
+  - `Models.cs` — Data models and extensions
+- 📦 **Reduced Main.cs complexity** — Cleaner, more focused main plugin class
+- 🧩 **Better separation of concerns** — Each component has a single responsibility
+- 🔧 **PTRUN Compliance improvements** — Fixed naming conventions and packaging issues
 
 ---
 
