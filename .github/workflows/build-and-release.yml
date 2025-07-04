@@ -238,53 +238,56 @@ jobs:
       - name: Prepare Release Notes
         id: release_notes
         run: |
-          cat > release_notes.md << 'EOL'
-          # 🔍 Definition Plugin v${{ steps.get_version.outputs.VERSION }}
-          
-          <img src="https://raw.githubusercontent.com/ruslanlap/PowerToysRun-Definition/refs/heads/master/data/definition.logo.png" alt="Definition Plugin Logo" width="96" height="96">
-          <img src="https://github.com/ruslanlap/PowerToysRun-Definition/blob/master/data/demo-definition-3.gif?raw=true" alt="Definition Plugin Demo" width="800">
-          
-          ## ✨ What's New in v${{ steps.get_version.outputs.VERSION }}
-          
-          ### 🔧 Bug Fixes & Improvements
-          - **Fixed CS0246 error** - Added `using ManagedCommon;` for proper Theme type resolution
-          - **Fixed PowerToys Run window behavior** - Window now stays open when playing pronunciation audio
-          
-          ### 🏗️ Code Architecture Improvements  
-          - **Major refactoring** - Separated utility classes into individual files for better maintainability
-          - **New organized structure**:
-            - `IconManager.cs` - Theme-aware icon management
-            - `AudioManager.cs` - Audio playback functionality  
-            - `ClipboardHelper.cs` - Clipboard operations
-            - `UrlHelper.cs` - URL handling utilities
-            - `TextHelper.cs` - Text processing utilities
-            - `ResultProcessor.cs` - Dictionary result processing
-            - `ContextMenuBuilder.cs` - Context menu creation
-            - `Models.cs` - Data models and extensions
-          - **Reduced Main.cs complexity** - Cleaner, more focused main plugin class
-          - **Better separation of concerns** - Each component has a single responsibility
-          
-          ### 🚀 Highlights
-          
-          - 🔍 **Instant Definitions** - Get definitions in real-time via `dictionaryapi.dev`
-          - 🔊 **Pronunciation Audio** - Play phonetic audio directly from your results
-          - 📚 **Phonetics & Synonyms** - View phonetic spelling and synonyms
-          - ⏱️ **Delayed Execution** - Shows loading indicator before fetching results
-          - 💾 **Caching** - In-memory cache for repeat lookups to improve performance
-          - 🌓 **Theme Awareness** - Automatically switches icons for light/dark mode
-          
+          VERSION="${{ steps.get_version.outputs.VERSION }}"
+          cat > release_notes.md << EOL
+          # 🔍 Definition Plugin v${VERSION}
+          <p align="center">
+            <img src="https://raw.githubusercontent.com/ruslanlap/PowerToysRun-Definition/refs/heads/master/data/definition.logo.png" width="128px" alt="Definition Plugin Logo" />
+          </p>
+          <p align="center">
+            <img src="https://github.com/ruslanlap/PowerToysRun-Definition/blob/master/data/demo-definition-3.gif?raw=true" alt="Definition Plugin Demo" width="800">
+          </p>
+          <p align="center">
+            A powerful plugin for PowerToys Run to get word definitions, pronunciations, and synonyms with ease.
+          </p>
+
+          ## ✨ What's New
+          - 🚀 Performance improvements: Faster lookups and reduced memory usage.
+          - 🐛 Bug fixes: Fixed issues with audio pronunciation and improved error handling.
+          - ✨ New features: Enhanced theme support and better caching mechanisms.
+          - 🔧 PTRUN Compliance: All PowerToys Run linting issues resolved (PTRUN1301, PTRUN1303, PTRUN1401, PTRUN1402).
+
           ## 📥 Installation
-          
-          1. Download the ZIP file for your platform (x64 or ARM64)
-          2. Extract to `%LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins\`
-          3. Restart PowerToys
-          4. Start using with `Alt+Space` then type `def <word>`
-          
-          ## 🐛 Found a bug?
-          
-          If you encounter any issues or have suggestions for improvements, please [open an issue](https://github.com/ruslanlap/PowerToysRun-Definition/issues).
-          
-          Made with ❤️ by [ruslanlap](https://github.com/ruslanlap)
+          ### Prerequisites
+          - PowerToys installed on your system.
+          - .NET runtime (if applicable).
+
+          ### Steps
+          1. Download the ZIP file for your platform (x64 or ARM64).
+          2. Extract the contents to \`%LOCALAPPDATA%\\Microsoft\\PowerToys\\PowerToys Run\\Plugins\\\`.
+          3. Restart PowerToys.
+          4. Start using with \`Alt+Space\` then type \`def <word>\`.
+
+          ### Troubleshooting
+          - If the plugin does not appear, ensure that the files are extracted to the correct directory.
+          - Make sure PowerToys is up to date.
+
+          ## 🔍 Quick Commands
+          | Command                     | Description                         |
+          |-----------------------------|-------------------------------------|
+          | \`def <word>\`                | Get definition of a word            |
+          | \`def pronunciation <word>\`  | Get pronunciation audio             |
+          | \`def synonyms <word>\`       | Show synonyms and antonyms          |
+          | \`def help\`                  | Display help information            |
+
+          ## 🙏 Thank You
+          Thank you for using Definition Plugin! Your feedback and contributions are greatly appreciated.
+
+          If you encounter any issues or have suggestions, please [open an issue](https://github.com/ruslanlap/PowerToysRun-Definition/issues).
+
+          Made with ❤️ by <a href="https://github.com/ruslanlap">ruslanlap</a>
+
+          Special thanks to all contributors and the PowerToys community for their support.
           EOL
           
           echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
