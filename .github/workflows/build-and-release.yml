@@ -211,9 +211,11 @@ jobs:
       - name: Prepare artifacts for release
         run: |
           mkdir -p release-artifacts
-          VERSION="${{ steps.get_version.outputs.VERSION }}"
-          cp downloaded-artifacts/build-artifacts-x64/Definition-${VERSION}-x64.zip release-artifacts/ || echo "Failed to copy x64 artifact"
-          cp downloaded-artifacts/build-artifacts-arm64/Definition-${VERSION}-ARM64.zip release-artifacts/ || echo "Failed to copy ARM64 artifact"
+          echo "Listing all downloaded artifacts:"
+          find downloaded-artifacts -type f
+          echo "Copying ZIP files to release-artifacts:"
+          cp downloaded-artifacts/build-artifacts-x64/*.zip release-artifacts/ || echo "Failed to copy x64 artifact"
+          cp downloaded-artifacts/build-artifacts-arm64/*.zip release-artifacts/ || echo "Failed to copy ARM64 artifact"
           echo "Listing release artifacts:"
           ls -la release-artifacts
       
@@ -221,15 +223,21 @@ jobs:
         run: |
           cd release-artifacts
           VERSION="${{ steps.get_version.outputs.VERSION }}"
-          sha256sum Definition-${VERSION}-x64.zip | tr 'a-f' 'A-F' > Definition-${VERSION}-x64.zip.sha256
-          sha256sum Definition-${VERSION}-ARM64.zip | tr 'a-f' 'A-F' > Definition-${VERSION}-ARM64.zip.sha256
+          echo "Files in release-artifacts:"
+          ls -la
+          echo "Generating checksums for all ZIP files:"
+          for zipfile in *.zip; do
+            if [ -f "$zipfile" ]; then
+              echo "Processing $zipfile"
+              sha256sum "$zipfile" | tr 'a-f' 'A-F' > "${zipfile}.sha256"
+            fi
+          done
           
           # Create combined checksums.txt file
           echo "SHA256 Checksums for Definition Plugin v${VERSION}" > checksums.txt
           echo "Generated on: $(date -u)" >> checksums.txt
           echo "" >> checksums.txt
-          cat Definition-${VERSION}-x64.zip.sha256 >> checksums.txt
-          cat Definition-${VERSION}-ARM64.zip.sha256 >> checksums.txt
+          cat *.zip.sha256 >> checksums.txt
       
       - name: Get version from tag
         id: get_version
@@ -302,10 +310,8 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            release-artifacts/Definition-${{ steps.get_version.outputs.VERSION }}-x64.zip
-            release-artifacts/Definition-${{ steps.get_version.outputs.VERSION }}-ARM64.zip
-            release-artifacts/Definition-${{ steps.get_version.outputs.VERSION }}-x64.zip.sha256
-            release-artifacts/Definition-${{ steps.get_version.outputs.VERSION }}-ARM64.zip.sha256
+            release-artifacts/*.zip
+            release-artifacts/*.zip.sha256
             release-artifacts/checksums.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
