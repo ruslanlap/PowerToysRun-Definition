@@ -60,7 +60,7 @@ jobs:
       
       - name: Copy build output to artifacts directory
         run: |
-          $artifactDir = "artifacts/Definition-v${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
+          $artifactDir = "artifacts/Definition-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
           
           # Create the artifact directory
           New-Item -ItemType Directory -Force -Path $artifactDir
@@ -128,7 +128,7 @@ jobs:
       
       - name: Remove unnecessary PowerToys DLLs
         run: |
-          $artifactDir = "artifacts/Definition-v${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
+          $artifactDir = "artifacts/Definition-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
           
           # Remove unnecessary PowerToys DLLs that are provided by the host
           $unnecessaryDlls = @(
@@ -150,7 +150,7 @@ jobs:
       
       - name: Create ZIP archive
         run: |
-          $artifactDir = "artifacts/Definition-v${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
+          $artifactDir = "artifacts/Definition-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
           
           # Create the zip files with proper naming convention: <name>-<version>-<platform>.zip
           if ("${{ matrix.platform }}" -eq "x64") {
