@@ -11,32 +11,24 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup .NET SDK
+      - name: Setup dotnet
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: 9.0.x
 
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install Snyk CLI
+      - name: Install Snyk
         run: npm install -g snyk
 
-      - name: Run Snyk Test
-        run: snyk test --all-projects
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      - name: Authenticate
+        run: snyk auth ${{ secrets.SNYK_TOKEN }}
 
-      - name: Monitor Project in Snyk
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+      - name: Test
+        run: snyk test --all-projects
+
+      - name: Monitor
         run: snyk monitor --all-projects
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
