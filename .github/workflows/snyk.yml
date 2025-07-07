@@ -53,10 +53,14 @@ jobs:
           restore-keys: ${{ runner.os }}-nuget-
 
       - name: Restore dependencies
-        run: dotnet restore --no-cache
+        run: |
+          cd Definition
+          dotnet restore --use-lock-file --locked-mode false
 
       - name: Run Snyk Test
-        run: snyk test --all-projects --skip-unresolved
+        run: |
+          cd Definition
+          snyk test --file=Community.PowerToys.Run.Plugin.Definition.csproj --skip-unresolved
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           # Performance optimization
@@ -64,7 +68,9 @@ jobs:
 
       - name: Monitor Project in Snyk
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        run: snyk monitor --all-projects --skip-unresolved
+        run: |
+          cd Definition
+          snyk monitor --file=Community.PowerToys.Run.Plugin.Definition.csproj --skip-unresolved
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           # Performance optimization
