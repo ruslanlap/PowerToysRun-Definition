@@ -18,10 +18,7 @@
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
     <img src="https://img.shields.io/github/v/release/ruslanlap/PowerToysRun-Definition?label=latest" alt="Latest Release">
   </a>
-  <img src="https://img.shields.io/maintenance/yes/2025" alt="Maintenance">
-  <img src="https://img.shields.io/badge/C%23-.NET-512BD4" alt="C# .NET">
   <img src="https://img.shields.io/badge/version-v1.0.1-brightgreen" alt="Version">
-  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome">
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/stargazers">
     <img src="https://img.shields.io/github/stars/ruslanlap/PowerToysRun-Definition" alt="GitHub stars">
   </a>
@@ -29,23 +26,17 @@
     <img src="https://img.shields.io/github/issues/ruslanlap/PowerToysRun-Definition" alt="GitHub issues">
   </a>
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
-    <img src="https://img.shields.io/github/downloads/ruslanlap/PowerToysRun-Definition/total" alt="GitHub all releases">
+    <img src="https://img.shields.io/github/downloads/ruslanlap/PowerToysRun-Definition/total?style=for-the-badge&logo=github" alt="GitHub all releases" width="180" height="30">
   </a>
-  <img src="https://img.shields.io/badge/Made%20with-❤️-red" alt="Made with Love">
-  <img src="https://img.shields.io/badge/Awesome-Yes-orange" alt="Awesome">
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
     <img src="https://img.shields.io/github/v/release/ruslanlap/PowerToysRun-Definition?style=for-the-badge" alt="Latest Release">
   </a>
-  <img src="https://img.shields.io/badge/PowerToys-Compatible-blue" alt="PowerToys Compatible">
-  <img src="https://img.shields.io/badge/platform-Windows-lightgrey" alt="Platform">
   <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
+      <img src="https://img.shields.io/badge/Made%20with-❤️-red" alt="Made with Love">
+  <img src="https://img.shields.io/badge/Awesome-Yes-orange" alt="Awesome">
           <a href="https://github.com/hlaueriksson/awesome-powertoys-run-plugins">
     <img src="https://awesome.re/mentioned-badge.svg" alt="Mentioned in Awesome PowerToys Run Plugins">
-  </a>
-  <a href="https://security.snyk.io/package/npm/snyk">
-    <img src="https://img.shields.io/snyk/vulnerabilities/github/ruslanlap/PowerToysRun-Definition?label=SNYK%20Passed&style=flat-square&logo=snyk" alt="Snyk Passed">
-  </a>
   </a>
 
 
