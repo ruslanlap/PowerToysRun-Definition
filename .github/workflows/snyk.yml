@@ -1,94 +1,42 @@
 name: snyk
+
 on:
   push:
     branches: [ master ]
   pull_request:
     branches: [ master ]
 
-# Optimize concurrency - cancel running jobs on new pushes
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   security:
-    runs-on: ubuntu-latest  # Ubuntu is faster and cheaper than Windows
-    
+    runs-on: windows-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          # Shallow clone for faster checkout
-          fetch-depth: 1
-      
+
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
-          # Cache NuGet packages
-          cache: true
-      
+
+      - name: Restore dependencies
+        run: dotnet restore
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          # Cache npm dependencies
-          cache: 'npm'
-      
-      # Cache Snyk CLI installation
-      - name: Cache Snyk CLI
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: snyk-cli-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            snyk-cli-${{ runner.os }}-
-      
+
       - name: Install Snyk CLI
-        run: |
-          # Check if Snyk is already installed and cached
-          if ! command -v snyk &> /dev/null; then
-            npm install -g snyk
-          fi
-      
+        run: npm install -g snyk
+
       - name: Authenticate Snyk CLI
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        run: echo "Snyk token configured via environment variable"
-      
-      # Cache .NET dependencies
-      - name: Cache .NET packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.fsproj', '**/*.vbproj') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
-      
-      - name: Restore dependencies
-        run: |
-          # Restore dependencies and generate lock file
-          dotnet restore --use-lock-file --locked-mode false
-      
-      # Run tests in parallel and with optimized settings
+        run: snyk auth $SNYK_TOKEN
+
       - name: Run Snyk Test
-        run: |
-          # Navigate to project directory and run Snyk test
-          cd Definition
-          snyk test --file=Community.PowerToys.Run.Plugin.Definition.csproj --skip-unresolved
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          # Optimize Snyk performance
-          SNYK_CFG_DISABLESUGGESTIONS: true
-          SNYK_DISABLE_ANALYTICS: true
-      
-      # Only monitor on master branch pushes (not PRs)
+        run: snyk test --all-projects
+
       - name: Monitor Project in Snyk
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        run: |
-          cd Definition
-          snyk monitor --file=Community.PowerToys.Run.Plugin.Definition.csproj --skip-unresolved
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          SNYK_CFG_DISABLESUGGESTIONS: true
-          SNYK_DISABLE_ANALYTICS: true
+        run: snyk monitor --all-projects
