@@ -6,72 +6,37 @@ on:
   pull_request:
     branches: [ master ]
 
-# Cancel previous runs on new commits
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   security:
-    runs-on: ubuntu-latest  # Ubuntu is faster for Node.js
+    runs-on: windows-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1  # Shallow clone for speed
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
-          cache: true  # Cache NuGet packages
+
+      - name: Restore dependencies
+        run: dotnet restore
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'  # Cache npm
-
-      - name: Cache Snyk CLI
-        id: cache-snyk
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: snyk-cli-${{ runner.os }}-v1
-          restore-keys: snyk-cli-${{ runner.os }}-
 
       - name: Install Snyk CLI
-        if: steps.cache-snyk.outputs.cache-hit != 'true'
         run: npm install -g snyk
 
-      - name: Cache .NET packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
-          restore-keys: ${{ runner.os }}-nuget-
-
-      - name: Restore dependencies
-        run: |
-          cd Definition
-          dotnet restore --use-lock-file --locked-mode false
-
       - name: Run Snyk Test
-        run: |
-          cd Definition
-          snyk test --file=Community.PowerToys.Run.Plugin.Definition.csproj --skip-unresolved
+        run: snyk test --all-projects
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          # Performance optimization
-          SNYK_CFG_DISABLESUGGESTIONS: true
 
       - name: Monitor Project in Snyk
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        run: |
-          cd Definition
-          snyk monitor --file=Community.PowerToys.Run.Plugin.Definition.csproj --skip-unresolved
+        run: snyk monitor --all-projects
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          # Performance optimization
-          SNYK_CFG_DISABLESUGGESTIONS: true
