@@ -25,10 +25,6 @@
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/issues">
     <img src="https://img.shields.io/github/issues/ruslanlap/PowerToysRun-Definition" alt="GitHub issues">
   </a>
-
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
-    <img src="https://img.shields.io/github/v/release/ruslanlap/PowerToysRun-Definition?style=for-the-badge" alt="Latest Release">
-  </a>
   <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
       <img src="https://img.shields.io/badge/Made%20with-❤️-red" alt="Made with Love">
