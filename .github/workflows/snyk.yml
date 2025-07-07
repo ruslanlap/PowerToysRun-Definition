@@ -66,13 +66,16 @@ jobs:
             ${{ runner.os }}-nuget-
       
       - name: Restore dependencies
-        run: dotnet restore --no-cache
+        run: |
+          # Restore dependencies and generate lock file
+          dotnet restore --use-lock-file --locked-mode false
       
       # Run tests in parallel and with optimized settings
       - name: Run Snyk Test
         run: |
-          # Use parallel processing and skip dev dependencies for faster scanning
-          snyk test --all-projects --skip-unresolved --parallel
+          # Navigate to project directory and run Snyk test
+          cd Definition
+          snyk test --file=Community.PowerToys.Run.Plugin.Definition.csproj --skip-unresolved
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           # Optimize Snyk performance
@@ -82,7 +85,9 @@ jobs:
       # Only monitor on master branch pushes (not PRs)
       - name: Monitor Project in Snyk
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        run: snyk monitor --all-projects --skip-unresolved
+        run: |
+          cd Definition
+          snyk monitor --file=Community.PowerToys.Run.Plugin.Definition.csproj --skip-unresolved
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_CFG_DISABLESUGGESTIONS: true
