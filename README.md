@@ -49,9 +49,6 @@
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.0.1/Definition-1.0.1-ARM64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-ARM64-blue?style=for-the-badge&logo=github" alt="Download ARM64">
   </a>
-  <a href="#-building-from-source">
-    <img src="https://img.shields.io/badge/🔨_BUILD-From%20Source-green?style=for-the-badge&logo=visualstudio" alt="Build from Source">
-  </a>
 </div>
 
 ## 📋 Table of Contents
