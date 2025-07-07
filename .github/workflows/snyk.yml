@@ -2,9 +2,9 @@ name: snyk
 
 on:
   push:
-    branches: [ masters ]
+    branches: [ master ]
   pull_request:
-    branches: [ masters ]
+    branches: [ master ]
 
 jobs:
   security:
