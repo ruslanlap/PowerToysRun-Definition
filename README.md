@@ -43,6 +43,9 @@
           <a href="https://github.com/hlaueriksson/awesome-powertoys-run-plugins">
     <img src="https://awesome.re/mentioned-badge.svg" alt="Mentioned in Awesome PowerToys Run Plugins">
   </a>
+  <a href="https://security.snyk.io/package/npm/snyk">
+    <img src="https://img.shields.io/snyk/vulnerabilities/github/ruslanlap/PowerToysRun-Definition?label=SNYK%20Passed&style=flat-square&logo=snyk" alt="Snyk Passed">
+  </a>
   </a>
 
 
