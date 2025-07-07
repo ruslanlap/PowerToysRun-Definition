@@ -12,6 +12,9 @@
 
 <div align="center">
   <!-- Badges -->
+    <a href="https://github.com/hlaueriksson/awesome-powertoys-run-plugins">
+    <img src="https://awesome.re/mentioned-badge.svg" alt="Mentioned in Awesome PowerToys Run Plugins">
+  </a>
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/actions/workflows/build-and-release.yml">
     <img src="https://github.com/ruslanlap/PowerToysRun-Definition/actions/workflows/build-and-release.yml/badge.svg" alt="Build Status">
   </a>
@@ -41,6 +44,8 @@
   <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
   </a>
+
+
 </div>
 
 <div align="center">
