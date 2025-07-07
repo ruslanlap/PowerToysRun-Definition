@@ -25,9 +25,7 @@
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/issues">
     <img src="https://img.shields.io/github/issues/ruslanlap/PowerToysRun-Definition" alt="GitHub issues">
   </a>
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
-    <img src="https://img.shields.io/github/downloads/ruslanlap/PowerToysRun-Definition/total?style=for-the-badge&logo=github" alt="GitHub all releases">
-  </a>
+
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
     <img src="https://img.shields.io/github/v/release/ruslanlap/PowerToysRun-Definition?style=for-the-badge" alt="Latest Release">
   </a>
@@ -48,6 +46,9 @@
   </a>
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.0.1/Definition-1.0.1-ARM64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-ARM64-blue?style=for-the-badge&logo=github" alt="Download ARM64">
+  </a>
+    <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
+    <img src="https://img.shields.io/github/downloads/ruslanlap/PowerToysRun-Definition/total?style=for-the-badge&logo=github" alt="GitHub all releases">
   </a>
 </div>
 
