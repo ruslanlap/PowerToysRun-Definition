@@ -26,11 +26,6 @@ namespace Community.PowerToys.Run.Plugin.Definition
         public string Name => "Definition";
         public string Description => "Lookup word definitions, phonetics, synonyms, antonyms, and examples.";
 
-        private const string ApiEndpoint = "https://api.dictionaryapi.dev/api/v2/entries/en/";
-        private const int CacheMaxSize = 100;
-        private const int HttpTimeoutSeconds = 10;
-        private const int TextTruncateLength = 30;
-
         // UI strings
         private const string EmptyQueryMessage = "Type a word to look up...";
         private const string SearchingMessage = "Looking up...";
@@ -47,11 +42,11 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
         private static readonly Lazy<HttpClient> HttpClientLazy = new(() => new HttpClient
         {
-            Timeout = TimeSpan.FromSeconds(HttpTimeoutSeconds)
+            Timeout = TimeSpan.FromSeconds(ConfigurationManager.Configuration.HttpTimeoutSeconds)
         });
         private static HttpClient HttpClient => HttpClientLazy.Value;
 
-        private readonly ConcurrentDictionary<string, CacheItem> _cache = new();
+        private readonly LRUCache _cache = new(ConfigurationManager.Configuration.CacheMaxSize);
         private readonly AudioManager _audioManager;
         private CancellationTokenSource _cancellationTokenSource;
         #endregion
@@ -120,7 +115,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
         private bool TryGetCachedResults(string searchTerm, string rawSearch, out List<Result> results)
         {
-            if (_cache.TryGetValue(searchTerm, out var cacheItem) && !cacheItem.IsExpired)
+            if (_cache.TryGetValue(searchTerm, out var cacheItem))
             {
                 results = cacheItem.Results.Select(r => r.Clone(rawSearch)).ToList();
                 return true;
@@ -134,7 +129,8 @@ namespace Community.PowerToys.Run.Plugin.Definition
         {
             try
             {
-                var task = FetchAndProcessResultsAsync(searchTerm, rawSearch, _cancellationTokenSource.Token);
+                // Use Task.Run to avoid blocking the UI thread
+                var task = Task.Run(async () => await FetchAndProcessResultsAsync(searchTerm, rawSearch, _cancellationTokenSource.Token));
                 var results = task.ConfigureAwait(false).GetAwaiter().GetResult();
 
                 CacheResults(searchTerm, results);
@@ -168,14 +164,8 @@ namespace Community.PowerToys.Run.Plugin.Definition
         {
             if (results.Any() && results.First().ContextData is ResultContext)
             {
-                // Implement LRU cache behavior
-                if (_cache.Count >= CacheMaxSize)
-                {
-                    var oldestKey = _cache.OrderBy(kvp => kvp.Value.Timestamp).First().Key;
-                    _cache.TryRemove(oldestKey, out _);
-                }
-
-                _cache[searchTerm] = new CacheItem(results, DateTime.UtcNow);
+                var cacheItem = new CacheItem(results, DateTime.UtcNow, searchTerm);
+                _cache.Set(searchTerm, cacheItem);
             }
         }
         #endregion
@@ -183,27 +173,36 @@ namespace Community.PowerToys.Run.Plugin.Definition
         #region API Communication
         private async Task<List<Result>> FetchAndProcessResultsAsync(string searchTerm, string rawSearch, CancellationToken cancellationToken)
         {
-            var requestUrl = $"{ApiEndpoint}{Uri.EscapeDataString(searchTerm)}";
-
-            using var response = await HttpClient.GetAsync(requestUrl, cancellationToken);
-
-            if (response.StatusCode == HttpStatusCode.NotFound)
+            return await RetryHelper.RetryAsync(async () =>
             {
-                return new List<Result> { CreateInfoResult(rawSearch, $"No definitions found for '{searchTerm}'", "Check spelling or try another word.") };
-            }
+                var requestUrl = $"{ConfigurationManager.Configuration.ApiEndpoint}{Uri.EscapeDataString(searchTerm)}";
 
-            response.EnsureSuccessStatusCode();
+                using var response = await HttpClient.GetAsync(requestUrl, cancellationToken);
 
-            await using var jsonStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var entries = await JsonSerializer.DeserializeAsync<List<DictionaryEntry>>(jsonStream, options, cancellationToken);
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return new List<Result> { CreateInfoResult(rawSearch, $"No definitions found for '{searchTerm}'", "Check spelling or try another word.") };
+                }
 
-            if (entries?.Any() != true)
-            {
-                return new List<Result> { CreateInfoResult(rawSearch, $"No definitions found for '{searchTerm}'", "API returned empty results.") };
-            }
+                // Store status code for retry logic
+                if (!response.IsSuccessStatusCode)
+                {
+                    var httpEx = new HttpRequestException($"HTTP {(int)response.StatusCode} {response.StatusCode}");
+                    httpEx.Data["StatusCode"] = response.StatusCode;
+                    throw httpEx;
+                }
 
-            return ProcessDictionaryEntries(entries, rawSearch);
+                await using var jsonStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var entries = await JsonSerializer.DeserializeAsync<List<DictionaryEntry>>(jsonStream, options, cancellationToken);
+
+                if (entries?.Any() != true)
+                {
+                    return new List<Result> { CreateInfoResult(rawSearch, $"No definitions found for '{searchTerm}'", "API returned empty results.") };
+                }
+
+                return ProcessDictionaryEntries(entries, rawSearch);
+            }, cancellationToken, 3, $"Dictionary lookup for '{searchTerm}'");
         }
 
         private List<Result> ProcessDictionaryEntries(List<DictionaryEntry> entries, string rawSearch)
