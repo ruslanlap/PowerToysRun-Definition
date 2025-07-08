@@ -35,7 +35,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"[Definition Plugin] Clipboard Error: {ex}");
+                        LogHelper.WriteError($"Clipboard Error: {ex}");
                         return false;
                     }
                 }, CancellationToken.None, TaskCreationOptions.None, _staTaskScheduler);
@@ -44,7 +44,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[Definition Plugin] Clipboard Task Error: {ex}");
+                LogHelper.WriteError($"Clipboard Task Error: {ex}");
                 return false;
             }
         }

@@ -11,13 +11,13 @@ namespace Community.PowerToys.Run.Plugin.Definition
             {
                 if (!Uri.IsWellFormedUriString(url, UriKind.Absolute)) return false;
 
-                Debug.WriteLine($"[Definition Plugin] Opening URL: {url}");
+                LogHelper.WriteLog($"Opening URL: {url}");
                 Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
                 return true;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[Definition Plugin] OpenUrl Error for {url}: {ex}");
+                LogHelper.WriteError($"OpenUrl Error for {url}: {ex}");
                 return false;
             }
         }

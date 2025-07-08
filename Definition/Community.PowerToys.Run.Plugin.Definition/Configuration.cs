@@ -49,18 +49,18 @@ namespace Community.PowerToys.Run.Plugin.Definition
                         WriteIndented = true
                     };
                     _configuration = JsonSerializer.Deserialize<PluginConfiguration>(jsonContent, options);
-                    Debug.WriteLine($"[Definition Plugin] Configuration loaded from {ConfigFilePath}");
+                    LogHelper.WriteLog($"Configuration loaded from {ConfigFilePath}");
                 }
                 else
                 {
                     _configuration = new PluginConfiguration();
                     SaveConfiguration();
-                    Debug.WriteLine($"[Definition Plugin] Default configuration created at {ConfigFilePath}");
+                    LogHelper.WriteLog($"Default configuration created at {ConfigFilePath}");
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[Definition Plugin] Error loading configuration: {ex.Message}");
+                LogHelper.WriteError($"Error loading configuration: {ex.Message}");
                 _configuration = new PluginConfiguration();
             }
         }
@@ -76,11 +76,11 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 };
                 var jsonContent = JsonSerializer.Serialize(_configuration, options);
                 File.WriteAllText(ConfigFilePath, jsonContent);
-                Debug.WriteLine($"[Definition Plugin] Configuration saved to {ConfigFilePath}");
+                LogHelper.WriteLog($"Configuration saved to {ConfigFilePath}");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[Definition Plugin] Error saving configuration: {ex.Message}");
+                LogHelper.WriteError($"Error saving configuration: {ex.Message}");
             }
         }
 

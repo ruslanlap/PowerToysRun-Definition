@@ -66,7 +66,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"[Definition Plugin] Audio menu action error: {ex}");
+                        LogHelper.WriteError($"Audio menu action error: {ex}");
                         return false;
                     }
                 }
@@ -114,7 +114,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
                         }
                         catch (Exception ex)
                         {
-                            Debug.WriteLine($"[Definition Plugin] Define word menu action error: {ex}");
+                            LogHelper.WriteError($"Define word menu action error: {ex}");
                             return false;
                         }
                     }

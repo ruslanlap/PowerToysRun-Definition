@@ -32,10 +32,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 {
                     var delay = attempt < RetryDelays.Length ? RetryDelays[attempt] : TimeSpan.FromSeconds(5);
                     
-                    if (ConfigurationManager.Configuration.EnableVerboseLogging)
-                    {
-                        Debug.WriteLine($"[Definition Plugin] {operationName} failed (attempt {attempt + 1}/{maxRetries}): {ex.Message}. Retrying in {delay.TotalSeconds}s...");
-                    }
+                    LogHelper.WriteLog($"{operationName} failed (attempt {attempt + 1}/{maxRetries}): {ex.Message}. Retrying in {delay.TotalSeconds}s...");
 
                     await Task.Delay(delay, cancellationToken);
                 }
