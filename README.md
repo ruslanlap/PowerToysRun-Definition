@@ -55,6 +55,7 @@
 - [🎬 Demo](#-demo)
 - [🚀 Installation](#-installation)
 - [🔧 Usage](#-usage)
+- [⚙️ Configuration](#️-configuration)
 - [📁 Data Storage](#-data-storage)
 - [🛠️ Building from Source](#️-building-from-source)
 - [📊 Project Structure](#-project-structure)
@@ -82,12 +83,14 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 - 🔊 **Pronunciation Audio**: Play phonetic audio directly from your results.
 - 📚 **Phonetics & Synonyms**: View phonetic spelling, synonyms, and antonyms.
 - 📝 **Usage Examples**: See real-world examples of how words are used.
+- ⚙️ **Fully Configurable**: JSON-based configuration with 11+ customizable settings.
 - ⏱️ **Delayed Execution**: Shows loading indicator before fetching results.
-- 💾 **Caching**: In-memory cache for repeat lookups (up to 100 entries) to improve performance.
+- 💾 **Smart Caching**: In-memory cache for repeat lookups with configurable size and expiration.
+- 🔄 **Robust Network Handling**: Exponential backoff retry logic for reliable API calls.
 - 🌓 **Theme Awareness**: Automatically switches icons for light/dark mode.
-- 📋 **Context Menu**: Copy definitions, play pronunciation, open source URL, or search for related words via right-click or keyboard shortcuts.
+- 📋 **Rich Context Menu**: Copy definitions, play pronunciation, open source URL, or search for related words.
 - 🔄 **Cancellable Requests**: Automatically cancels previous requests when typing new queries.
-- 🌐 **Wiktionary Integration**: Open any word in Wiktionary (https://en.wiktionary.org/wiki/{word}) for additional information and translations.
+- 🌐 **Wiktionary Integration**: Open any word in Wiktionary for additional information and translations.
 
 ## 🎬 Demo
 
@@ -143,6 +146,42 @@ To verify the plugin is correctly installed:
    - Play pronunciation audio
    - Open the word in Wiktionary
    - Search for related words
+
+## ⚙️ Configuration
+
+The plugin supports extensive customization through a `config.json` file that's automatically created in the plugin directory. Changes take effect immediately without requiring a restart.
+
+### Available Settings
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `CacheMaxSize` | 100 | Maximum number of cached word lookups |
+| `HttpTimeoutSeconds` | 10 | Timeout for API requests in seconds |
+| `CacheExpirationMinutes` | 30 | How long to keep cache entries |
+| `EnableAudioPlayback` | true | Enable/disable pronunciation audio |
+| `EnableClipboardOperations` | true | Enable/disable copy to clipboard |
+| `TextTruncateLength` | 30 | Maximum text length in context menu |
+| `EnableVerboseLogging` | false | Enable detailed debug logging |
+| `ApiEndpoint` | dictionaryapi.dev | Dictionary API endpoint |
+| `MaxResultsPerMeaning` | 3 | Maximum definitions per word meaning |
+| `ShowExamplesInResults` | true | Show usage examples |
+| `ShowSynonymsInResults` | true | Show synonyms |
+| `ShowAntonymsInResults` | true | Show antonyms |
+
+### Example Configuration
+
+```json
+{
+  "CacheMaxSize": 200,
+  "HttpTimeoutSeconds": 15,
+  "EnableAudioPlayback": true,
+  "ShowSynonymsInResults": false,
+  "ShowAntonymsInResults": false,
+  "ShowExamplesInResults": true,
+  "MaxResultsPerMeaning": 2,
+  "EnableVerboseLogging": true
+}
+```
 
 ## 📁 Data Storage
 
@@ -315,22 +354,30 @@ If you find this plugin useful and would like to support its development, you ca
 
 [![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-☕️-FFDD00?style=for-the-badge&logo=buy-me-a-coffee)](https://ruslanlap.github.io/ruslanlap_buymeacoffe/)
 
-## 🆕 What's New (v1.0.1)
+## 🆕 What's New (v1.2.1)
 
-- 🐞 **Fixed CS0246 error** — Added `using ManagedCommon;` for proper Theme type resolution
-- 🪄 **Fixed PowerToys Run window behavior** — Window now stays open when playing pronunciation audio
-- 🏗️ **Major code refactoring** — Separated utility classes into individual files for better maintainability:
-  - `IconManager.cs` — Theme-aware icon management
-  - `AudioManager.cs` — Audio playback functionality  
-  - `ClipboardHelper.cs` — Clipboard operations
-  - `UrlHelper.cs` — URL handling utilities
-  - `TextHelper.cs` — Text processing utilities
-  - `ResultProcessor.cs` — Dictionary result processing
-  - `ContextMenuBuilder.cs` — Context menu creation
-  - `Models.cs` — Data models and extensions
-- 📦 **Reduced Main.cs complexity** — Cleaner, more focused main plugin class
-- 🧩 **Better separation of concerns** — Each component has a single responsibility
-- 🔧 **PTRUN Compliance improvements** — Fixed naming conventions and packaging issues
+- ⚙️ **Fully Configurable Settings** — JSON-based configuration system with runtime updates:
+  - `config.json` with 11 customizable settings
+  - Toggle synonyms, antonyms, examples display
+  - Configure cache size, timeouts, and result limits
+  - Enable/disable audio playback and clipboard operations
+  - Settings reload automatically without restart
+- 🔄 **Robust Network Retry Logic** — Enhanced reliability for API calls:
+  - Exponential backoff with smart retry conditions
+  - Handles transient network errors gracefully
+  - Configurable retry attempts and delays
+- 🛠️ **Improved Clipboard Operations** — Better threading and reliability:
+  - Custom STA task scheduler for thread safety
+  - Enhanced error handling and timeout protection
+  - Configurable clipboard operations enable/disable
+- 🔧 **Configuration Bug Fix** — Settings now actually work:
+  - Fixed issue where config.json changes were ignored
+  - All configuration options now properly respected
+  - Dynamic reloading ensures immediate effect
+- 📊 **Enhanced Debugging** — Better troubleshooting capabilities:
+  - Verbose logging option for detailed diagnostics
+  - Improved error reporting throughout the plugin
+  - Better network error categorization
 
 ---
 
