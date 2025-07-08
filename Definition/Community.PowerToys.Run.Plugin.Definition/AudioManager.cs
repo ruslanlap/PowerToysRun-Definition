@@ -29,7 +29,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
         public bool PlayAudio(string url)
         {
-            if (_disposed || string.IsNullOrWhiteSpace(url)) return false;
+            if (!ConfigurationManager.Configuration.EnableAudioPlayback || _disposed || string.IsNullOrWhiteSpace(url)) return false;
 
             try
             {

@@ -22,7 +22,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
         public static bool CopyToClipboard(string text)
         {
-            if (string.IsNullOrEmpty(text)) return false;
+            if (!ConfigurationManager.Configuration.EnableClipboardOperations || string.IsNullOrEmpty(text)) return false;
 
             try
             {

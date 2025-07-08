@@ -28,8 +28,17 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 var titleWithPOS = $"{titlePrefix} ({partOfSpeech})";
 
                 results.AddRange(ProcessDefinitions(meaning, titleWithPOS, phoneticInfo.AudioUrl, sourceUrl, entry.Word, rawSearch));
-                results.AddRange(ProcessSynonyms(meaning, partOfSpeech, sourceUrl, entry.Word, rawSearch));
-                results.AddRange(ProcessAntonyms(meaning, partOfSpeech, sourceUrl, entry.Word, rawSearch));
+                
+                // Only add synonyms/antonyms if enabled in configuration
+                if (ConfigurationManager.Configuration.ShowSynonymsInResults)
+                {
+                    results.AddRange(ProcessSynonyms(meaning, partOfSpeech, sourceUrl, entry.Word, rawSearch));
+                }
+                
+                if (ConfigurationManager.Configuration.ShowAntonymsInResults)
+                {
+                    results.AddRange(ProcessAntonyms(meaning, partOfSpeech, sourceUrl, entry.Word, rawSearch));
+                }
             }
 
             return results.Any() 
@@ -56,7 +65,9 @@ namespace Community.PowerToys.Run.Plugin.Definition
         private List<Result> ProcessDefinitions(Meaning meaning, string titleWithPOS, string audioUrl, string sourceUrl, string word, string rawSearch)
         {
             var results = new List<Result>();
-            var definitions = meaning.Definitions?.Where(d => d != null && !string.IsNullOrWhiteSpace(d.Definition)) ?? Enumerable.Empty<DefinitionItem>();
+            var definitions = meaning.Definitions?
+                .Where(d => d != null && !string.IsNullOrWhiteSpace(d.Definition))
+                .Take(ConfigurationManager.Configuration.MaxResultsPerMeaning) ?? Enumerable.Empty<DefinitionItem>();
 
             foreach (var definition in definitions)
             {
@@ -70,7 +81,8 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
                 results.Add(CreateResult(rawSearch, _iconManager.DefinitionIcon, titleWithPOS, definition.Definition, contextData, 100));
 
-                if (!string.IsNullOrWhiteSpace(definition.Example))
+                // Only add examples if enabled in configuration
+                if (ConfigurationManager.Configuration.ShowExamplesInResults && !string.IsNullOrWhiteSpace(definition.Example))
                 {
                     var exampleContext = new ResultContext 
                     { 

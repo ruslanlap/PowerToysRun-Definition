@@ -33,7 +33,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
         private void AddCopyMenuItem(List<ContextMenuResult> menuItems, ResultContext context)
         {
-            if (string.IsNullOrWhiteSpace(context.TextToCopy)) return;
+            if (!ConfigurationManager.Configuration.EnableClipboardOperations || string.IsNullOrWhiteSpace(context.TextToCopy)) return;
 
             menuItems.Add(new ContextMenuResult
             {
@@ -49,7 +49,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
         private void AddAudioMenuItem(List<ContextMenuResult> menuItems, ResultContext context)
         {
-            if (!Uri.IsWellFormedUriString(context.AudioUrl, UriKind.Absolute)) return;
+            if (!ConfigurationManager.Configuration.EnableAudioPlayback || !Uri.IsWellFormedUriString(context.AudioUrl, UriKind.Absolute)) return;
 
             menuItems.Add(new ContextMenuResult
             {

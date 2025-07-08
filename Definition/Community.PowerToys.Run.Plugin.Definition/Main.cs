@@ -79,6 +79,9 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
         public List<Result> Query(Query query, bool delayedExecution)
         {
+            // Reload configuration to pick up changes
+            ConfigurationManager.ReloadConfiguration();
+            
             var rawSearch = query.Search ?? string.Empty;
             var searchTerm = rawSearch.Trim().ToLowerInvariant();
 
