@@ -132,7 +132,6 @@ namespace Community.PowerToys.Run.Plugin.Definition
         }
 
         public int Count => _cache.Count;
-        public int Capacity => _capacity;
 
         private void AddToHead(CacheItem item)
         {

@@ -35,7 +35,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
             {
                 if (!Uri.IsWellFormedUriString(url, UriKind.Absolute)) return false;
 
-                LogHelper.WriteLog($"Playing audio from: {url}");
+                Debug.WriteLine($"[Definition Plugin] Playing audio from: {url}");
 
                 lock (_lock)
                 {
@@ -57,7 +57,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
             }
             catch (Exception ex)
             {
-                LogHelper.WriteError($"PlayAudio Error for {url}: {ex}");
+                Debug.WriteLine($"[Definition Plugin] PlayAudio Error for {url}: {ex}");
                 return false;
             }
         }
@@ -75,7 +75,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
             }
             catch (Exception ex)
             {
-                LogHelper.WriteError($"PlayAudioInternal Error: {ex}");
+                Debug.WriteLine($"[Definition Plugin] PlayAudioInternal Error: {ex}");
             }
         }
 
@@ -115,7 +115,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
                         }
                         catch (Exception ex)
                         {
-                            LogHelper.WriteError($"AudioManager Dispose Error: {ex}");
+                            Debug.WriteLine($"[Definition Plugin] AudioManager Dispose Error: {ex}");
                         }
                         finally
                         {

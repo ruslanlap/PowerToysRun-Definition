@@ -35,7 +35,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
             ErrorIcon = GetIconPath($"error.{themePrefix}.png");
             InfoIcon = GetIconPath($"info.{themePrefix}.png");
 
-            LogHelper.WriteLog($"Icons updated for theme: {theme}");
+            Debug.WriteLine($"[Definition Plugin] Icons updated for theme: {theme}");
         }
 
         private string GetIconPath(string filename) => Path.Combine(_pluginDirectory, "Images", filename);

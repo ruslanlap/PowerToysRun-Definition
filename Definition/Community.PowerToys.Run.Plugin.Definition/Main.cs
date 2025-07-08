@@ -40,28 +40,13 @@ namespace Community.PowerToys.Run.Plugin.Definition
         private PluginInitContext _context;
         private bool _disposed;
 
-        private static HttpClient _httpClient;
-        private static HttpClient HttpClient 
+        private static readonly Lazy<HttpClient> HttpClientLazy = new(() => new HttpClient
         {
-            get
-            {
-                if (_httpClient == null)
-                {
-                    _httpClient = new HttpClient
-                    {
-                        Timeout = TimeSpan.FromSeconds(ConfigurationManager.Configuration.HttpTimeoutSeconds)
-                    };
-                }
-                else
-                {
-                    // Update timeout if configuration changed
-                    _httpClient.Timeout = TimeSpan.FromSeconds(ConfigurationManager.Configuration.HttpTimeoutSeconds);
-                }
-                return _httpClient;
-            }
-        }
+            Timeout = TimeSpan.FromSeconds(ConfigurationManager.Configuration.HttpTimeoutSeconds)
+        });
+        private static HttpClient HttpClient => HttpClientLazy.Value;
 
-        private LRUCache _cache;
+        private readonly LRUCache _cache = new(ConfigurationManager.Configuration.CacheMaxSize);
         private readonly AudioManager _audioManager;
         private CancellationTokenSource _cancellationTokenSource;
         #endregion
@@ -80,11 +65,8 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
             _pluginDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             _iconManager.Initialize(_pluginDirectory, _context.API.GetCurrentTheme());
-            
-            // Initialize cache with current configuration
-            _cache = new LRUCache(ConfigurationManager.Configuration.CacheMaxSize);
 
-            LogHelper.WriteLog($"Initialized. Directory: {_pluginDirectory}");
+            Debug.WriteLine($"[Definition Plugin] Initialized. Directory: {_pluginDirectory}");
         }
         #endregion
 
@@ -99,13 +81,6 @@ namespace Community.PowerToys.Run.Plugin.Definition
         {
             // Reload configuration to pick up changes
             ConfigurationManager.ReloadConfiguration();
-            
-            // Update cache size if needed
-            if (_cache != null && _cache.Capacity != ConfigurationManager.Configuration.CacheMaxSize)
-            {
-                _cache = new LRUCache(ConfigurationManager.Configuration.CacheMaxSize);
-                LogHelper.WriteLog($"Cache resized to {ConfigurationManager.Configuration.CacheMaxSize} entries");
-            }
             
             var rawSearch = query.Search ?? string.Empty;
             var searchTerm = rawSearch.Trim().ToLowerInvariant();
@@ -143,7 +118,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
         private bool TryGetCachedResults(string searchTerm, string rawSearch, out List<Result> results)
         {
-            if (_cache?.TryGetValue(searchTerm, out var cacheItem) == true)
+            if (_cache.TryGetValue(searchTerm, out var cacheItem))
             {
                 results = cacheItem.Results.Select(r => r.Clone(rawSearch)).ToList();
                 return true;
@@ -170,7 +145,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
             }
             catch (HttpRequestException ex)
             {
-                LogHelper.WriteError($"HTTP error for '{searchTerm}': {ex.Message}");
+                Debug.WriteLine($"[Definition Plugin] HTTP error for '{searchTerm}': {ex.Message}");
                 var errorMessage = ex.Data.Contains("StatusCode") 
                     ? $"Could not reach dictionary service. ({ex.Data["StatusCode"]})"
                     : "Could not reach dictionary service. Check connection.";
@@ -178,19 +153,19 @@ namespace Community.PowerToys.Run.Plugin.Definition
             }
             catch (JsonException ex)
             {
-                LogHelper.WriteError($"JSON parsing failed for '{searchTerm}': {ex.Message}");
+                Debug.WriteLine($"[Definition Plugin] JSON parsing failed for '{searchTerm}': {ex.Message}");
                 return new List<Result> { CreateErrorResult(rawSearch, ApiErrorTitle, "Failed to parse response from dictionary service.") };
             }
             catch (Exception ex)
             {
-                LogHelper.WriteError($"Unexpected error for '{searchTerm}': {ex}");
+                Debug.WriteLine($"[Definition Plugin] Unexpected error for '{searchTerm}': {ex}");
                 return new List<Result> { CreateErrorResult(rawSearch, UnexpectedErrorTitle, "An unexpected error occurred.") };
             }
         }
 
         private void CacheResults(string searchTerm, List<Result> results)
         {
-            if (_cache != null && results.Any() && results.First().ContextData is ResultContext)
+            if (results.Any() && results.First().ContextData is ResultContext)
             {
                 var cacheItem = new CacheItem(results, DateTime.UtcNow, searchTerm);
                 _cache.Set(searchTerm, cacheItem);
