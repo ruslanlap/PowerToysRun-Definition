@@ -184,10 +184,24 @@ namespace Community.PowerToys.Run.Plugin.Definition
         {
             return await RetryHelper.RetryAsync(async () =>
             {
-                var tasks = _dictionaryProviders.Values.Select(p => p.LookupAsync(searchTerm, cancellationToken)).ToList();
-                var resultsList = await Task.WhenAll(tasks);
+                var allEntries = new List<DictionaryEntry>();
                 
-                var allEntries = resultsList.SelectMany(e => e ?? Enumerable.Empty<DictionaryEntry>()).ToList();
+                // Run providers in parallel but catch individual failures
+                var tasks = _dictionaryProviders.Values.Select(async provider =>
+                {
+                    try
+                    {
+                        return await provider.LookupAsync(searchTerm, cancellationToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[Definition Plugin] Provider {provider.LanguageCode} failed: {ex.Message}");
+                        return new List<DictionaryEntry>();
+                    }
+                }).ToList();
+                
+                var resultsList = await Task.WhenAll(tasks);
+                allEntries = resultsList.SelectMany(e => e ?? Enumerable.Empty<DictionaryEntry>()).ToList();
 
                 if (!allEntries.Any())
                 {
