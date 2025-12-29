@@ -30,13 +30,9 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
             using var response = await _httpClient.GetAsync(requestUrl, token);
 
-            if (!response.IsSuccessStatusCode)
-            {
-                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                    return new List<DictionaryEntry>();
-
-                throw new HttpRequestException($"HTTP {(int)response.StatusCode} {response.StatusCode}");
-            }
+            // Note: sum.in.ua returns 404 for ALL requests, even for existing words
+            // The actual "not found" status is indicated in the HTML content with "не знайдено"
+            // So we should not early-return on 404, but instead parse the HTML to check
 
             var stream = await response.Content.ReadAsStreamAsync(token);
             var doc = new HtmlDocument();
@@ -63,8 +59,6 @@ namespace Community.PowerToys.Run.Plugin.Definition
                     return new List<DictionaryEntry>();
                 }
             }
-
-            if (articleNodes == null) return new List<DictionaryEntry>();
 
             if (articleNodes == null) return new List<DictionaryEntry>();
 
