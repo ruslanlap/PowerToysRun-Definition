@@ -8,6 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Community.PowerToys.Run.Plugin.Dependencies" Version="0.90.0" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
   </ItemGroup>
   <ItemGroup>
     <None Include="plugin.json">

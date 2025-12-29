@@ -20,6 +20,8 @@ namespace Community.PowerToys.Run.Plugin.Definition
         public bool ShowExamplesInResults { get; set; } = true;
         public bool ShowSynonymsInResults { get; set; } = true;
         public bool ShowAntonymsInResults { get; set; } = true;
+        public string Language { get; set; } = "en";
+        public string UkrainianApiEndpoint { get; set; } = "https://sum.in.ua/s/";
     }
 
     internal static class ConfigurationManager

@@ -1,0 +1,101 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using HtmlAgilityPack;
+
+namespace Community.PowerToys.Run.Plugin.Definition
+{
+    internal class UkrainianDictionaryProvider : IDictionaryProvider
+    {
+        private readonly HttpClient _httpClient;
+        public string LanguageCode => "uk";
+        public string DisplayName => "Українська (sum.in.ua)";
+
+        public UkrainianDictionaryProvider(HttpClient httpClient)
+        {
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        }
+
+        public async Task<List<DictionaryEntry>> LookupAsync(string word, CancellationToken token)
+        {
+            var requestUrl = $"{ConfigurationManager.Configuration.UkrainianApiEndpoint}{Uri.EscapeDataString(word)}";
+
+            using var response = await _httpClient.GetAsync(requestUrl, token);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    return new List<DictionaryEntry>();
+
+                throw new HttpRequestException($"HTTP {(int)response.StatusCode} {response.StatusCode}");
+            }
+
+            var html = await response.Content.ReadAsStringAsync(token);
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+
+            // sum.in.ua structure: definitions are inside div with id="article"
+            // There might be multiple articles if multiple meanings exist (rare on sum.in.ua as they usually have separate pages or distinct blocks)
+            var articleNodes = doc.DocumentNode.SelectNodes("//div[@id='article']");
+            if (articleNodes == null || articleNodes.Count == 0)
+            {
+                // Fallback: check if it's a "word not found" page with suggestions
+                if (html.Contains("не знайдено") || html.Contains("Можливо, ви шукали"))
+                {
+                    return new List<DictionaryEntry>();
+                }
+                
+                // Another fallback: sometimes it's just in specific headers
+                articleNodes = doc.DocumentNode.SelectNodes("//div[@itemprop='articleBody']");
+            }
+
+            if (articleNodes == null) return new List<DictionaryEntry>();
+
+            var entries = new List<DictionaryEntry>();
+            foreach (var node in articleNodes)
+            {
+                var entry = new DictionaryEntry
+                {
+                    Word = word,
+                    SourceUrls = new List<string> { requestUrl }
+                };
+
+                // Extracting text and cleaning it up
+                // sum.in.ua often uses <em> for grammar, <b> for word
+                var cleanText = node.InnerText.Trim();
+                
+                // Simple parsing for sum.in.ua:
+                // Usually starts with WORD, grammar info, then definition.
+                // We'll put the whole text as one definition for now, 
+                // but ideally we split by numbered meanings if they exist (1., 2., ...)
+                
+                var meaning = new Meaning
+                {
+                    PartOfSpeech = ExtractPartOfSpeech(cleanText),
+                    Definitions = new List<DefinitionItem> 
+                    { 
+                        new DefinitionItem { Definition = cleanText } 
+                    }
+                };
+                
+                entry.Meanings.Add(meaning);
+                entries.Add(entry);
+            }
+
+            return entries;
+        }
+
+        private string ExtractPartOfSpeech(string text)
+        {
+            if (text.Contains("іменник")) return "noun";
+            if (text.Contains("дієслово")) return "verb";
+            if (text.Contains("прикметник")) return "adjective";
+            if (text.Contains("прислівник")) return "adverb";
+            if (text.Contains("чол.") || text.Contains("жін.") || text.Contains("сер.")) return "noun";
+            return "unknown";
+        }
+    }
+}

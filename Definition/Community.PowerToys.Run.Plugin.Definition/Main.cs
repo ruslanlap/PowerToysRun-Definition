@@ -49,6 +49,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
         private readonly LRUCache _cache = new(ConfigurationManager.Configuration.CacheMaxSize);
         private readonly AudioManager _audioManager;
         private CancellationTokenSource _cancellationTokenSource;
+        private readonly Dictionary<string, IDictionaryProvider> _dictionaryProviders;
         #endregion
 
         #region Initialization
@@ -56,6 +57,11 @@ namespace Community.PowerToys.Run.Plugin.Definition
         {
             _iconManager = new IconManager();
             _audioManager = new AudioManager();
+            _dictionaryProviders = new Dictionary<string, IDictionaryProvider>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "en", new EnglishDictionaryProvider(HttpClient) },
+                { "uk", new UkrainianDictionaryProvider(HttpClient) }
+            };
         }
 
         public void Init(PluginInitContext context)
@@ -178,34 +184,45 @@ namespace Community.PowerToys.Run.Plugin.Definition
         {
             return await RetryHelper.RetryAsync(async () =>
             {
-                var requestUrl = $"{ConfigurationManager.Configuration.ApiEndpoint}{Uri.EscapeDataString(searchTerm)}";
+                var tasks = _dictionaryProviders.Values.Select(p => p.LookupAsync(searchTerm, cancellationToken)).ToList();
+                var resultsList = await Task.WhenAll(tasks);
+                
+                var allEntries = resultsList.SelectMany(e => e ?? Enumerable.Empty<DictionaryEntry>()).ToList();
 
-                using var response = await HttpClient.GetAsync(requestUrl, cancellationToken);
-
-                if (response.StatusCode == HttpStatusCode.NotFound)
+                if (!allEntries.Any())
                 {
                     return new List<Result> { CreateInfoResult(rawSearch, $"No definitions found for '{searchTerm}'", "Check spelling or try another word.") };
                 }
 
-                // Store status code for retry logic
-                if (!response.IsSuccessStatusCode)
+                var results = ProcessDictionaryEntries(allEntries, rawSearch);
+                
+                // Adjust scores based on script detection
+                bool isCyrillic = searchTerm.Any(c => (c >= 0x0400 && c <= 0x04FF));
+                foreach (var result in results)
                 {
-                    var httpEx = new HttpRequestException($"HTTP {(int)response.StatusCode} {response.StatusCode}");
-                    httpEx.Data["StatusCode"] = response.StatusCode;
-                    throw httpEx;
+                    if (result.ContextData is ResultContext context)
+                    {
+                        // Identify provider by language (assuming simple mapping for now)
+                        bool isUkResult = result.SubTitle != null && (result.SubTitle.Any(c => (c >= 0x0400 && c <= 0x04FF)));
+                        
+                        if (isCyrillic && isUkResult) result.Score += 10;
+                        if (!isCyrillic && !isUkResult) result.Score += 10;
+                    }
                 }
 
-                await using var jsonStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                var entries = await JsonSerializer.DeserializeAsync<List<DictionaryEntry>>(jsonStream, options, cancellationToken);
-
-                if (entries?.Any() != true)
-                {
-                    return new List<Result> { CreateInfoResult(rawSearch, $"No definitions found for '{searchTerm}'", "API returned empty results.") };
-                }
-
-                return ProcessDictionaryEntries(entries, rawSearch);
+                return results.OrderByDescending(r => r.Score).ToList();
             }, cancellationToken, 3, $"Dictionary lookup for '{searchTerm}'");
+        }
+
+        private IDictionaryProvider GetCurrentProvider()
+        {
+            var lang = ConfigurationManager.Configuration.Language?.ToLowerInvariant() ?? "en";
+            if (_dictionaryProviders.TryGetValue(lang, out var provider))
+            {
+                return provider;
+            }
+
+            return _dictionaryProviders["en"];
         }
 
         private List<Result> ProcessDictionaryEntries(List<DictionaryEntry> entries, string rawSearch)
@@ -219,9 +236,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 results.AddRange(entryResults);
             }
 
-            return results.Any() 
-                ? results 
-                : new List<Result> { CreateInfoResult(rawSearch, "No definitions found", "No processable definitions in API response.") };
+            return results;
         }
         #endregion
 
