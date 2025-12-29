@@ -21,9 +21,10 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
         public async Task<List<DictionaryEntry>> LookupAsync(string word, CancellationToken token)
         {
-            // sum.in.ua uses Latin transliteration in URLs, not Cyrillic
-            var transliteratedWord = TransliterateCyrillicToLatin(word);
-            var requestUrl = $"{ConfigurationManager.Configuration.UkrainianApiEndpoint}{Uri.EscapeDataString(transliteratedWord)}";
+            var baseUrl = ConfigurationManager.Configuration.UkrainianApiEndpoint;
+            if (string.IsNullOrEmpty(baseUrl)) baseUrl = "https://sum.in.ua/s/";
+
+            var requestUrl = $"{baseUrl}{Uri.EscapeDataString(transliteratedWord)}";
 
             using var response = await _httpClient.GetAsync(requestUrl, token);
 
@@ -35,9 +36,10 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 throw new HttpRequestException($"HTTP {(int)response.StatusCode} {response.StatusCode}");
             }
 
-            var html = await response.Content.ReadAsStringAsync(token);
+            var stream = await response.Content.ReadAsStreamAsync(token);
             var doc = new HtmlDocument();
-            doc.LoadHtml(html);
+            // Force UTF-8 encoding to avoid execution environment specific defaults (e.g. Windows-1252)
+            doc.Load(stream, System.Text.Encoding.UTF8);
 
             // sum.in.ua structure: definitions are primarily in div with itemprop="articleBody"
             // We prioritize this as it's cleaner and avoids nested div#article issues
