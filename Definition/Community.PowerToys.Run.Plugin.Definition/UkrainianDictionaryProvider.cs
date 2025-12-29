@@ -23,7 +23,9 @@ namespace Community.PowerToys.Run.Plugin.Definition
         {
             var baseUrl = ConfigurationManager.Configuration.UkrainianApiEndpoint;
             if (string.IsNullOrEmpty(baseUrl)) baseUrl = "https://sum.in.ua/s/";
-
+            
+            // sum.in.ua uses Latin transliteration in URLs, not Cyrillic
+            var transliteratedWord = TransliterateCyrillicToLatin(word);
             var requestUrl = $"{baseUrl}{Uri.EscapeDataString(transliteratedWord)}";
 
             using var response = await _httpClient.GetAsync(requestUrl, token);
@@ -54,7 +56,9 @@ namespace Community.PowerToys.Run.Plugin.Definition
             if (articleNodes == null || articleNodes.Count == 0)
             {
                 // Check for "word not found" page with suggestions
-                if (html.Contains("не знайдено") || html.Contains("Можливо, ви шукали"))
+                // Since we read as stream, accessing InnerText or OuterHtml of DocumentNode
+                var pageContent = doc.DocumentNode.OuterHtml;
+                if (pageContent.Contains("не знайдено") || pageContent.Contains("Можливо, ви шукали"))
                 {
                     return new List<DictionaryEntry>();
                 }

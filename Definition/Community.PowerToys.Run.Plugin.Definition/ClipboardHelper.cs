@@ -11,8 +11,6 @@ namespace Community.PowerToys.Run.Plugin.Definition
     internal static class ClipboardHelper
     {
         private static readonly object _lock = new object();
-        private static Thread _staThread;
-        private static bool _isInitialized = false;
         private static readonly TaskScheduler _staTaskScheduler;
 
         static ClipboardHelper()
