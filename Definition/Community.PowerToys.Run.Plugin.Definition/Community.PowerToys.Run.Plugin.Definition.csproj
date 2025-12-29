@@ -5,6 +5,8 @@
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <Platforms>x64;ARM64</Platforms>
     <PlatformTarget>$(Platform)</PlatformTarget>
+    <AssemblyVersion>1.2.2.0</AssemblyVersion>
+    <FileVersion>1.2.2.0</FileVersion>
     <Version>1.2.2</Version>
   </PropertyGroup>
   <ItemGroup>

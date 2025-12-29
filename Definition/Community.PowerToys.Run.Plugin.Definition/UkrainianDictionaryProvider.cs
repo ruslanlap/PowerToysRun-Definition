@@ -21,14 +21,20 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
         public async Task<List<DictionaryEntry>> LookupAsync(string word, CancellationToken token)
         {
+            System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] Starting lookup for word: '{word}'");
+
             var baseUrl = ConfigurationManager.Configuration.UkrainianApiEndpoint;
             if (string.IsNullOrEmpty(baseUrl)) baseUrl = "https://sum.in.ua/s/";
-            
+
             // sum.in.ua uses Latin transliteration in URLs, not Cyrillic
             var transliteratedWord = TransliterateCyrillicToLatin(word);
             var requestUrl = $"{baseUrl}{Uri.EscapeDataString(transliteratedWord)}";
 
+            System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] Transliterated '{word}' -> '{transliteratedWord}'");
+            System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] Request URL: {requestUrl}");
+
             using var response = await _httpClient.GetAsync(requestUrl, token);
+            System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] Response status: {response.StatusCode}");
 
             // Note: sum.in.ua returns 404 for ALL requests, even for existing words
             // The actual "not found" status is indicated in the HTML content with "не знайдено"
@@ -42,11 +48,13 @@ namespace Community.PowerToys.Run.Plugin.Definition
             // sum.in.ua structure: definitions are primarily in div with itemprop="articleBody"
             // We prioritize this as it's cleaner and avoids nested div#article issues
             var articleNodes = doc.DocumentNode.SelectNodes("//div[@itemprop='articleBody']");
-            
+            System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] articleBody nodes found: {(articleNodes != null ? articleNodes.Count : 0)}");
+
             if (articleNodes == null || articleNodes.Count == 0)
             {
                 // Fallback to div#article if itemprop not found
                 articleNodes = doc.DocumentNode.SelectNodes("//div[@id='article']");
+                System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] Fallback to #article nodes: {(articleNodes != null ? articleNodes.Count : 0)}");
             }
 
             if (articleNodes == null || articleNodes.Count == 0)
@@ -56,12 +64,19 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 var pageContent = doc.DocumentNode.OuterHtml;
                 if (pageContent.Contains("не знайдено") || pageContent.Contains("Можливо, ви шукали"))
                 {
+                    System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] Word not found (contains 'не знайдено')");
                     return new List<DictionaryEntry>();
                 }
+                System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] No article nodes found and no 'не знайдено' message");
             }
 
-            if (articleNodes == null) return new List<DictionaryEntry>();
+            if (articleNodes == null)
+            {
+                System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] articleNodes is null, returning empty");
+                return new List<DictionaryEntry>();
+            }
 
+            System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] Processing {articleNodes.Count} article nodes");
             var entries = new List<DictionaryEntry>();
             foreach (var node in articleNodes)
             {
