@@ -39,20 +39,26 @@ namespace Community.PowerToys.Run.Plugin.Definition
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
 
-            // sum.in.ua structure: definitions are inside div with id="article"
-            // There might be multiple articles if multiple meanings exist (rare on sum.in.ua as they usually have separate pages or distinct blocks)
-            var articleNodes = doc.DocumentNode.SelectNodes("//div[@id='article']");
+            // sum.in.ua structure: definitions are primarily in div with itemprop="articleBody"
+            // We prioritize this as it's cleaner and avoids nested div#article issues
+            var articleNodes = doc.DocumentNode.SelectNodes("//div[@itemprop='articleBody']");
+            
             if (articleNodes == null || articleNodes.Count == 0)
             {
-                // Fallback: check if it's a "word not found" page with suggestions
+                // Fallback to div#article if itemprop not found
+                articleNodes = doc.DocumentNode.SelectNodes("//div[@id='article']");
+            }
+
+            if (articleNodes == null || articleNodes.Count == 0)
+            {
+                // Check for "word not found" page with suggestions
                 if (html.Contains("не знайдено") || html.Contains("Можливо, ви шукали"))
                 {
                     return new List<DictionaryEntry>();
                 }
-                
-                // Another fallback: sometimes it's just in specific headers
-                articleNodes = doc.DocumentNode.SelectNodes("//div[@itemprop='articleBody']");
             }
+
+            if (articleNodes == null) return new List<DictionaryEntry>();
 
             if (articleNodes == null) return new List<DictionaryEntry>();
 

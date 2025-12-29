@@ -18,7 +18,7 @@
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
     <img src="https://img.shields.io/github/v/release/ruslanlap/PowerToysRun-Definition?label=latest" alt="Latest Release">
   </a>
-  <img src="https://img.shields.io/badge/version-v1.2.1-brightgreen" alt="Version">
+  <img src="https://img.shields.io/badge/version-v1.2.2-brightgreen" alt="Version">
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/stargazers">
     <img src="https://img.shields.io/github/stars/ruslanlap/PowerToysRun-Definition" alt="GitHub stars">
   </a>
@@ -37,10 +37,10 @@
 </div>
 
 <div align="center">
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.2.1/Definition-1.2.1-x64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.2.2/Definition-1.2.2-x64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-x64-blue?style=for-the-badge&logo=github" alt="Download x64">
   </a>
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.2.1/Definition-1.2.1-ARM64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.2.2/Definition-1.2.2-ARM64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-ARM64-blue?style=for-the-badge&logo=github" alt="Download ARM64">
   </a>
     <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
@@ -67,7 +67,15 @@
 - [📄 License](#-license)
 - [🙏 Acknowledgements](#-acknowledgements)
 - [☕ Support](#-support)
-- [🆕 What's New (1.2.1)](#-whats-new-v121)
+- [🆕 What's New (v1.2.2)](#-whats-new-v122)
+
+## 🆕 What's New (v1.2.2)
+
+- 🇺🇦 **Ukrainian Dictionary Support** — Integrated with `sum.in.ua` explanatory dictionary.
+- 🔄 **Parallel Lookup** — Simultaneously fetch results from English and Ukrainian sources.
+- 🎯 **Smart Prioritization** — Results are automatically prioritized based on the query script (Cyrillic vs Latin).
+- 🏗️ **Improved Architecture** — Refactored to a provider-based system for better extensibility.
+- 🩹 **Better Reliability** — Enhanced error handling ensures one failed provider doesn't break the entire search.
 
 ## 📋 Overview
 
@@ -110,8 +118,8 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 ### Quick Install
 
 1. Download the appropriate ZIP for your system architecture:
-   - [x64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.2.1/Definition-1.2.1-x64.zip)
-   - [ARM64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.2.1/Definition-1.2.1-ARM64.zip)
+   - [x64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.2.2/Definition-1.2.2-x64.zip)
+   - [ARM64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.2.2/Definition-1.2.2-ARM64.zip)
 
 2. Extract the ZIP to:
    ```
@@ -195,7 +203,7 @@ cd PowerToysRun-Definition/Definition
 dotnet build
 # To package:
 dotnet publish -c Release -r win-x64 --output ./publish
-zip -r Definition-v1.2.1-x64.zip ./publish
+zip -r Definition-v1.2.2-x64.zip ./publish
 ```
 
 ## 📊 Project Structure
@@ -353,6 +361,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 If you find this plugin useful and would like to support its development, you can buy me a coffee:
 
 [![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-☕️-FFDD00?style=for-the-badge&logo=buy-me-a-coffee)](https://ruslanlap.github.io/ruslanlap_buymeacoffe/)
+
+## 🆕 What's New (v1.2.2)
+
+- 🇺🇦 **Ukrainian Dictionary Support** — Integrated with `sum.in.ua` explanatory dictionary.
+- 🔄 **Parallel Lookup** — Simultaneously fetch results from English and Ukrainian sources.
+- 🎯 **Smart Prioritization** — Results are automatically prioritized based on the query script (Cyrillic vs Latin).
+- 🏗️ **Improved Architecture** — Refactored to a provider-based system for better extensibility.
+- 🩹 **Better Reliability** — Enhanced error handling ensures one failed provider doesn't break the entire search.
+- 📦 **Dependencies** — Added `HtmlAgilityPack` for robust HTML parsing of Ukrainian results.
 
 ## 🆕 What's New (v1.2.1)
 
