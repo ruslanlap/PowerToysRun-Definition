@@ -7,9 +7,10 @@
   "targets": {
     ".NETCoreApp,Version=v9.0": {},
     ".NETCoreApp,Version=v9.0/win-x64": {
-      "Community.PowerToys.Run.Plugin.Definition/1.0.0": {
+      "Community.PowerToys.Run.Plugin.Definition/1.2.2": {
         "dependencies": {
           "Community.PowerToys.Run.Plugin.Dependencies": "0.90.0",
+          "HtmlAgilityPack": "1.12.4",
           "PowerToys.Common.UI": "0.90.0.0",
           "PowerToys.ManagedCommon": "0.90.0.0",
           "PowerToys.Settings.UI.Lib": "0.90.0.0",
@@ -57,6 +58,14 @@
           }
         }
       },
+      "HtmlAgilityPack/1.12.4": {
+        "runtime": {
+          "lib/net7.0/HtmlAgilityPack.dll": {
+            "assemblyVersion": "1.12.4.0",
+            "fileVersion": "1.12.4.0"
+          }
+        }
+      },
       "PowerToys.Common.UI/0.90.0.0": {
         "runtime": {
           "PowerToys.Common.UI.dll": {
@@ -100,7 +109,7 @@
     }
   },
   "libraries": {
-    "Community.PowerToys.Run.Plugin.Definition/1.0.0": {
+    "Community.PowerToys.Run.Plugin.Definition/1.2.2": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -116,6 +125,13 @@
       "sha512": "sha512-jUb3zg570enp5Fh4qwzjeZWyRlkOTS49H4cpf6iKKKy6+xciffWADyLSrR2+xShqpG2wiPcg96lmsKGB5LUNHA==",
       "path": "community.powertoys.run.plugin.dependencies/0.90.0",
       "hashPath": "community.powertoys.run.plugin.dependencies.0.90.0.nupkg.sha512"
+    },
+    "HtmlAgilityPack/1.12.4": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ljqvBabvFwKoLniuoQKO8b5bJfJweKLs4fUNS/V5dsvpo0A8MlJqxxn9XVmP2DaskbUXty6IYaWAi1SArGIMeQ==",
+      "path": "htmlagilitypack/1.12.4",
+      "hashPath": "htmlagilitypack.1.12.4.nupkg.sha512"
     },
     "PowerToys.Common.UI/0.90.0.0": {
       "type": "reference",
