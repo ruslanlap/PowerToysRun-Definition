@@ -18,7 +18,7 @@
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
     <img src="https://img.shields.io/github/v/release/ruslanlap/PowerToysRun-Definition?label=latest" alt="Latest Release">
   </a>
-  <img src="https://img.shields.io/badge/version-v1.3.1-brightgreen" alt="Version">
+  <img src="https://img.shields.io/badge/version-v1.3.2-brightgreen" alt="Version">
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/stargazers">
     <img src="https://img.shields.io/github/stars/ruslanlap/PowerToysRun-Definition" alt="GitHub stars">
   </a>
@@ -37,10 +37,10 @@
 </div>
 
 <div align="center">
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.1/Definition-1.3.1-x64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.2/Definition-1.3.2-x64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-x64-blue?style=for-the-badge&logo=github" alt="Download x64">
   </a>
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.1/Definition-1.3.1-ARM64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.2/Definition-1.3.2-ARM64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-ARM64-blue?style=for-the-badge&logo=github" alt="Download ARM64">
   </a>
     <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
@@ -67,9 +67,17 @@
 - [📄 License](#-license)
 - [🙏 Acknowledgements](#-acknowledgements)
 - [☕ Support](#-support)
+- [🆕 What's New (v1.3.2)](#-whats-new-v132)
 - [🆕 What's New (v1.3.1)](#-whats-new-v131)
 
-## 🆕 What's New (v1.3.1)
+## 🆕 What's New (v1.3.2)
++
++- 🏮 **Offline Chinese Dictionary** — Switched from unreliable web scraping to an embedded **CC-CEDICT** database (~124,000 entries).
++- ⚡ **Instant Lookups** — Chinese results are now served instantly from memory without any network requests.
++- 🛡️ **Improved Reliability** — Eliminated "No definitions found" errors caused by MDBG.net's request blocking or layout changes.
++- 📦 **Optimized Assets** — Compressed dictionary data into an embedded resource for an efficient distribution.
++
++## 🆕 What's New (v1.3.1)
 
 - 🩹 **Fixed Chinese Dictionary Selectors** — Resolved an issue where Chinese lookups returned "No definitions found" by correcting HTML scraping selectors.
 - 🇨🇳 **Chinese Dictionary Support** — Added support for Chinese-English lookups using MDBG.net (CC-CEDICT data).
@@ -133,8 +141,8 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 ### Quick Install
 
 1. Download the appropriate ZIP for your system architecture:
-   - [x64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.1/Definition-1.3.1-x64.zip)
-   - [ARM64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.1/Definition-1.3.1-ARM64.zip)
+   - [x64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.2/Definition-1.3.2-x64.zip)
+   - [ARM64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.2/Definition-1.3.2-ARM64.zip)
 
 2. Extract the ZIP to:
    ```
