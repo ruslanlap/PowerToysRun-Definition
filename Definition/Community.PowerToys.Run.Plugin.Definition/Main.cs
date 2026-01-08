@@ -40,9 +40,16 @@ namespace Community.PowerToys.Run.Plugin.Definition
         private PluginInitContext _context;
         private bool _disposed;
 
-        private static readonly Lazy<HttpClient> HttpClientLazy = new(() => new HttpClient
+        private static readonly Lazy<HttpClient> HttpClientLazy = new(() =>
         {
-            Timeout = TimeSpan.FromSeconds(ConfigurationManager.Configuration.HttpTimeoutSeconds)
+            var handler = new HttpClientHandler();
+            var client = new HttpClient(handler)
+            {
+                Timeout = TimeSpan.FromSeconds(ConfigurationManager.Configuration.HttpTimeoutSeconds)
+            };
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+            client.DefaultRequestHeaders.AcceptLanguage.ParseAdd("en-US,en;q=0.9");
+            return client;
         });
         private static HttpClient HttpClient => HttpClientLazy.Value;
 
