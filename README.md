@@ -18,7 +18,7 @@
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
     <img src="https://img.shields.io/github/v/release/ruslanlap/PowerToysRun-Definition?label=latest" alt="Latest Release">
   </a>
-  <img src="https://img.shields.io/badge/version-v1.3.0-brightgreen" alt="Version">
+  <img src="https://img.shields.io/badge/version-v1.3.1-brightgreen" alt="Version">
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/stargazers">
     <img src="https://img.shields.io/github/stars/ruslanlap/PowerToysRun-Definition" alt="GitHub stars">
   </a>
@@ -37,10 +37,10 @@
 </div>
 
 <div align="center">
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.0/Definition-1.3.0-x64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.1/Definition-1.3.1-x64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-x64-blue?style=for-the-badge&logo=github" alt="Download x64">
   </a>
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.0/Definition-1.3.0-ARM64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.1/Definition-1.3.1-ARM64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-ARM64-blue?style=for-the-badge&logo=github" alt="Download ARM64">
   </a>
     <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
@@ -67,10 +67,17 @@
 - [📄 License](#-license)
 - [🙏 Acknowledgements](#-acknowledgements)
 - [☕ Support](#-support)
-- [🆕 What's New (v1.3.0)](#-whats-new-v130)
+- [🆕 What's New (v1.3.1)](#-whats-new-v131)
+
+## 🆕 What's New (v1.3.1)
+
+- 🩹 **Fixed Chinese Dictionary Selectors** — Resolved an issue where Chinese lookups returned "No definitions found" by correcting HTML scraping selectors.
+- 🇨🇳 **Chinese Dictionary Support** — Added support for Chinese-English lookups using MDBG.net (CC-CEDICT data).
+- 🔄 **Three-Language Parallel Lookup** — Simultaneously fetch results from English, Ukrainian, and Chinese sources.
+- 🎯 **Enhanced Smart Prioritization** — Results are automatically prioritized based on query script (Latin, Cyrillic, or Chinese characters).
+- 📦 **Improved Web Scraping** — Leverages HtmlAgilityPack for robust HTML parsing of both Ukrainian and Chinese dictionary sources.
 
 ## 🆕 What's New (v1.3.0)
-
 - 🇨🇳 **Chinese Dictionary Support** — Added support for Chinese-English lookups using MDBG.net (CC-CEDICT data).
 - 🔄 **Three-Language Parallel Lookup** — Simultaneously fetch results from English, Ukrainian, and Chinese sources.
 - 🎯 **Enhanced Smart Prioritization** — Results are automatically prioritized based on query script (Latin, Cyrillic, or Chinese characters).
@@ -126,8 +133,8 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 ### Quick Install
 
 1. Download the appropriate ZIP for your system architecture:
-   - [x64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.0/Definition-1.3.0-x64.zip)
-   - [ARM64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.0/Definition-1.3.0-ARM64.zip)
+   - [x64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.1/Definition-1.3.1-x64.zip)
+   - [ARM64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.1/Definition-1.3.1-ARM64.zip)
 
 2. Extract the ZIP to:
    ```
@@ -211,7 +218,7 @@ cd PowerToysRun-Definition/Definition
 dotnet build
 # To package:
 dotnet publish -c Release -r win-x64 --output ./publish
-zip -r Definition-v1.3.0-x64.zip ./publish
+zip -r Definition-v1.3.1-x64.zip ./publish
 ```
 
 ## 📊 Project Structure

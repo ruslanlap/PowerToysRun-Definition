@@ -80,7 +80,8 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
             // Find all result rows in the results table
             // MDBG search results are in table rows with class "row"
-            var resultRows = doc.DocumentNode.SelectNodes("//div[@class='row']");
+            var resultRows = doc.DocumentNode.SelectNodes("//table[contains(@class, 'wordresults')]//tr[contains(@class, 'row')]")
+                             ?? doc.DocumentNode.SelectNodes("//tr[contains(@class, 'row')]");
             
             if (resultRows == null || !resultRows.Any())
             {
@@ -111,18 +112,18 @@ namespace Community.PowerToys.Run.Plugin.Definition
         private DictionaryEntry ParseResultRow(HtmlNode row, string sourceUrl)
         {
             // Extract Chinese characters (simplified and/or traditional)
-            var chineseNode = row.SelectSingleNode(".//div[@class='hanzi']");
+            var chineseNode = row.SelectSingleNode(".//div[contains(@class, 'hanzi')]");
             if (chineseNode == null) return null;
 
             var chineseText = GetCleanText(chineseNode);
             if (string.IsNullOrEmpty(chineseText)) return null;
 
             // Extract Pinyin
-            var pinyinNode = row.SelectSingleNode(".//div[@class='pinyin']");
+            var pinyinNode = row.SelectSingleNode(".//div[contains(@class, 'pinyin')]");
             var pinyin = pinyinNode != null ? GetCleanText(pinyinNode) : string.Empty;
 
             // Extract English definition
-            var defNode = row.SelectSingleNode(".//div[@class='defs']");
+            var defNode = row.SelectSingleNode(".//div[contains(@class, 'defs')]");
             var definition = defNode != null ? GetCleanText(defNode) : string.Empty;
 
             // Create dictionary entry
