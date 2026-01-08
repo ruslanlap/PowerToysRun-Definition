@@ -60,7 +60,8 @@ namespace Community.PowerToys.Run.Plugin.Definition
             _dictionaryProviders = new Dictionary<string, IDictionaryProvider>(StringComparer.OrdinalIgnoreCase)
             {
                 { "en", new EnglishDictionaryProvider(HttpClient) },
-                { "uk", new UkrainianDictionaryProvider(HttpClient) }
+                { "uk", new UkrainianDictionaryProvider(HttpClient) },
+                { "zh", new ChineseDictionaryProvider(HttpClient) }
             };
         }
 
@@ -212,15 +213,19 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 
                 // Adjust scores based on script detection
                 bool isCyrillic = searchTerm.Any(c => (c >= 0x0400 && c <= 0x04FF));
+                bool isChinese = searchTerm.Any(c => (c >= 0x4E00 && c <= 0x9FFF) || (c >= 0x3400 && c <= 0x4DBF));
+                
                 foreach (var result in results)
                 {
                     if (result.ContextData is ResultContext context)
                     {
                         // Identify provider by language (assuming simple mapping for now)
                         bool isUkResult = result.SubTitle != null && (result.SubTitle.Any(c => (c >= 0x0400 && c <= 0x04FF)));
+                        bool isChineseResult = result.SubTitle != null && (result.SubTitle.Any(c => (c >= 0x4E00 && c <= 0x9FFF) || (c >= 0x3400 && c <= 0x4DBF)));
                         
                         if (isCyrillic && isUkResult) result.Score += 10;
-                        if (!isCyrillic && !isUkResult) result.Score += 10;
+                        if (isChinese && isChineseResult) result.Score += 10;
+                        if (!isCyrillic && !isChinese && !isUkResult && !isChineseResult) result.Score += 10;
                     }
                 }
 
