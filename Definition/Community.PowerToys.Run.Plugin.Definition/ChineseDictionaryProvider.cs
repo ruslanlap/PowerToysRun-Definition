@@ -1,214 +1,153 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
-using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using HtmlAgilityPack;
 
 namespace Community.PowerToys.Run.Plugin.Definition
 {
     /// <summary>
-    /// Chinese dictionary provider using MDBG.net (CC-CEDICT data)
-    /// Supports both Chinese characters and Pinyin queries
+    /// Chinese dictionary provider using an embedded CC-CEDICT database.
+    /// Provides instant, offline results for Chinese characters (Simplified/Traditional) and Pinyin.
     /// </summary>
     internal class ChineseDictionaryProvider : IDictionaryProvider
     {
-        private readonly HttpClient _httpClient;
         public string LanguageCode => "zh";
-        public string DisplayName => "中文 (MDBG.net)";
+        public string DisplayName => "中文 (CC-CEDICT Offline)";
 
-        private const string DefaultBaseUrl = "https://www.mdbg.net/chinese/dictionary?page=worddict&wdrst=0&wdqb=";
+        private static readonly Lazy<Dictionary<string, List<DictionaryEntry>>> _dictionaryData = new(LoadDictionary);
 
-        public ChineseDictionaryProvider(HttpClient httpClient)
+        public ChineseDictionaryProvider(System.Net.Http.HttpClient _)
         {
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            // HttpClient is no longer needed but kept for interface compatibility
         }
 
-        public async Task<List<DictionaryEntry>> LookupAsync(string word, CancellationToken token)
+        public Task<List<DictionaryEntry>> LookupAsync(string word, CancellationToken token)
         {
-            System.Diagnostics.Debug.WriteLine($"[ChineseProvider] Starting lookup for word: '{word}'");
+            if (string.IsNullOrWhiteSpace(word))
+                return Task.FromResult(new List<DictionaryEntry>());
 
-            var baseUrl = ConfigurationManager.Configuration.ChineseApiEndpoint;
+            var normalizedWord = word.Trim().ToLowerInvariant();
             
-            // Use default if empty
-            if (string.IsNullOrEmpty(baseUrl))
+            // Search in memory
+            if (_dictionaryData.Value.TryGetValue(normalizedWord, out var entries))
             {
-                baseUrl = DefaultBaseUrl;
+                return Task.FromResult(entries);
             }
 
-            var requestUrl = $"{baseUrl}{Uri.EscapeDataString(word)}";
-            System.Diagnostics.Debug.WriteLine($"[ChineseProvider] Request URL: {requestUrl}");
+            // Fallback: Partial match if no exact match (limit to top 10)
+            var partialMatches = _dictionaryData.Value
+                .Where(kvp => kvp.Key.Contains(normalizedWord))
+                .Take(10)
+                .SelectMany(kvp => kvp.Value)
+                .ToList();
+
+            return Task.FromResult(partialMatches);
+        }
+
+        private static Dictionary<string, List<DictionaryEntry>> LoadDictionary()
+        {
+            var data = new Dictionary<string, List<DictionaryEntry>>(StringComparer.OrdinalIgnoreCase);
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = "Community.PowerToys.Run.Plugin.Definition.Resources.cedict.txt.gz";
 
             try
             {
-                using var response = await _httpClient.GetAsync(requestUrl, token);
-                System.Diagnostics.Debug.WriteLine($"[ChineseProvider] Response status: {response.StatusCode}");
-
-                var html = await response.Content.ReadAsStringAsync(token);
-                System.Diagnostics.Debug.WriteLine($"[ChineseProvider] Response length: {html.Length} bytes");
-                
-                var doc = new HtmlDocument();
-                doc.LoadHtml(html);
-
-                // Parse the results table
-                var results = ParseSearchResults(word, doc, requestUrl);
-                
-                if (!results.Any())
+                using Stream stream = assembly.GetManifestResourceStream(resourceName);
+                if (stream == null)
                 {
-                    System.Diagnostics.Debug.WriteLine($"[ChineseProvider] No results found");
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine($"[ChineseProvider] Found {results.Count} results");
+                    System.Diagnostics.Debug.WriteLine($"[ChineseProvider] Resource not found: {resourceName}");
+                    return data;
                 }
 
-                return results;
+                using GZipStream decompressionStream = new GZipStream(stream, CompressionMode.Decompress);
+                using StreamReader reader = new StreamReader(decompressionStream, Encoding.UTF8);
+
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
+                        continue;
+
+                    var entry = ParseLine(line);
+                    if (entry == null) continue;
+
+                    // Index by simplified
+                    AddEntry(data, entry.Word, entry);
+                    
+                    // Index by traditional if different
+                    var parts = line.Split(' ');
+                    if (parts.Length > 0 && parts[0] != entry.Word)
+                    {
+                        AddEntry(data, parts[0], entry);
+                    }
+                    
+                    // Index by pinyin (without tones for easier search)
+                    if (!string.IsNullOrEmpty(entry.Phonetic))
+                    {
+                        var cleanPinyin = Regex.Replace(entry.Phonetic, @"\d", "").Replace(" ", "").ToLowerInvariant();
+                        AddEntry(data, cleanPinyin, entry);
+                    }
+                }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[ChineseProvider] Error: {ex.Message}");
-                throw;
+                System.Diagnostics.Debug.WriteLine($"[ChineseProvider] Error loading dictionary: {ex.Message}");
             }
+
+            return data;
         }
 
-        private List<DictionaryEntry> ParseSearchResults(string query, HtmlDocument doc, string sourceUrl)
+        private static void AddEntry(Dictionary<string, List<DictionaryEntry>> data, string key, DictionaryEntry entry)
         {
-            var entries = new List<DictionaryEntry>();
-
-            // Find all result rows in the results table
-            // MDBG search results are in table rows with class "row"
-            var resultRows = doc.DocumentNode.SelectNodes("//table[contains(@class, 'wordresults')]//tr[contains(@class, 'row')]")
-                             ?? doc.DocumentNode.SelectNodes("//tr[contains(@class, 'row')]");
-            
-            if (resultRows == null || !resultRows.Any())
-            {
-                System.Diagnostics.Debug.WriteLine("[ChineseProvider] No result rows found");
-                return entries;
-            }
-
-            // Limit to top 5 results to avoid overwhelming the user
-            foreach (var row in resultRows.Take(5))
-            {
-                try
-                {
-                    var entry = ParseResultRow(row, sourceUrl);
-                    if (entry != null)
-                    {
-                        entries.Add(entry);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"[ChineseProvider] Error parsing row: {ex.Message}");
-                }
-            }
-
-            return entries;
+            if (string.IsNullOrEmpty(key)) return;
+            if (!data.ContainsKey(key))
+                data[key] = new List<DictionaryEntry>();
+            data[key].Add(entry);
         }
 
-        private DictionaryEntry ParseResultRow(HtmlNode row, string sourceUrl)
+        private static DictionaryEntry ParseLine(string line)
         {
-            // Extract Chinese characters from the td.head cell (not from JavaScript!)
-            // The structure is: <tr class="row"><td class="head"><div class="hanzi">...</div><div class="pinyin">...</div></td>
-            var headCell = row.SelectSingleNode(".//td[contains(@class, 'head')]");
-            if (headCell == null) return null;
-            
-            var chineseNode = headCell.SelectSingleNode(".//div[contains(@class, 'hanzi')]");
-            if (chineseNode == null) return null;
+            // Format: Traditional Simplified [pinyin] /english def 1/def 2/
+            var match = Regex.Match(line, @"^(\S+)\s+(\S+)\s+\[([^\]]+)\]\s+/(.*)/$");
+            if (!match.Success) return null;
 
-            var chineseText = GetCleanText(chineseNode);
-            if (string.IsNullOrEmpty(chineseText)) return null;
+            var traditional = match.Groups[1].Value;
+            var simplified = match.Groups[2].Value;
+            var pinyin = match.Groups[3].Value;
+            var defPart = match.Groups[4].Value;
 
-            // Extract Pinyin from the same head cell
-            var pinyinNode = headCell.SelectSingleNode(".//div[contains(@class, 'pinyin')]");
-            var pinyin = pinyinNode != null ? GetCleanText(pinyinNode) : string.Empty;
-
-            // Extract English definition from td.details cell
-            var detailsCell = row.SelectSingleNode(".//td[contains(@class, 'details')]");
-            var defNode = detailsCell?.SelectSingleNode(".//div[contains(@class, 'defs')]");
-            var definition = defNode != null ? GetCleanText(defNode) : string.Empty;
-
-            // Create dictionary entry
             var entry = new DictionaryEntry
             {
-                Word = chineseText,
+                Word = simplified,
                 Phonetic = pinyin,
-                SourceUrls = new List<string> { sourceUrl }
+                SourceUrls = new List<string> { "https://www.mdbg.net/chinese/dictionary?page=cc-cedict" }
             };
 
-            // Add phonetic if available
-            if (!string.IsNullOrEmpty(pinyin))
+            if (traditional != simplified)
             {
-                entry.Phonetics.Add(new Phonetic
-                {
-                    Text = pinyin
-                });
+                entry.Word = $"{simplified} ({traditional})";
             }
 
-            // Parse definitions (they may be numbered)
-            var definitions = ParseDefinitions(definition);
-            
-            var meaning = new Meaning
+            entry.Phonetics.Add(new Phonetic { Text = pinyin });
+
+            var definitions = defPart.Split('/')
+                .Select(d => d.Trim())
+                .Where(d => !string.IsNullOrEmpty(d))
+                .Select(d => new DefinitionItem { Definition = d })
+                .ToList();
+
+            entry.Meanings.Add(new Meaning
             {
-                PartOfSpeech = string.Empty, // MDBG doesn't always provide part of speech
                 Definitions = definitions
-            };
+            });
 
-            entry.Meanings.Add(meaning);
             return entry;
-        }
-
-        private List<DefinitionItem> ParseDefinitions(string definitionText)
-        {
-            var definitions = new List<DefinitionItem>();
-
-            if (string.IsNullOrEmpty(definitionText))
-            {
-                return definitions;
-            }
-
-            // Check if definitions are numbered (e.g., "1. first def / 2. second def")
-            // MDBG uses " / " to separate multiple definitions
-            var parts = definitionText.Split(new[] { " / " }, StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (var part in parts.Take(3)) // Limit to 3 definitions per entry
-            {
-                var cleanDef = part.Trim();
-                
-                // Remove leading numbers if present (e.g., "1. definition" -> "definition")
-                cleanDef = Regex.Replace(cleanDef, @"^\d+\.\s*", "");
-                
-                if (!string.IsNullOrEmpty(cleanDef))
-                {
-                    definitions.Add(new DefinitionItem { Definition = cleanDef });
-                }
-            }
-
-            // If no parts were found, add the whole text as one definition
-            if (!definitions.Any() && !string.IsNullOrEmpty(definitionText))
-            {
-                definitions.Add(new DefinitionItem { Definition = definitionText.Trim() });
-            }
-
-            return definitions;
-        }
-
-        private string GetCleanText(HtmlNode node)
-        {
-            if (node == null) return string.Empty;
-            
-            var text = node.InnerText;
-            
-            // Decode HTML entities
-            text = System.Net.WebUtility.HtmlDecode(text);
-            
-            // Replace multiple whitespace with single space
-            text = Regex.Replace(text, @"\s+", " ");
-            
-            return text.Trim();
         }
     }
 }
