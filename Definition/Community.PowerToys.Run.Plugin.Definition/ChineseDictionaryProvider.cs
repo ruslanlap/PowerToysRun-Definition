@@ -111,19 +111,24 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
         private DictionaryEntry ParseResultRow(HtmlNode row, string sourceUrl)
         {
-            // Extract Chinese characters (simplified and/or traditional)
-            var chineseNode = row.SelectSingleNode(".//div[contains(@class, 'hanzi')]");
+            // Extract Chinese characters from the td.head cell (not from JavaScript!)
+            // The structure is: <tr class="row"><td class="head"><div class="hanzi">...</div><div class="pinyin">...</div></td>
+            var headCell = row.SelectSingleNode(".//td[contains(@class, 'head')]");
+            if (headCell == null) return null;
+            
+            var chineseNode = headCell.SelectSingleNode(".//div[contains(@class, 'hanzi')]");
             if (chineseNode == null) return null;
 
             var chineseText = GetCleanText(chineseNode);
             if (string.IsNullOrEmpty(chineseText)) return null;
 
-            // Extract Pinyin
-            var pinyinNode = row.SelectSingleNode(".//div[contains(@class, 'pinyin')]");
+            // Extract Pinyin from the same head cell
+            var pinyinNode = headCell.SelectSingleNode(".//div[contains(@class, 'pinyin')]");
             var pinyin = pinyinNode != null ? GetCleanText(pinyinNode) : string.Empty;
 
-            // Extract English definition
-            var defNode = row.SelectSingleNode(".//div[contains(@class, 'defs')]");
+            // Extract English definition from td.details cell
+            var detailsCell = row.SelectSingleNode(".//td[contains(@class, 'details')]");
+            var defNode = detailsCell?.SelectSingleNode(".//div[contains(@class, 'defs')]");
             var definition = defNode != null ? GetCleanText(defNode) : string.Empty;
 
             // Create dictionary entry
