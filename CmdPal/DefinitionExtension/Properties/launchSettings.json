@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "DefinitionExtension (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "DefinitionExtension (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
