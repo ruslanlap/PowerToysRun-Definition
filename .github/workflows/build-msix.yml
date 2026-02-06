@@ -11,7 +11,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        platform: [x64, ARM64]
+        platform: [x64, arm64]
 
     steps:
       - name: Checkout code
@@ -30,7 +30,7 @@ jobs:
 
       - name: Build MSIX package
         run: |
-          msbuild CmdPal/CmdPal-Definition.sln `
+          msbuild CmdPal/DefinitionExtension/DefinitionExtension.csproj `
             /p:Configuration=Release `
             /p:Platform=${{ matrix.platform }} `
             /p:AppxPackageDir="${{ github.workspace }}/AppPackages/" `
@@ -40,14 +40,33 @@ jobs:
             /p:GenerateAppxPackageOnBuild=true
         shell: pwsh
 
+      - name: List build output
+        if: always()
+        shell: pwsh
+        run: |
+          Write-Host "=== AppPackages directory ==="
+          if (Test-Path "${{ github.workspace }}/AppPackages") {
+            Get-ChildItem -Path "${{ github.workspace }}/AppPackages" -Recurse | ForEach-Object { Write-Host $_.FullName }
+          } else {
+            Write-Host "AppPackages directory does not exist"
+          }
+          Write-Host "=== Build output ==="
+          Get-ChildItem -Path "CmdPal/DefinitionExtension/bin" -Recurse -ErrorAction SilentlyContinue | ForEach-Object { Write-Host $_.FullName }
+
       - name: Find MSIX package
         id: find_msix
         shell: pwsh
         run: |
-          $msixFiles = Get-ChildItem -Path "${{ github.workspace }}/AppPackages" -Recurse -Filter "*.msix"
+          # Search in AppPackages first, then in bin output
+          $searchPaths = @("${{ github.workspace }}/AppPackages", "CmdPal/DefinitionExtension/bin")
+          $msixFiles = @()
+          foreach ($path in $searchPaths) {
+            if (Test-Path $path) {
+              $msixFiles += Get-ChildItem -Path $path -Recurse -Filter "*.msix" -ErrorAction SilentlyContinue
+            }
+          }
           if ($msixFiles.Count -eq 0) {
-            Write-Host "No .msix found. Listing all files in AppPackages:"
-            Get-ChildItem -Path "${{ github.workspace }}/AppPackages" -Recurse | ForEach-Object { Write-Host $_.FullName }
+            Write-Error "No MSIX files found"
             exit 1
           }
           $msixPath = $msixFiles[0].FullName
@@ -74,8 +93,8 @@ jobs:
       - name: Download ARM64 MSIX
         uses: actions/download-artifact@v4
         with:
-          name: msix-ARM64
-          path: msix-ARM64
+          name: msix-arm64
+          path: msix-arm64
 
       - name: Find makeappx
         shell: pwsh
@@ -98,7 +117,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path bundle-output
 
           Get-ChildItem -Path msix-x64 -Filter "*.msix" | Copy-Item -Destination bundle-input/
-          Get-ChildItem -Path msix-ARM64 -Filter "*.msix" | Copy-Item -Destination bundle-input/
+          Get-ChildItem -Path msix-arm64 -Filter "*.msix" | Copy-Item -Destination bundle-input/
 
           Write-Host "Bundle input contents:"
           Get-ChildItem bundle-input
@@ -118,4 +137,4 @@ jobs:
           name: DefinitionForCommandPalette-individual-msix
           path: |
             msix-x64/*.msix
-            msix-ARM64/*.msix
+            msix-arm64/*.msix
