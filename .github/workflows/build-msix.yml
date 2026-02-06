@@ -101,9 +101,8 @@ jobs:
       - name: Find makeappx
         shell: pwsh
         run: |
-          $makeappx = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -Filter "makeappx.exe" |
-            Where-Object { $_.FullName -match "\\x64\\makeappx.exe$" } |
-            Sort-Object { [version]($_.Directory.Parent.Parent.Name) } -Descending |
+          $makeappx = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\makeappx.exe" |
+            Sort-Object { [version]$_.Directory.Parent.Name } -Descending |
             Select-Object -First 1
           if ($makeappx) {
             Write-Host "Found makeappx at: $($makeappx.FullName)"
