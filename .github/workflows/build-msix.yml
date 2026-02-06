@@ -13,6 +13,10 @@ jobs:
       matrix:
         platform: [x64, arm64]
 
+    defaults:
+      run:
+        working-directory: CmdPal
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,12 +29,15 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
+      - name: Verify .NET SDK version
+        run: dotnet --version
+
       - name: Restore NuGet packages
-        run: dotnet restore CmdPal/CmdPal-Definition.sln -p:Platform=${{ matrix.platform }}
+        run: dotnet restore DefinitionExtension/DefinitionExtension.csproj -p:Platform=${{ matrix.platform }}
 
       - name: Build MSIX package
         run: |
-          msbuild CmdPal/DefinitionExtension/DefinitionExtension.csproj `
+          msbuild DefinitionExtension/DefinitionExtension.csproj `
             /p:Configuration=Release `
             /p:Platform=${{ matrix.platform }} `
             /p:AppxPackageDir="${{ github.workspace }}/AppPackages/" `
@@ -44,29 +51,22 @@ jobs:
         if: always()
         shell: pwsh
         run: |
-          Write-Host "=== AppPackages directory ==="
+          Write-Host "=== AppPackages ==="
           if (Test-Path "${{ github.workspace }}/AppPackages") {
-            Get-ChildItem -Path "${{ github.workspace }}/AppPackages" -Recurse | ForEach-Object { Write-Host $_.FullName }
+            Get-ChildItem -Path "${{ github.workspace }}/AppPackages" -Recurse -File | ForEach-Object {
+              Write-Host "$($_.Length) bytes  $($_.FullName)"
+            }
           } else {
             Write-Host "AppPackages directory does not exist"
           }
-          Write-Host "=== Build output ==="
-          Get-ChildItem -Path "CmdPal/DefinitionExtension/bin" -Recurse -ErrorAction SilentlyContinue | ForEach-Object { Write-Host $_.FullName }
 
       - name: Find MSIX package
         id: find_msix
         shell: pwsh
         run: |
-          # Search in AppPackages first, then in bin output
-          $searchPaths = @("${{ github.workspace }}/AppPackages", "CmdPal/DefinitionExtension/bin")
-          $msixFiles = @()
-          foreach ($path in $searchPaths) {
-            if (Test-Path $path) {
-              $msixFiles += Get-ChildItem -Path $path -Recurse -Filter "*.msix" -ErrorAction SilentlyContinue
-            }
-          }
-          if ($msixFiles.Count -eq 0) {
-            Write-Error "No MSIX files found"
+          $msixFiles = Get-ChildItem -Path "${{ github.workspace }}/AppPackages" -Recurse -Filter "*.msix" -ErrorAction SilentlyContinue
+          if (-not $msixFiles -or $msixFiles.Count -eq 0) {
+            Write-Error "No MSIX files found in AppPackages"
             exit 1
           }
           $msixPath = $msixFiles[0].FullName
