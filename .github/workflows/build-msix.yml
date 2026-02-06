@@ -44,6 +44,8 @@ jobs:
             /p:AppxBundle=Never `
             /p:UapAppxPackageBuildMode=SideloadOnly `
             /p:AppxPackageSigningEnabled=false `
+            /p:PublishSingleFile=false `
+            /p:PublishTrimmed=false `
             /p:GenerateAppxPackageOnBuild=true
         shell: pwsh
 
