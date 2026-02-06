@@ -72,10 +72,13 @@ jobs:
           msbuild CmdPal/DefinitionExtension/DefinitionExtension.csproj `
             /p:Configuration=Release `
             /p:Platform=${{ matrix.platform }} `
+            /p:RuntimeIdentifier=win-${{ matrix.platform }} `
             /p:AppxPackageDir="${{ github.workspace }}/AppPackages/" `
             /p:AppxBundle=Never `
             /p:UapAppxPackageBuildMode=SideloadOnly `
             /p:AppxPackageSigningEnabled=false `
+            /p:PublishSingleFile=false `
+            /p:PublishTrimmed=false `
             /p:GenerateAppxPackageOnBuild=true
         shell: pwsh
 
