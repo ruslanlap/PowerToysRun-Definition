@@ -24,7 +24,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        platform: [x64, ARM64]
+        platform: [x64, arm64]
 
     steps:
       - name: Checkout code
@@ -69,7 +69,7 @@ jobs:
 
       - name: Build MSIX package
         run: |
-          msbuild CmdPal/CmdPal-Definition.sln `
+          msbuild CmdPal/DefinitionExtension/DefinitionExtension.csproj `
             /p:Configuration=Release `
             /p:Platform=${{ matrix.platform }} `
             /p:AppxPackageDir="${{ github.workspace }}/AppPackages/" `
@@ -113,8 +113,8 @@ jobs:
       - name: Download ARM64 MSIX
         uses: actions/download-artifact@v4
         with:
-          name: msix-ARM64
-          path: msix-ARM64
+          name: msix-arm64
+          path: msix-arm64
 
       - name: Install Windows SDK (makeappx)
         shell: pwsh
@@ -138,7 +138,7 @@ jobs:
 
           # Copy all MSIX files into bundle input
           Get-ChildItem -Path msix-x64 -Filter "*.msix" | Copy-Item -Destination bundle-input/
-          Get-ChildItem -Path msix-ARM64 -Filter "*.msix" | Copy-Item -Destination bundle-input/
+          Get-ChildItem -Path msix-arm64 -Filter "*.msix" | Copy-Item -Destination bundle-input/
 
           Write-Host "Bundle input contents:"
           Get-ChildItem bundle-input
