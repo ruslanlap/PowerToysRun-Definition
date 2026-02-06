@@ -32,6 +32,9 @@
           <a href="https://github.com/hlaueriksson/awesome-powertoys-run-plugins">
     <img src="https://awesome.re/mentioned-badge.svg" alt="Mentioned in Awesome PowerToys Run Plugins">
   </a>
+  <a href="https://winstall.app/apps/ruslanlap.DefinitionForCommandPalette">
+    <img src="https://img.shields.io/badge/Install%20with-WinGet-blue.svg" alt="Install with WinGet">
+  </a>
 
 
 </div>
@@ -140,9 +143,21 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 
 ### Install via WinGet
 
+> **WinGet** is Microsoft's official package manager for Windows 10/11. It's like `apt` for Ubuntu or `brew` for macOS - a command-line tool that installs, updates, and manages software automatically.
+
+**Why use WinGet?**
+- ⚡ **One command** — No need to download ZIP files manually
+- 🔄 **Auto-updates** — Get notified when new versions are available
+- 🛡️ **Trusted source** — Packages are verified and digitally signed
+- 🧹 **Clean uninstall** — Removes all files and registry entries properly
+
 ```powershell
 winget install ruslanlap.DefinitionForCommandPalette
 ```
+
+**Prerequisites for WinGet:**
+- Windows 10 version 1709 (build 16299) or later
+- [WinGet client](https://docs.microsoft.com/en-us/windows/package-manager/winget/) (pre-installed on Windows 11, or install from Microsoft Store/App Installer)
 
 ### Quick Install (Manual)
 
@@ -306,6 +321,13 @@ Please make sure to update tests as appropriate.
 <details>
 <summary><b>How can I see more information about a word?</b></summary>
 <p>Right-click on any result and select "Open Source URL in Browser" to view the word in Wiktionary, which provides additional information, translations, and etymology.</p>
+</details>
+
+<details>
+<summary><b>What's the difference between WinGet and manual installation?</b></summary>
+<p><strong>WinGet installation:</strong> Run one command (<code>winget install ruslanlap.DefinitionForCommandPalette</code>) and WinGet handles everything - downloads, verifies, installs, and registers the extension automatically. You also get automatic update notifications when new versions are released.</p>
+<p><strong>Manual installation:</strong> Download ZIP file, extract to specific folder, restart PowerToys. You need to check for updates manually on GitHub.</p>
+<p>WinGet is recommended for most users as it's more convenient and ensures you always have the latest version.</p>
 </details>
 
 ## 🔆 Feature Spotlight
