@@ -1,0 +1,77 @@
+name: Publish to WinGet
+
+on:
+  release:
+    types: [released]
+
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag to publish (e.g. v1.0.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: windows-latest
+
+    steps:
+      - name: Get version from release
+        id: get_version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ github.event.inputs.release_tag }}"
+          else
+            TAG="${{ github.event.release.tag_name }}"
+          fi
+          VERSION="${TAG#v}"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "TAG=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Wait for release assets
+        shell: pwsh
+        run: |
+          # Wait up to 10 minutes for the msixbundle to appear in the release
+          $maxAttempts = 20
+          $delaySeconds = 30
+          $assetUrl = "https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/${{ steps.get_version.outputs.TAG }}/DefinitionForCommandPalette.msixbundle"
+
+          for ($i = 1; $i -le $maxAttempts; $i++) {
+            try {
+              $response = Invoke-WebRequest -Uri $assetUrl -Method Head -MaximumRedirection 5 -ErrorAction Stop
+              if ($response.StatusCode -eq 200) {
+                Write-Host "Release asset is available (attempt $i)"
+                break
+              }
+            } catch {
+              if ($i -eq $maxAttempts) {
+                Write-Error "Release asset not available after $maxAttempts attempts: $assetUrl"
+                exit 1
+              }
+              Write-Host "Attempt $i/$maxAttempts - Asset not yet available, waiting ${delaySeconds}s..."
+              Start-Sleep -Seconds $delaySeconds
+            }
+          }
+
+      - name: Install wingetcreate
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri "https://aka.ms/wingetcreate/latest" -OutFile wingetcreate.exe
+
+      - name: Update and submit WinGet manifest
+        shell: pwsh
+        run: |
+          $version = "${{ steps.get_version.outputs.VERSION }}"
+          $tag = "${{ steps.get_version.outputs.TAG }}"
+          $url = "https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/${tag}/DefinitionForCommandPalette.msixbundle"
+
+          .\wingetcreate.exe update `
+            --id "ruslanlap.DefinitionForCommandPalette" `
+            --version $version `
+            --urls $url `
+            --token "${{ secrets.WINGET_GITHUB_TOKEN }}" `
+            --submit
