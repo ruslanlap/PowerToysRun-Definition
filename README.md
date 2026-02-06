@@ -138,7 +138,13 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 - .NET 9.0 Runtime (included with Windows 11 22H2 or later)
 - Internet connection (for API access)
 
-### Quick Install
+### Install via WinGet
+
+```powershell
+winget install ruslanlap.DefinitionForCommandPalette
+```
+
+### Quick Install (Manual)
 
 1. Download the appropriate ZIP for your system architecture:
    - [x64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.2/Definition-1.3.2-x64.zip)
