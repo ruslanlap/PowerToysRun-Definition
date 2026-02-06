@@ -9,8 +9,8 @@
   IgnorableNamespaces="uap uap3 rescap mp">
 
   <Identity
-    Name="ruslanlap.DefinitionForCommandPalette"
-    Publisher="CN=1D5E8901-4083-4190-9587-CDE59A1A8FA5"
+    Name="ruslanlap.DefinitionforCommandPalette"
+    Publisher="CN=11D55891-40B3-4190-95B7-CDE591AABEA5"
     Version="1.0.0.0" />
 
   <Properties>
@@ -53,7 +53,7 @@
           <uap3:AppExtension Name="com.microsoft.commandpalette"
             Id="CmdPal-Definition"
             PublicFolder="Public"
-            DisplayName="ruslanlap.DefinitionForCommandPalette"
+            DisplayName="ruslanlap.DefinitionforCommandPalette"
             Description="Dictionary lookup extension for Microsoft PowerToys Command Palette">
             <uap3:Properties>
               <CmdPalProvider>
