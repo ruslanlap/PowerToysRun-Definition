@@ -3,6 +3,7 @@
 
 using Microsoft.CommandPalette.Extensions;
 using Shmuelie.WinRTServer;
+using Shmuelie.WinRTServer.CsWinRT;
 using System;
 using System.Threading;
 
@@ -15,12 +16,14 @@ public class Program
     {
         if (args.Length > 0 && args[0] == "-RegisterProcessAsComServer")
         {
-            using var server = new ComServer();
+            global::Shmuelie.WinRTServer.ComServer server = new();
             var extensionDisposedEvent = new ManualResetEvent(false);
             var extensionInstance = new DefinitionExtension(extensionDisposedEvent);
-            server.RegisterClass<DefinitionExtension>(() => extensionInstance);
+            server.RegisterClass<DefinitionExtension, IExtension>(() => extensionInstance);
             server.Start();
             extensionDisposedEvent.WaitOne();
+            server.Stop();
+            server.UnsafeDispose();
         }
         else
         {
