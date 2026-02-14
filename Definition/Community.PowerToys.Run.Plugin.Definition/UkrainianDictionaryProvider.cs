@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -11,16 +12,18 @@ using HtmlAgilityPack;
 namespace Community.PowerToys.Run.Plugin.Definition
 {
     /// <summary>
-    /// Ukrainian dictionary provider using sum.in.ua
-    /// Uses transliterated URL paths: https://sum.in.ua/s/{word}
+    /// Ukrainian dictionary provider using goroh.pp.ua (primary) with sum.in.ua (fallback).
+    /// goroh.pp.ua uses Cyrillic in URL paths: https://goroh.pp.ua/Тлумачення/{word}
+    /// sum.in.ua uses transliterated URL paths: https://sum.in.ua/s/{word}
     /// </summary>
     internal class UkrainianDictionaryProvider : IDictionaryProvider
     {
         private readonly HttpClient _httpClient;
         public string LanguageCode => "uk";
-        public string DisplayName => "Українська (sum.in.ua)";
+        public string DisplayName => "Українська (goroh.pp.ua)";
 
-        private const string DefaultBaseUrl = "https://sum.in.ua/s/";
+        private const string GorohBaseUrl = "https://goroh.pp.ua/Тлумачення/";
+        private const string SumBaseUrl = "https://sum.in.ua/s/";
 
         public UkrainianDictionaryProvider(HttpClient httpClient)
         {
@@ -31,77 +34,259 @@ namespace Community.PowerToys.Run.Plugin.Definition
         {
             System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] Starting lookup for word: '{word}'");
 
-            // Transliterate Cyrillic to Latin for URL
-            var transliteratedWord = TransliterateCyrillicToLatin(word.ToLowerInvariant());
-            var baseUrl = ConfigurationManager.Configuration.UkrainianApiEndpoint;
-            
-            // Use default if empty or if using old query parameter approach
-            if (string.IsNullOrEmpty(baseUrl) || baseUrl.Contains("?swrd="))
-            {
-                baseUrl = DefaultBaseUrl;
-            }
-
-            var requestUrl = $"{baseUrl}{transliteratedWord}";
-            System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] Transliterated '{word}' -> '{transliteratedWord}'");
-            System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] Request URL: {requestUrl}");
-
+            // Try goroh.pp.ua first (primary source)
             try
             {
-                using var response = await _httpClient.GetAsync(requestUrl, token);
-                System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] Response status: {response.StatusCode}");
-
-                // Note: sum.in.ua may return 404 for existing words, so we don't check status code
-                var html = await response.Content.ReadAsStringAsync(token);
-                System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] Response length: {html.Length} bytes");
-                
-                var doc = new HtmlDocument();
-                doc.LoadHtml(html);
-
-                // Try to get the article body (definition content)
-                var articleBody = doc.DocumentNode.SelectSingleNode("//div[@itemprop='articleBody']");
-                
-                if (articleBody != null)
+                var results = await LookupGorohAsync(word, token);
+                if (results.Count > 0)
                 {
-                    System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] Found articleBody");
-                    return ParseArticleBody(word, articleBody, requestUrl);
+                    return results;
                 }
-
-                // Fallback: Try the #article selector
-                var articleNode = doc.DocumentNode.SelectSingleNode("//div[@id='article']//div[@itemprop='articleBody']")
-                                ?? doc.DocumentNode.SelectSingleNode("//div[@id='textside']//div[@itemprop='articleBody']");
-                if (articleNode != null)
-                {
-                    System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] Found article via fallback selector");
-                    return ParseArticleBody(word, articleNode, requestUrl);
-                }
-
-                // Check if it's a "not found" page
-                var pageContent = doc.DocumentNode.InnerText;
-                if (pageContent.Contains("не знайдено") || pageContent.Contains("Можливо, ви шукали"))
-                {
-                    System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] Word not found");
-                    return new List<DictionaryEntry>();
-                }
-
-                // Check for search alternatives
-                var searchRes = doc.DocumentNode.SelectSingleNode("//div[@id='search-res']");
-                if (searchRes != null)
-                {
-                    System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] Found alternatives");
-                    return ParseAlternatives(word, searchRes, requestUrl);
-                }
-
-                System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] No content found");
-                return new List<DictionaryEntry>();
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] Error: {ex.Message}");
-                throw;
+                System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] goroh.pp.ua failed: {ex.Message}");
             }
+
+            // Fallback to sum.in.ua
+            try
+            {
+                var results = await LookupSumAsync(word, token);
+                if (results.Count > 0)
+                {
+                    return results;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] sum.in.ua fallback failed: {ex.Message}");
+            }
+
+            return new List<DictionaryEntry>();
         }
 
-        private List<DictionaryEntry> ParseArticleBody(string word, HtmlNode articleBody, string sourceUrl)
+        #region goroh.pp.ua (primary)
+
+        private async Task<List<DictionaryEntry>> LookupGorohAsync(string word, CancellationToken token)
+        {
+            // goroh.pp.ua accepts Cyrillic directly in URL
+            var requestUrl = $"{GorohBaseUrl}{Uri.EscapeDataString(word.ToLowerInvariant())}";
+            System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] goroh.pp.ua URL: {requestUrl}");
+
+            using var response = await _httpClient.GetAsync(requestUrl, token);
+            System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] goroh.pp.ua status: {response.StatusCode}");
+
+            // 404 means word not found
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return new List<DictionaryEntry>();
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new List<DictionaryEntry>();
+            }
+
+            var html = await response.Content.ReadAsStringAsync(token);
+
+            // Check for isNotFound in page data
+            if (html.Contains("isNotFound: true"))
+            {
+                return new List<DictionaryEntry>();
+            }
+
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+
+            return ParseGorohHtml(word, doc, requestUrl);
+        }
+
+        private List<DictionaryEntry> ParseGorohHtml(string word, HtmlDocument doc, string sourceUrl)
+        {
+            var articleBlocks = doc.DocumentNode.SelectNodes("//div[contains(@class, 'article-block')]");
+            if (articleBlocks == null || articleBlocks.Count == 0)
+            {
+                System.Diagnostics.Debug.WriteLine("[UkrainianProvider] goroh.pp.ua: no article-block found");
+                return new List<DictionaryEntry>();
+            }
+
+            var entry = new DictionaryEntry
+            {
+                Word = word,
+                SourceUrls = new List<string> { sourceUrl }
+            };
+
+            foreach (var block in articleBlocks)
+            {
+                // Extract word title from h2.page__sub-header > span.uppercase
+                var titleNode = block.SelectSingleNode(".//h2[contains(@class, 'page__sub-header')]//span[contains(@class, 'uppercase')]");
+                var wordTitle = HtmlEntity.DeEntitize(titleNode?.InnerText?.Trim() ?? word.ToUpper());
+                // Remove stress marks for cleaner display
+                wordTitle = wordTitle.Replace("\u0301", "");
+
+                // Extract part of speech from span.block-remark
+                var remarkNode = block.SelectSingleNode(".//h2[contains(@class, 'page__sub-header')]//span[contains(@class, 'block-remark')]");
+                var pos = ParsePartOfSpeech(remarkNode);
+
+                // Extract definitions from span.interpret-formula
+                var formulaNodes = block.SelectNodes(".//span[contains(@class, 'interpret-formula')]");
+                if (formulaNodes == null || formulaNodes.Count == 0)
+                {
+                    continue;
+                }
+
+                var meaning = new Meaning
+                {
+                    PartOfSpeech = pos
+                };
+
+                // Get interpret divs which contain both formula and examples
+                var interpretDivs = block.SelectNodes(".//div[contains(@class, 'interpret')]");
+
+                if (interpretDivs != null)
+                {
+                    foreach (var interpretDiv in interpretDivs.Take(5))
+                    {
+                        var formulaNode = interpretDiv.SelectSingleNode(".//span[contains(@class, 'interpret-formula')]");
+                        if (formulaNode == null)
+                            continue;
+
+                        var defText = HtmlEntity.DeEntitize(formulaNode.InnerText?.Trim() ?? "");
+                        if (string.IsNullOrEmpty(defText))
+                            continue;
+
+                        var displayText = defText.Length > 250
+                            ? defText.Substring(0, 247) + "..."
+                            : defText;
+
+                        var defItem = new DefinitionItem { Definition = displayText };
+
+                        // Extract first example if available
+                        var exampleNode = interpretDiv.SelectSingleNode(".//span[contains(@class, 'example-text')]");
+                        if (exampleNode != null)
+                        {
+                            var exampleText = HtmlEntity.DeEntitize(exampleNode.InnerText?.Trim() ?? "");
+                            if (!string.IsNullOrEmpty(exampleText))
+                            {
+                                var sourceNode = exampleNode.SelectSingleNode("following-sibling::span[contains(@class, 'example-source')]")
+                                    ?? interpretDiv.SelectSingleNode(".//span[contains(@class, 'example-source')]");
+                                var source = sourceNode != null ? " " + HtmlEntity.DeEntitize(sourceNode.InnerText?.Trim() ?? "") : "";
+                                defItem.Example = exampleText.Length > 200
+                                    ? exampleText.Substring(0, 197) + "..."
+                                    : exampleText + source;
+                            }
+                        }
+
+                        meaning.Definitions.Add(defItem);
+                    }
+                }
+                else
+                {
+                    // Fallback: just get formulas without examples
+                    foreach (var formulaNode in formulaNodes.Take(5))
+                    {
+                        var defText = HtmlEntity.DeEntitize(formulaNode.InnerText?.Trim() ?? "");
+                        if (!string.IsNullOrEmpty(defText))
+                        {
+                            var displayText = defText.Length > 250
+                                ? defText.Substring(0, 247) + "..."
+                                : defText;
+                            meaning.Definitions.Add(new DefinitionItem { Definition = displayText });
+                        }
+                    }
+                }
+
+                if (meaning.Definitions.Count > 0)
+                {
+                    entry.Meanings.Add(meaning);
+                }
+            }
+
+            if (entry.Meanings.Count == 0)
+            {
+                return new List<DictionaryEntry>();
+            }
+
+            System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] goroh.pp.ua: found {entry.Meanings.Sum(m => m.Definitions.Count)} definitions");
+            return new List<DictionaryEntry> { entry };
+        }
+
+        private string ParsePartOfSpeech(HtmlNode remarkNode)
+        {
+            if (remarkNode == null)
+                return string.Empty;
+
+            var text = HtmlEntity.DeEntitize(remarkNode.InnerText?.Trim() ?? "").ToLowerInvariant();
+
+            // Check for gender indicators from goroh.pp.ua format like "и, ж." or "а, ч."
+            var genderNode = remarkNode.SelectSingleNode(".//span[@title]");
+            if (genderNode != null)
+            {
+                var title = genderNode.GetAttributeValue("title", "").ToLowerInvariant();
+                if (title.Contains("жіночий")) return "іменник (ж.)";
+                if (title.Contains("чоловічий")) return "іменник (ч.)";
+                if (title.Contains("середній")) return "іменник (с.)";
+            }
+
+            // Fallback: check text patterns
+            if (text.Contains("ж.")) return "іменник (ж.)";
+            if (text.Contains("ч.")) return "іменник (ч.)";
+            if (text.Contains("с.")) return "іменник (с.)";
+
+            return string.Empty;
+        }
+
+        #endregion
+
+        #region sum.in.ua (fallback)
+
+        private async Task<List<DictionaryEntry>> LookupSumAsync(string word, CancellationToken token)
+        {
+            var transliteratedWord = TransliterateCyrillicToLatin(word.ToLowerInvariant());
+
+            var baseUrl = ConfigurationManager.Configuration.UkrainianApiEndpoint;
+            if (string.IsNullOrEmpty(baseUrl) || !baseUrl.Contains("sum.in.ua"))
+            {
+                baseUrl = SumBaseUrl;
+            }
+
+            var requestUrl = $"{baseUrl}{transliteratedWord}";
+            System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] sum.in.ua URL: {requestUrl}");
+
+            using var response = await _httpClient.GetAsync(requestUrl, token);
+            System.Diagnostics.Debug.WriteLine($"[UkrainianProvider] sum.in.ua status: {response.StatusCode}");
+
+            // sum.in.ua may return 404 for existing words, so we parse HTML regardless
+            var html = await response.Content.ReadAsStringAsync(token);
+            if (string.IsNullOrEmpty(html))
+            {
+                return new List<DictionaryEntry>();
+            }
+
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+
+            // Try to get the article body
+            var articleBody = doc.DocumentNode.SelectSingleNode("//div[@itemprop='articleBody']")
+                ?? doc.DocumentNode.SelectSingleNode("//div[@id='article']//div[@itemprop='articleBody']")
+                ?? doc.DocumentNode.SelectSingleNode("//div[@id='textside']//div[@itemprop='articleBody']");
+
+            if (articleBody != null)
+            {
+                return ParseSumArticleBody(word, articleBody, requestUrl);
+            }
+
+            // Check for "not found" page
+            var pageContent = doc.DocumentNode.InnerText;
+            if (pageContent.Contains("не знайдено") || pageContent.Contains("Можливо, ви шукали"))
+            {
+                return new List<DictionaryEntry>();
+            }
+
+            return new List<DictionaryEntry>();
+        }
+
+        private List<DictionaryEntry> ParseSumArticleBody(string word, HtmlNode articleBody, string sourceUrl)
         {
             var entry = new DictionaryEntry
             {
@@ -109,18 +294,9 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 SourceUrls = new List<string> { sourceUrl }
             };
 
-            // Extract the word title
-            var titleNode = articleBody.SelectSingleNode(".//strong[@class='title']");
-            var wordTitle = titleNode?.InnerText?.Trim() ?? word.ToUpper();
-
-            // Get all text content
             var fullText = GetCleanText(articleBody);
-            
-            // Extract part of speech
-            var pos = ExtractPartOfSpeech(articleBody, fullText);
-
-            // Split into numbered definitions
-            var definitions = SplitDefinitions(articleBody, fullText);
+            var pos = ExtractSumPartOfSpeech(articleBody, fullText);
+            var definitions = SplitSumDefinitions(articleBody, fullText);
 
             var meaning = new Meaning
             {
@@ -132,79 +308,32 @@ namespace Community.PowerToys.Run.Plugin.Definition
             return new List<DictionaryEntry> { entry };
         }
 
-        private List<DictionaryEntry> ParseAlternatives(string word, HtmlNode searchRes, string sourceUrl)
-        {
-            var entry = new DictionaryEntry
-            {
-                Word = word,
-                SourceUrls = new List<string> { sourceUrl }
-            };
-
-            var headerNode = searchRes.SelectSingleNode(".//p");
-            var headerText = headerNode?.InnerText?.Trim() ?? "Слово не знайдено";
-
-            var alternatives = new List<string>();
-            var listItems = searchRes.SelectNodes(".//li");
-            if (listItems != null)
-            {
-                foreach (var li in listItems.Take(5))
-                {
-                    var altWord = li.InnerText?.Trim();
-                    if (!string.IsNullOrEmpty(altWord))
-                    {
-                        alternatives.Add(altWord);
-                    }
-                }
-            }
-
-            var definitionText = alternatives.Any()
-                ? $"{headerText}: {string.Join(", ", alternatives)}"
-                : headerText;
-
-            var meaning = new Meaning
-            {
-                PartOfSpeech = string.Empty,
-                Definitions = new List<DefinitionItem>
-                {
-                    new DefinitionItem { Definition = definitionText }
-                }
-            };
-
-            entry.Meanings.Add(meaning);
-            return new List<DictionaryEntry> { entry };
-        }
-
         private string GetCleanText(HtmlNode node)
         {
-            var text = node.InnerText;
+            var text = HtmlEntity.DeEntitize(node.InnerText ?? "");
             text = Regex.Replace(text, @"\s+", " ");
             return text.Trim();
         }
 
-        private List<DefinitionItem> SplitDefinitions(HtmlNode articleBody, string fullText)
+        private List<DefinitionItem> SplitSumDefinitions(HtmlNode articleBody, string fullText)
         {
             var definitions = new List<DefinitionItem>();
 
-            // Try to find numbered definitions by looking for span.zn elements
             var znNodes = articleBody.SelectNodes(".//span[@class='zn']");
-            
             if (znNodes != null && znNodes.Count > 1)
             {
-                // Multiple numbered definitions
                 var pNodes = articleBody.SelectNodes(".//p[@class='znach']");
                 if (pNodes != null)
                 {
-                    foreach (var p in pNodes.Take(5)) // Limit to 5 definitions
+                    foreach (var p in pNodes.Take(5))
                     {
                         var defText = GetCleanText(p);
-                        // Remove leading number
                         defText = Regex.Replace(defText, @"^\d+\.\s*", "");
-                        
+
                         if (!string.IsNullOrEmpty(defText))
                         {
-                            // Truncate for display
-                            var displayText = defText.Length > 250 
-                                ? defText.Substring(0, 247) + "..." 
+                            var displayText = defText.Length > 250
+                                ? defText.Substring(0, 247) + "..."
                                 : defText;
                             definitions.Add(new DefinitionItem { Definition = displayText });
                         }
@@ -212,19 +341,17 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 }
             }
 
-            // If no numbered definitions found, use full text
             if (!definitions.Any())
             {
-                // Remove the word title from the beginning
                 var text = fullText;
-                var titleMatch = Regex.Match(text, @"^[А-ЯІЇЄҐ]+,?\s*");
+                var titleMatch = Regex.Match(text, @"^[А-ЯІЇЄҐ\u0301]+,?\s*");
                 if (titleMatch.Success)
                 {
                     text = text.Substring(titleMatch.Length);
                 }
 
-                var displayText = text.Length > 400 
-                    ? text.Substring(0, 397) + "..." 
+                var displayText = text.Length > 400
+                    ? text.Substring(0, 397) + "..."
                     : text;
                 definitions.Add(new DefinitionItem { Definition = displayText.Trim() });
             }
@@ -232,38 +359,39 @@ namespace Community.PowerToys.Run.Plugin.Definition
             return definitions;
         }
 
-        private string ExtractPartOfSpeech(HtmlNode articleBody, string fullText)
+        private string ExtractSumPartOfSpeech(HtmlNode articleBody, string fullText)
         {
-            // Look for abbreviation tags
             var abbrNode = articleBody.SelectSingleNode(".//abbr[@class='mark']");
             if (abbrNode != null)
             {
                 var title = abbrNode.GetAttributeValue("title", "");
                 var text = abbrNode.InnerText?.Trim() ?? "";
 
-                if (title.Contains("чоловічий") || text == "чол.") return "noun (m)";
-                if (title.Contains("жіночий") || text == "жін.") return "noun (f)";
-                if (title.Contains("середній") || text == "сер.") return "noun (n)";
+                if (title.Contains("чоловічий") || text == "чол.") return "іменник (ч.)";
+                if (title.Contains("жіночий") || text == "жін.") return "іменник (ж.)";
+                if (title.Contains("середній") || text == "сер.") return "іменник (с.)";
             }
 
-            // Fallback to text patterns
-            if (fullText.Contains("іменник")) return "noun";
-            if (fullText.Contains("дієслово")) return "verb";
-            if (fullText.Contains("прикметник")) return "adjective";
-            if (fullText.Contains("прислівник")) return "adverb";
-            if (fullText.Contains("займенник")) return "pronoun";
-            if (fullText.Contains("числівник")) return "numeral";
-            if (fullText.Contains("частка")) return "particle";
-            if (fullText.Contains("сполучник")) return "conjunction";
-            if (fullText.Contains("прийменник")) return "preposition";
-            if (fullText.Contains("вигук")) return "interjection";
-            
+            if (fullText.Contains("іменник")) return "іменник";
+            if (fullText.Contains("дієслово")) return "дієслово";
+            if (fullText.Contains("прикметник")) return "прикметник";
+            if (fullText.Contains("прислівник")) return "прислівник";
+            if (fullText.Contains("займенник")) return "займенник";
+            if (fullText.Contains("числівник")) return "числівник";
+            if (fullText.Contains("частка")) return "частка";
+            if (fullText.Contains("сполучник")) return "сполучник";
+            if (fullText.Contains("прийменник")) return "прийменник";
+            if (fullText.Contains("вигук")) return "вигук";
+
             return string.Empty;
         }
 
+        #endregion
+
+        #region Transliteration (for sum.in.ua)
+
         /// <summary>
         /// Transliterates Ukrainian Cyrillic to Latin for sum.in.ua URL paths.
-        /// Based on the scheme used by sum.in.ua website.
         /// </summary>
         private string TransliterateCyrillicToLatin(string input)
         {
@@ -272,20 +400,12 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
             var transliteration = new Dictionary<char, string>
             {
-                // Lowercase
                 {'а', "a"}, {'б', "b"}, {'в', "v"}, {'г', "gh"}, {'ґ', "g"}, {'д', "d"},
                 {'е', "e"}, {'є', "je"}, {'ж', "zh"}, {'з', "z"}, {'и', "y"}, {'і', "i"},
                 {'ї', "ji"}, {'й', "j"}, {'к', "k"}, {'л', "l"}, {'м', "m"}, {'н', "n"},
                 {'о', "o"}, {'п', "p"}, {'р', "r"}, {'с', "s"}, {'т', "t"}, {'у', "u"},
                 {'ф', "f"}, {'х', "kh"}, {'ц', "c"}, {'ч', "ch"}, {'ш', "sh"}, {'щ', "shh"},
-                {'ь', "j"}, {'ю', "ju"}, {'я', "ja"}, {'\'', "."}, {'\u2019', "."},
-                // Uppercase (converted to lowercase in input, but keep for safety)
-                {'А', "a"}, {'Б', "b"}, {'В', "v"}, {'Г', "gh"}, {'Ґ', "g"}, {'Д', "d"},
-                {'Е', "e"}, {'Є', "je"}, {'Ж', "zh"}, {'З', "z"}, {'И', "y"}, {'І', "i"},
-                {'Ї', "ji"}, {'Й', "j"}, {'К', "k"}, {'Л', "l"}, {'М', "m"}, {'Н', "n"},
-                {'О', "o"}, {'П', "p"}, {'Р', "r"}, {'С', "s"}, {'Т', "t"}, {'У', "u"},
-                {'Ф', "f"}, {'Х', "kh"}, {'Ц', "c"}, {'Ч', "ch"}, {'Ш', "sh"}, {'Щ', "shh"},
-                {'Ь', "j"}, {'Ю', "ju"}, {'Я', "ja"}
+                {'ь', "j"}, {'ю', "ju"}, {'я', "ja"}, {'\'', "."}, {'\u2019', "."}
             };
 
             var result = new StringBuilder(input.Length * 2);
@@ -299,5 +419,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
             return result.ToString();
         }
+
+        #endregion
     }
 }

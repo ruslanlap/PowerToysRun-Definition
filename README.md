@@ -114,7 +114,7 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 ## ✨ Features
 
 - 🔍 **Instant Definitions**: Get definitions in real-time via `dictionaryapi.dev`.
-- 🇺🇦 **Ukrainian Dictionary (Українська)**: Lookup Ukrainian words using the [Словник української мови (sum.in.ua)](https://sum.in.ua/) — just type any word in Cyrillic (e.g. `def слово`).
+- 🇺🇦 **Ukrainian Dictionary (Українська)**: Lookup Ukrainian words using [goroh.pp.ua](https://goroh.pp.ua/) (500,000+ words) with [sum.in.ua](https://sum.in.ua/) as fallback — just type any word in Cyrillic (e.g. `def слово`).
 - 🇨🇳 **Chinese Dictionary (中文)**: Offline Chinese-English lookups powered by the embedded CC-CEDICT database (~124,000 entries) — no network needed.
 - 🔄 **Three-Language Parallel Lookup**: All providers are queried simultaneously; results are prioritized based on your query script (Latin, Cyrillic, or Chinese characters).
 - 🔊 **Pronunciation Audio**: Play phonetic audio directly from your results.
@@ -212,7 +212,7 @@ The plugin supports extensive customization through a `config.json` file that's 
 |---------|---------|-------------|
 | `Language` | `"en"` | Default language (`"en"`, `"uk"`, or `"zh"`) |
 | `ApiEndpoint` | `https://api.dictionaryapi.dev/api/v2/entries/en/` | English dictionary API endpoint |
-| `UkrainianApiEndpoint` | `https://sum.in.ua/s/` | Ukrainian dictionary endpoint (sum.in.ua) |
+| `UkrainianApiEndpoint` | `https://sum.in.ua/s/` | Ukrainian dictionary fallback endpoint (sum.in.ua) |
 | `ChineseApiEndpoint` | `https://www.mdbg.net/chinese/dictionary?...` | Chinese dictionary reference URL |
 | `CacheMaxSize` | 100 | Maximum number of cached word lookups |
 | `HttpTimeoutSeconds` | 10 | Timeout for API requests in seconds |
@@ -299,7 +299,7 @@ Please make sure to update tests as appropriate.
 
 <details>
 <summary><b>Does the plugin require internet access?</b></summary>
-<p>English and Ukrainian lookups require internet access (dictionaryapi.dev and sum.in.ua respectively). Chinese lookups use an embedded offline dictionary and work without internet. All results are cached in memory for subsequent lookups.</p>
+<p>English and Ukrainian lookups require internet access (dictionaryapi.dev and goroh.pp.ua respectively). Chinese lookups use an embedded offline dictionary and work without internet. All results are cached in memory for subsequent lookups.</p>
 </details>
 
 <details>
@@ -319,7 +319,7 @@ Please make sure to update tests as appropriate.
 
 <details>
 <summary><b>How do I look up Ukrainian words?</b></summary>
-<p>Just type <code>def слово</code> (any Ukrainian word in Cyrillic). The plugin automatically detects Cyrillic script and prioritizes results from <a href="https://sum.in.ua/">sum.in.ua</a> (Словник української мови). No special API key is needed — the plugin scrapes the sum.in.ua website directly.</p>
+<p>Just type <code>def слово</code> (any Ukrainian word in Cyrillic). The plugin automatically detects Cyrillic script and prioritizes Ukrainian results. The primary source is <a href="https://goroh.pp.ua/">goroh.pp.ua</a> (Горох — українські словники, 500,000+ words) with <a href="https://sum.in.ua/">sum.in.ua</a> as fallback. No special API key is needed.</p>
 </details>
 
 <details>
@@ -327,7 +327,7 @@ Please make sure to update tests as appropriate.
 <p>Three languages are supported out of the box:</p>
 <ul>
 <li><strong>English</strong> — via <a href="https://dictionaryapi.dev/">dictionaryapi.dev</a> (free REST API)</li>
-<li><strong>Ukrainian (Українська)</strong> — via <a href="https://sum.in.ua/">sum.in.ua</a> (HTML scraping, no formal API exists)</li>
+<li><strong>Ukrainian (Українська)</strong> — via <a href="https://goroh.pp.ua/">goroh.pp.ua</a> (primary) + <a href="https://sum.in.ua/">sum.in.ua</a> (fallback)</li>
 <li><strong>Chinese (中文)</strong> — via embedded CC-CEDICT database (~124,000 entries, fully offline)</li>
 </ul>
 </details>
@@ -394,7 +394,7 @@ The plugin supports three dictionary sources with automatic script detection:
 | Language | Source | Method | Internet Required |
 |----------|--------|--------|:-----------------:|
 | **English** | [dictionaryapi.dev](https://dictionaryapi.dev/) | REST API (JSON) | Yes |
-| **Українська** | [sum.in.ua](https://sum.in.ua/) (Словник української мови) | HTML scraping | Yes |
+| **Українська** | [goroh.pp.ua](https://goroh.pp.ua/) (primary) + [sum.in.ua](https://sum.in.ua/) (fallback) | HTML scraping | Yes |
 | **中文** | CC-CEDICT (embedded, ~124,000 entries) | Offline database | No |
 
 **How it works:** When you type `def <word>`, all three providers are queried in parallel. The plugin detects the script of your input and boosts scores for matching results:
@@ -402,7 +402,7 @@ The plugin supports three dictionary sources with automatic script detection:
 - Chinese characters (`def 你好`) → Chinese results prioritized
 - Latin input (`def hello`) → English results prioritized
 
-> **Note on Ukrainian:** There is no public REST API for Ukrainian dictionaries. The plugin works around this by scraping [sum.in.ua](https://sum.in.ua/) (Словник української мови) — a comprehensive Ukrainian explanatory dictionary. Cyrillic words are transliterated to Latin for the URL path (e.g. `слово` → `slovo` → `https://sum.in.ua/s/slovo`).
+> **Note on Ukrainian:** There is no public REST API for Ukrainian dictionaries. The plugin uses [goroh.pp.ua](https://goroh.pp.ua/) (Горох — українські словники) as the primary source — a comprehensive Ukrainian dictionary with 500,000+ words, definitions, examples, synonyms, and more. Cyrillic words are used directly in the URL (e.g. `def слово` → `https://goroh.pp.ua/Тлумачення/слово`). If goroh.pp.ua is unavailable, [sum.in.ua](https://sum.in.ua/) is used as fallback.
 
 ## 📸 Screenshots
 
@@ -441,7 +441,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [Microsoft PowerToys](https://github.com/microsoft/PowerToys) team for the amazing launcher
 - [dictionaryapi.dev](https://dictionaryapi.dev/) for providing the free English dictionary API
-- [sum.in.ua](https://sum.in.ua/) for the Словник української мови (Ukrainian explanatory dictionary)
+- [goroh.pp.ua](https://goroh.pp.ua/) for Горох — українські словники (primary Ukrainian dictionary source)
+- [sum.in.ua](https://sum.in.ua/) for the Словник української мови (Ukrainian dictionary fallback)
 - [MDBG.net](https://www.mdbg.net) for providing access to CC-CEDICT Chinese-English dictionary
 - [Wiktionary](https://en.wiktionary.org/) for comprehensive word information and translations
 - All contributors who have helped improve this plugin
