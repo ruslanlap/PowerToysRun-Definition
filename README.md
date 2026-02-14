@@ -105,7 +105,7 @@
 
 ## 📋 Overview
 
-Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsoft/PowerToys) that allows you to quickly lookup word definitions, phonetics, and synonyms without leaving your keyboard. Simply type `def <word>` to fetch definitions from dictionaryapi.dev.
+Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsoft/PowerToys) that allows you to quickly lookup word definitions, phonetics, and synonyms without leaving your keyboard. Simply type `def <word>` to fetch definitions. The plugin supports **English**, **Ukrainian (Українська)**, and **Chinese (中文)** with automatic script detection — just type a word in any supported language and the plugin will prioritize results accordingly.
 
 <div align="center">
   <img src="data/demo-definition-2.gif" alt="Lookup word definitions" width="650">
@@ -114,10 +114,13 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 ## ✨ Features
 
 - 🔍 **Instant Definitions**: Get definitions in real-time via `dictionaryapi.dev`.
+- 🇺🇦 **Ukrainian Dictionary (Українська)**: Lookup Ukrainian words using [goroh.pp.ua](https://goroh.pp.ua/) (500,000+ words) with [sum.in.ua](https://sum.in.ua/) as fallback — just type any word in Cyrillic (e.g. `def слово`).
+- 🇨🇳 **Chinese Dictionary (中文)**: Offline Chinese-English lookups powered by the embedded CC-CEDICT database (~124,000 entries) — no network needed.
+- 🔄 **Three-Language Parallel Lookup**: All providers are queried simultaneously; results are prioritized based on your query script (Latin, Cyrillic, or Chinese characters).
 - 🔊 **Pronunciation Audio**: Play phonetic audio directly from your results.
 - 📚 **Phonetics & Synonyms**: View phonetic spelling, synonyms, and antonyms.
 - 📝 **Usage Examples**: See real-world examples of how words are used.
-- ⚙️ **Fully Configurable**: JSON-based configuration with 11+ customizable settings.
+- ⚙️ **Fully Configurable**: JSON-based configuration with 15+ customizable settings.
 - ⏱️ **Delayed Execution**: Shows loading indicator before fetching results.
 - 💾 **Smart Caching**: In-memory cache for repeat lookups with configurable size and expiration.
 - 🔄 **Robust Network Handling**: Exponential backoff retry logic for reliable API calls.
@@ -207,6 +210,10 @@ The plugin supports extensive customization through a `config.json` file that's 
 
 | Setting | Default | Description |
 |---------|---------|-------------|
+| `Language` | `"en"` | Default language (`"en"`, `"uk"`, or `"zh"`) |
+| `ApiEndpoint` | `https://api.dictionaryapi.dev/api/v2/entries/en/` | English dictionary API endpoint |
+| `UkrainianApiEndpoint` | `https://sum.in.ua/s/` | Ukrainian dictionary fallback endpoint (sum.in.ua) |
+| `ChineseApiEndpoint` | `https://www.mdbg.net/chinese/dictionary?...` | Chinese dictionary reference URL |
 | `CacheMaxSize` | 100 | Maximum number of cached word lookups |
 | `HttpTimeoutSeconds` | 10 | Timeout for API requests in seconds |
 | `CacheExpirationMinutes` | 30 | How long to keep cache entries |
@@ -214,7 +221,6 @@ The plugin supports extensive customization through a `config.json` file that's 
 | `EnableClipboardOperations` | true | Enable/disable copy to clipboard |
 | `TextTruncateLength` | 30 | Maximum text length in context menu |
 | `EnableVerboseLogging` | false | Enable detailed debug logging |
-| `ApiEndpoint` | dictionaryapi.dev | Dictionary API endpoint |
 | `MaxResultsPerMeaning` | 3 | Maximum definitions per word meaning |
 | `ShowExamplesInResults` | true | Show usage examples |
 | `ShowSynonymsInResults` | true | Show synonyms |
@@ -224,6 +230,7 @@ The plugin supports extensive customization through a `config.json` file that's 
 
 ```json
 {
+  "Language": "en",
   "CacheMaxSize": 200,
   "HttpTimeoutSeconds": 15,
   "EnableAudioPlayback": true,
@@ -234,6 +241,8 @@ The plugin supports extensive customization through a `config.json` file that's 
   "EnableVerboseLogging": true
 }
 ```
+
+> **Note:** You don't need to change `Language` to use Ukrainian or Chinese. The plugin queries all three providers in parallel and automatically detects the script of your query. Cyrillic input (e.g. `def слово`) will prioritize Ukrainian results, Chinese characters will prioritize Chinese results, and Latin input will prioritize English results.
 
 ## 📁 Data Storage
 
@@ -290,7 +299,7 @@ Please make sure to update tests as appropriate.
 
 <details>
 <summary><b>Does the plugin require internet access?</b></summary>
-<p>Yes, the plugin needs internet access to fetch definitions from dictionaryapi.dev. Results are cached in memory for subsequent lookups of the same word.</p>
+<p>English and Ukrainian lookups require internet access (dictionaryapi.dev and goroh.pp.ua respectively). Chinese lookups use an embedded offline dictionary and work without internet. All results are cached in memory for subsequent lookups.</p>
 </details>
 
 <details>
@@ -305,7 +314,22 @@ Please make sure to update tests as appropriate.
 
 <details>
 <summary><b>Can I customize the dictionary source?</b></summary>
-<p>Not in the current version, but this may be added in future updates. The plugin currently uses dictionaryapi.dev exclusively.</p>
+<p>Yes. You can change <code>ApiEndpoint</code> (English) and <code>UkrainianApiEndpoint</code> (Ukrainian) in <code>config.json</code>. Chinese lookups use the embedded CC-CEDICT database.</p>
+</details>
+
+<details>
+<summary><b>How do I look up Ukrainian words?</b></summary>
+<p>Just type <code>def слово</code> (any Ukrainian word in Cyrillic). The plugin automatically detects Cyrillic script and prioritizes Ukrainian results. The primary source is <a href="https://goroh.pp.ua/">goroh.pp.ua</a> (Горох — українські словники, 500,000+ words) with <a href="https://sum.in.ua/">sum.in.ua</a> as fallback. No special API key is needed.</p>
+</details>
+
+<details>
+<summary><b>Which languages are supported?</b></summary>
+<p>Three languages are supported out of the box:</p>
+<ul>
+<li><strong>English</strong> — via <a href="https://dictionaryapi.dev/">dictionaryapi.dev</a> (free REST API)</li>
+<li><strong>Ukrainian (Українська)</strong> — via <a href="https://goroh.pp.ua/">goroh.pp.ua</a> (primary) + <a href="https://sum.in.ua/">sum.in.ua</a> (fallback)</li>
+<li><strong>Chinese (中文)</strong> — via embedded CC-CEDICT database (~124,000 entries, fully offline)</li>
+</ul>
 </details>
 
 <details>
@@ -363,9 +387,22 @@ This section highlights some of the most powerful features of the Definition plu
 | System.Threading | Asynchronous operations |
 | GitHub Actions | CI/CD with multi-architecture builds |
 
-## 🌐 Localization
+## 🌐 Supported Languages
 
-Currently, the plugin UI is in English. Localization support is planned for future releases.
+The plugin supports three dictionary sources with automatic script detection:
+
+| Language | Source | Method | Internet Required |
+|----------|--------|--------|:-----------------:|
+| **English** | [dictionaryapi.dev](https://dictionaryapi.dev/) | REST API (JSON) | Yes |
+| **Українська** | [goroh.pp.ua](https://goroh.pp.ua/) (primary) + [sum.in.ua](https://sum.in.ua/) (fallback) | HTML scraping | Yes |
+| **中文** | CC-CEDICT (embedded, ~124,000 entries) | Offline database | No |
+
+**How it works:** When you type `def <word>`, all three providers are queried in parallel. The plugin detects the script of your input and boosts scores for matching results:
+- Cyrillic input (`def слово`) → Ukrainian results prioritized
+- Chinese characters (`def 你好`) → Chinese results prioritized
+- Latin input (`def hello`) → English results prioritized
+
+> **Note on Ukrainian:** There is no public REST API for Ukrainian dictionaries. The plugin uses [goroh.pp.ua](https://goroh.pp.ua/) (Горох — українські словники) as the primary source — a comprehensive Ukrainian dictionary with 500,000+ words, definitions, examples, synonyms, and more. Cyrillic words are used directly in the URL (e.g. `def слово` → `https://goroh.pp.ua/Тлумачення/слово`). If goroh.pp.ua is unavailable, [sum.in.ua](https://sum.in.ua/) is used as fallback.
 
 ## 📸 Screenshots
 
@@ -403,7 +440,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgements
 
 - [Microsoft PowerToys](https://github.com/microsoft/PowerToys) team for the amazing launcher
-- [dictionaryapi.dev](https://dictionaryapi.dev/) for providing the free dictionary API
+- [dictionaryapi.dev](https://dictionaryapi.dev/) for providing the free English dictionary API
+- [goroh.pp.ua](https://goroh.pp.ua/) for Горох — українські словники (primary Ukrainian dictionary source)
+- [sum.in.ua](https://sum.in.ua/) for the Словник української мови (Ukrainian dictionary fallback)
 - [MDBG.net](https://www.mdbg.net) for providing access to CC-CEDICT Chinese-English dictionary
 - [Wiktionary](https://en.wiktionary.org/) for comprehensive word information and translations
 - All contributors who have helped improve this plugin
