@@ -90,7 +90,7 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 ## ✨ Features
 
 - 🔍 **Instant Definitions**: Get definitions in real-time via `dictionaryapi.dev`.
-- 🇺🇦 **Ukrainian Dictionary (Українська)**: Lookup Ukrainian words using [goroh.pp.ua](https://goroh.pp.ua/) (500,000+ words) with [sum.in.ua](https://sum.in.ua/) as fallback — just type any word in Cyrillic (e.g. `def слово`).
+- 🇺🇦 **Ukrainian Dictionary (Українська)**: Lookup Ukrainian words using Wiktionary https://uk.wiktionary.org as the primary source (e.g. `def слово`).
 - 🇨🇳 **Chinese Dictionary (中文)**: Offline Chinese-English lookups powered by the embedded CC-CEDICT database (~124,000 entries) — no network needed.
 - 🔄 **Three-Language Parallel Lookup**: All providers are queried simultaneously; results are prioritized based on your query script (Latin, Cyrillic, or Chinese characters).
 - 🔊 **Pronunciation Audio**: Play phonetic audio directly from your results.
@@ -417,8 +417,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [Microsoft PowerToys](https://github.com/microsoft/PowerToys) team for the amazing launcher
 - [dictionaryapi.dev](https://dictionaryapi.dev/) for providing the free English dictionary API
-- [goroh.pp.ua](https://goroh.pp.ua/) for Горох — українські словники (primary Ukrainian dictionary source)
-- [sum.in.ua](https://sum.in.ua/) for the Словник української мови (Ukrainian dictionary fallback)
+- [goroh.pp.ua](https://goroh.pp.ua/) for Горох — українські словники (primary Ukrainian dictionary source) NEED API write to developers of goroh.pp.ua to add API to the plugin. 
+- [sum.in.ua](https://sum.in.ua/) for the Словник української мови (Ukrainian dictionary fallback) NOT WORKING.
 - [MDBG.net](https://www.mdbg.net) for providing access to CC-CEDICT Chinese-English dictionary
 - [Wiktionary](https://en.wiktionary.org/) for comprehensive word information and translations
 - All contributors who have helped improve this plugin
@@ -431,7 +431,7 @@ If you find this plugin useful and would like to support its development, you ca
 
 ## 🆕 What's New (v1.2.2)
 
-- 🇺🇦 **Ukrainian Dictionary Support** — Integrated with `sum.in.ua` explanatory dictionary.
+- 🇺🇦 **Ukrainian Dictionary Support** — Integrated with `sum.in.ua` explanatory dictionary. NOT WORKING.
 - 🇨🇳 **Chinese Dictionary Support** — Integrated with `MDBG.net` (CC-CEDICT data) for Chinese-English lookups.
 - 🔄 **Parallel Lookup** — Simultaneously fetch results from English, Ukrainian, and Chinese sources.
 - 🎯 **Smart Prioritization** — Results are automatically prioritized based on the query script (Cyrillic, Chinese, or Latin).
