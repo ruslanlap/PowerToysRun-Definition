@@ -9,7 +9,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
     internal class PluginConfiguration
     {
         public int CacheMaxSize { get; set; } = 100;
-        public int HttpTimeoutSeconds { get; set; } = 10;
+        public int HttpTimeoutSeconds { get; set; } = 30;
         public int CacheExpirationMinutes { get; set; } = 30;
         public bool EnableAudioPlayback { get; set; } = true;
         public bool EnableClipboardOperations { get; set; } = true;

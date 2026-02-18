@@ -188,14 +188,45 @@ namespace Community.PowerToys.Run.Plugin.Definition
         #endregion
 
         #region API Communication
+        private static ScriptType DetectScript(string text)
+        {
+            bool hasCyrillic = false, hasCjk = false, hasLatin = false;
+            foreach (var c in text)
+            {
+                if (c >= 0x0400 && c <= 0x04FF) hasCyrillic = true;
+                else if ((c >= 0x4E00 && c <= 0x9FFF) || (c >= 0x3400 && c <= 0x4DBF)) hasCjk = true;
+                else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) hasLatin = true;
+            }
+
+            if (hasCyrillic && !hasCjk && !hasLatin) return ScriptType.Cyrillic;
+            if (hasCjk && !hasCyrillic && !hasLatin) return ScriptType.Cjk;
+            if (hasLatin && !hasCyrillic && !hasCjk) return ScriptType.Latin;
+            return ScriptType.Mixed;
+        }
+
+        private IEnumerable<IDictionaryProvider> GetProvidersForScript(ScriptType script)
+        {
+            return script switch
+            {
+                ScriptType.Cyrillic => _dictionaryProviders.Values.Where(p => p.LanguageCode == "uk"),
+                ScriptType.Cjk => _dictionaryProviders.Values.Where(p => p.LanguageCode == "zh"),
+                ScriptType.Latin => _dictionaryProviders.Values.Where(p => p.LanguageCode == "en"),
+                _ => _dictionaryProviders.Values
+            };
+        }
+
+        private enum ScriptType { Latin, Cyrillic, Cjk, Mixed }
+
         private async Task<List<Result>> FetchAndProcessResultsAsync(string searchTerm, string rawSearch, CancellationToken cancellationToken)
         {
             return await RetryHelper.RetryAsync(async () =>
             {
-                var allEntries = new List<DictionaryEntry>();
+                var script = DetectScript(searchTerm);
+                var providers = GetProvidersForScript(script).ToList();
                 
-                // Run providers in parallel but catch individual failures
-                var tasks = _dictionaryProviders.Values.Select(async provider =>
+                Debug.WriteLine($"[Definition Plugin] Script: {script}, using providers: {string.Join(", ", providers.Select(p => p.LanguageCode))}");
+
+                var tasks = providers.Select(async provider =>
                 {
                     try
                     {
@@ -203,13 +234,13 @@ namespace Community.PowerToys.Run.Plugin.Definition
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.Debug.WriteLine($"[Definition Plugin] Provider {provider.LanguageCode} failed: {ex.Message}");
+                        Debug.WriteLine($"[Definition Plugin] Provider {provider.LanguageCode} FAILED for '{searchTerm}': {ex.GetType().Name}: {ex.Message}");
                         return new List<DictionaryEntry>();
                     }
                 }).ToList();
                 
                 var resultsList = await Task.WhenAll(tasks);
-                allEntries = resultsList.SelectMany(e => e ?? Enumerable.Empty<DictionaryEntry>()).ToList();
+                var allEntries = resultsList.SelectMany(e => e ?? Enumerable.Empty<DictionaryEntry>()).ToList();
 
                 if (!allEntries.Any())
                 {
@@ -218,21 +249,16 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
                 var results = ProcessDictionaryEntries(allEntries, rawSearch);
                 
-                // Adjust scores based on script detection
-                bool isCyrillic = searchTerm.Any(c => (c >= 0x0400 && c <= 0x04FF));
-                bool isChinese = searchTerm.Any(c => (c >= 0x4E00 && c <= 0x9FFF) || (c >= 0x3400 && c <= 0x4DBF));
-                
                 foreach (var result in results)
                 {
-                    if (result.ContextData is ResultContext context)
+                    if (result.ContextData is ResultContext)
                     {
-                        // Identify provider by language (assuming simple mapping for now)
-                        bool isUkResult = result.SubTitle != null && (result.SubTitle.Any(c => (c >= 0x0400 && c <= 0x04FF)));
-                        bool isChineseResult = result.SubTitle != null && (result.SubTitle.Any(c => (c >= 0x4E00 && c <= 0x9FFF) || (c >= 0x3400 && c <= 0x4DBF)));
+                        bool isUkResult = result.SubTitle != null && result.SubTitle.Any(c => c >= 0x0400 && c <= 0x04FF);
+                        bool isChineseResult = result.SubTitle != null && result.SubTitle.Any(c => (c >= 0x4E00 && c <= 0x9FFF) || (c >= 0x3400 && c <= 0x4DBF));
                         
-                        if (isCyrillic && isUkResult) result.Score += 10;
-                        if (isChinese && isChineseResult) result.Score += 10;
-                        if (!isCyrillic && !isChinese && !isUkResult && !isChineseResult) result.Score += 10;
+                        if (script == ScriptType.Cyrillic && isUkResult) result.Score += 10;
+                        if (script == ScriptType.Cjk && isChineseResult) result.Score += 10;
+                        if (script == ScriptType.Latin && !isUkResult && !isChineseResult) result.Score += 10;
                     }
                 }
 
