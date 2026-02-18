@@ -77,7 +77,6 @@
 ## 🆕 What's New (v1.3.3)
 
 - 🇺🇦 **Ukrainian Dictionary** — Switched to Wiktionary https://uk.wiktionary.org as the primary source
-- 🇺🇦 **Ukrainian Dictionary** — Switched to Wiktionary API as the primary source
 
 
 ## 📋 Overview
