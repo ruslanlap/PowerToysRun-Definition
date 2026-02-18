@@ -18,7 +18,7 @@
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
     <img src="https://img.shields.io/github/v/release/ruslanlap/PowerToysRun-Definition?label=latest" alt="Latest Release">
   </a>
-  <img src="https://img.shields.io/badge/version-v1.3.2-brightgreen" alt="Version">
+  <img src="https://img.shields.io/badge/version-v1.3.3-brightgreen" alt="Version">
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/stargazers">
     <img src="https://img.shields.io/github/stars/ruslanlap/PowerToysRun-Definition" alt="GitHub stars">
   </a>
@@ -40,10 +40,10 @@
 </div>
 
 <div align="center">
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.2/Definition-1.3.2-x64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.3/Definition-1.3.3-x64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-x64-blue?style=for-the-badge&logo=github" alt="Download x64">
   </a>
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.2/Definition-1.3.2-ARM64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.3/Definition-1.3.3-ARM64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-ARM64-blue?style=for-the-badge&logo=github" alt="Download ARM64">
   </a>
     <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
@@ -70,8 +70,15 @@
 - [📄 License](#-license)
 - [🙏 Acknowledgements](#-acknowledgements)
 - [☕ Support](#-support)
+- [🆕 What's New (v1.3.3)](#-whats-new-v133)
 - [🆕 What's New (v1.3.2)](#-whats-new-v132)
 - [🆕 What's New (v1.3.1)](#-whats-new-v131)
+
+## 🆕 What's New (v1.3.3)
+
+- 🇺🇦 **Ukrainian Dictionary** — Switched to [goroh.pp.ua](https://goroh.pp.ua) as the primary source with [sum.in.ua](https://sum.in.ua) as fallback for broader coverage.
+- 🔍 **Ukrainian Word Search** — Full support for searching and looking up words in Ukrainian, including definitions, examples, and synonyms.
+- ⚡ **Improved Fallback Logic** — Automatic failover between Ukrainian dictionary providers ensures results are always returned.
 
 ## 🆕 What's New (v1.3.2)
 +
@@ -165,8 +172,8 @@ winget install ruslanlap.DefinitionForCommandPalette
 ### Quick Install (Manual)
 
 1. Download the appropriate ZIP for your system architecture:
-   - [x64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.2/Definition-1.3.2-x64.zip)
-   - [ARM64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.2/Definition-1.3.2-ARM64.zip)
+   - [x64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.3/Definition-1.3.3-x64.zip)
+   - [ARM64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.3/Definition-1.3.3-ARM64.zip)
 
 2. Extract the ZIP to:
    ```
