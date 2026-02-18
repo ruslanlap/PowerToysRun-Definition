@@ -76,39 +76,9 @@
 
 ## 🆕 What's New (v1.3.3)
 
-- 🇺🇦 **Ukrainian Dictionary** — Switched to [goroh.pp.ua](https://goroh.pp.ua) as the primary source with [sum.in.ua](https://sum.in.ua) as fallback for broader coverage.
-- 🔍 **Ukrainian Word Search** — Full support for searching and looking up words in Ukrainian, including definitions, examples, and synonyms.
-- ⚡ **Improved Fallback Logic** — Automatic failover between Ukrainian dictionary providers ensures results are always returned.
+- 🇺🇦 **Ukrainian Dictionary** — Switched to Wiktionary https://uk.wiktionary.org as the primary source
+- 🇺🇦 **Ukrainian Dictionary** — Switched to Wiktionary API as the primary source
 
-## 🆕 What's New (v1.3.2)
-+
-+- 🏮 **Offline Chinese Dictionary** — Switched from unreliable web scraping to an embedded **CC-CEDICT** database (~124,000 entries).
-+- ⚡ **Instant Lookups** — Chinese results are now served instantly from memory without any network requests.
-+- 🛡️ **Improved Reliability** — Eliminated "No definitions found" errors caused by MDBG.net's request blocking or layout changes.
-+- 📦 **Optimized Assets** — Compressed dictionary data into an embedded resource for an efficient distribution.
-+
-+## 🆕 What's New (v1.3.1)
-
-- 🩹 **Fixed Chinese Dictionary Selectors** — Resolved an issue where Chinese lookups returned "No definitions found" by correcting HTML scraping selectors.
-- 🇨🇳 **Chinese Dictionary Support** — Added support for Chinese-English lookups using MDBG.net (CC-CEDICT data).
-- 🔄 **Three-Language Parallel Lookup** — Simultaneously fetch results from English, Ukrainian, and Chinese sources.
-- 🎯 **Enhanced Smart Prioritization** — Results are automatically prioritized based on query script (Latin, Cyrillic, or Chinese characters).
-- 📦 **Improved Web Scraping** — Leverages HtmlAgilityPack for robust HTML parsing of both Ukrainian and Chinese dictionary sources.
-
-## 🆕 What's New (v1.3.0)
-- 🇨🇳 **Chinese Dictionary Support** — Added support for Chinese-English lookups using MDBG.net (CC-CEDICT data).
-- 🔄 **Three-Language Parallel Lookup** — Simultaneously fetch results from English, Ukrainian, and Chinese sources.
-- 🎯 **Enhanced Smart Prioritization** — Results are automatically prioritized based on query script (Latin, Cyrillic, or Chinese characters).
-- 📦 **Improved Web Scraping** — Leverages HtmlAgilityPack for robust HTML parsing of both Ukrainian and Chinese dictionary sources.
-
-## 🆕 What's New (v1.2.2)
-
-- 🇺🇦 **Ukrainian Dictionary Support** — Integrated with `sum.in.ua` explanatory dictionary.
-- 🇨🇳 **Chinese Dictionary Support** — Integrated with `MDBG.net` (CC-CEDICT data) for Chinese-English lookups.
-- 🔄 **Parallel Lookup** — Simultaneously fetch results from English, Ukrainian, and Chinese sources.
-- 🎯 **Smart Prioritization** — Results are automatically prioritized based on the query script (Cyrillic, Chinese, or Latin).
-- 🏗️ **Improved Architecture** — Refactored to a provider-based system for better extensibility.
-- 🩹 **Better Reliability** — Enhanced error handling ensures one failed provider doesn't break the entire search.
 
 ## 📋 Overview
 
