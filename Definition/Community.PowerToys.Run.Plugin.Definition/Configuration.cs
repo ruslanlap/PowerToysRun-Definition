@@ -21,6 +21,8 @@ namespace Community.PowerToys.Run.Plugin.Definition
         public bool ShowSynonymsInResults { get; set; } = true;
         public bool ShowAntonymsInResults { get; set; } = true;
         public string Language { get; set; } = "en";
+        public string FrenchApiEndpoint { get; set; } = "https://api.dictionaryapi.dev/api/v2/entries/fr/";
+        public string LatinLanguages { get; set; } = "en";
         public string UkrainianApiEndpoint { get; set; } = "https://sum.in.ua/s/";
         public string ChineseApiEndpoint { get; set; } = "https://www.mdbg.net/chinese/dictionary?page=worddict&wdrst=0&wdqb=";
     }

@@ -67,6 +67,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
             _dictionaryProviders = new Dictionary<string, IDictionaryProvider>(StringComparer.OrdinalIgnoreCase)
             {
                 { "en", new EnglishDictionaryProvider(HttpClient) },
+                { "fr", new FrenchDictionaryProvider(HttpClient) },
                 { "uk", new UkrainianDictionaryProvider(HttpClient) },
                 { "zh", new ChineseDictionaryProvider(HttpClient) }
             };
@@ -107,8 +108,30 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 return new List<Result> { CreateInfoResult(rawSearch, Name, EmptyQueryMessage) };
             }
 
+            // Parse language prefix (e.g., "fr:bonjour", "en:hello")
+            string forcedLang = null;
+            var termForLookup = searchTerm;
+            var colonIndex = searchTerm.IndexOf(':');
+            if (colonIndex > 0 && colonIndex < searchTerm.Length - 1)
+            {
+                var prefix = searchTerm.Substring(0, colonIndex);
+                if (_dictionaryProviders.ContainsKey(prefix))
+                {
+                    forcedLang = prefix;
+                    termForLookup = searchTerm.Substring(colonIndex + 1).Trim();
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(termForLookup))
+            {
+                return new List<Result> { CreateInfoResult(rawSearch, Name, EmptyQueryMessage) };
+            }
+
+            // Build cache key that includes the forced language
+            var cacheKey = forcedLang != null ? $"{forcedLang}:{termForLookup}" : termForLookup;
+
             // Check cache first
-            if (TryGetCachedResults(searchTerm, rawSearch, out var cachedResults))
+            if (TryGetCachedResults(cacheKey, rawSearch, out var cachedResults))
             {
                 return cachedResults;
             }
@@ -116,11 +139,11 @@ namespace Community.PowerToys.Run.Plugin.Definition
             // Show loading message for non-delayed execution
             if (!delayedExecution)
             {
-                return new List<Result> { CreateInfoResult(rawSearch, SearchingMessage, $"Searching for '{searchTerm}'") };
+                return new List<Result> { CreateInfoResult(rawSearch, SearchingMessage, $"Searching for '{termForLookup}'") };
             }
 
             // Perform actual API call
-            return ExecuteDelayedQuery(searchTerm, rawSearch);
+            return ExecuteDelayedQuery(termForLookup, rawSearch, cacheKey, forcedLang);
         }
 
         private void CancelPreviousRequest()
@@ -142,15 +165,15 @@ namespace Community.PowerToys.Run.Plugin.Definition
             return false;
         }
 
-        private List<Result> ExecuteDelayedQuery(string searchTerm, string rawSearch)
+        private List<Result> ExecuteDelayedQuery(string searchTerm, string rawSearch, string cacheKey = null, string forcedLang = null)
         {
             try
             {
                 // Use Task.Run to avoid blocking the UI thread
-                var task = Task.Run(async () => await FetchAndProcessResultsAsync(searchTerm, rawSearch, _cancellationTokenSource.Token));
+                var task = Task.Run(async () => await FetchAndProcessResultsAsync(searchTerm, rawSearch, _cancellationTokenSource.Token, forcedLang));
                 var results = task.ConfigureAwait(false).GetAwaiter().GetResult();
 
-                CacheResults(searchTerm, results);
+                CacheResults(cacheKey ?? searchTerm, results);
                 return results;
             }
             catch (OperationCanceledException)
@@ -210,19 +233,42 @@ namespace Community.PowerToys.Run.Plugin.Definition
             {
                 ScriptType.Cyrillic => _dictionaryProviders.Values.Where(p => p.LanguageCode == "uk"),
                 ScriptType.Cjk => _dictionaryProviders.Values.Where(p => p.LanguageCode == "zh"),
-                ScriptType.Latin => _dictionaryProviders.Values.Where(p => p.LanguageCode == "en"),
+                ScriptType.Latin => GetLatinProviders(),
                 _ => _dictionaryProviders.Values
             };
         }
 
+        private IEnumerable<IDictionaryProvider> GetLatinProviders()
+        {
+            var latinLangs = (ConfigurationManager.Configuration.LatinLanguages ?? "en")
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            var providers = _dictionaryProviders.Values
+                .Where(p => latinLangs.Any(l => string.Equals(l, p.LanguageCode, StringComparison.OrdinalIgnoreCase)))
+                .ToList();
+
+            return providers.Count > 0 ? providers : _dictionaryProviders.Values.Where(p => p.LanguageCode == "en");
+        }
+
         private enum ScriptType { Latin, Cyrillic, Cjk, Mixed }
 
-        private async Task<List<Result>> FetchAndProcessResultsAsync(string searchTerm, string rawSearch, CancellationToken cancellationToken)
+        private async Task<List<Result>> FetchAndProcessResultsAsync(string searchTerm, string rawSearch, CancellationToken cancellationToken, string forcedLang = null)
         {
             return await RetryHelper.RetryAsync(async () =>
             {
-                var script = DetectScript(searchTerm);
-                var providers = GetProvidersForScript(script).ToList();
+                List<IDictionaryProvider> providers;
+                ScriptType script;
+
+                if (forcedLang != null && _dictionaryProviders.TryGetValue(forcedLang, out var forcedProvider))
+                {
+                    providers = new List<IDictionaryProvider> { forcedProvider };
+                    script = DetectScript(searchTerm);
+                }
+                else
+                {
+                    script = DetectScript(searchTerm);
+                    providers = GetProvidersForScript(script).ToList();
+                }
                 
                 Debug.WriteLine($"[Definition Plugin] Script: {script}, using providers: {string.Join(", ", providers.Select(p => p.LanguageCode))}");
 

@@ -18,7 +18,7 @@
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
     <img src="https://img.shields.io/github/v/release/ruslanlap/PowerToysRun-Definition?label=latest" alt="Latest Release">
   </a>
-  <img src="https://img.shields.io/badge/version-v1.3.3-brightgreen" alt="Version">
+  <img src="https://img.shields.io/badge/version-v1.4.0-brightgreen" alt="Version">
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/stargazers">
     <img src="https://img.shields.io/github/stars/ruslanlap/PowerToysRun-Definition" alt="GitHub stars">
   </a>
@@ -40,10 +40,10 @@
 </div>
 
 <div align="center">
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.3/Definition-1.3.3-x64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.4.0/Definition-1.4.0-x64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-x64-blue?style=for-the-badge&logo=github" alt="Download x64">
   </a>
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.3/Definition-1.3.3-ARM64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.4.0/Definition-1.4.0-ARM64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-ARM64-blue?style=for-the-badge&logo=github" alt="Download ARM64">
   </a>
     <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
@@ -70,9 +70,18 @@
 - [📄 License](#-license)
 - [🙏 Acknowledgements](#-acknowledgements)
 - [☕ Support](#-support)
+- [🆕 What's New (v1.4.0)](#-whats-new-v140)
 - [🆕 What's New (v1.3.3)](#-whats-new-v133)
 - [🆕 What's New (v1.3.2)](#-whats-new-v132)
 - [🆕 What's New (v1.3.1)](#-whats-new-v131)
+
+## 🆕 What's New (v1.4.0)
+
+- 🇫🇷 **French Dictionary Support** — Added French language support via Free Dictionary API (`https://freedictionaryapi.com/`)
+- 🏷️ **Language Prefix System** — Force specific dictionaries with prefixes: `fr:bonjour`, `en:hello`, `uk:слово`, `zh:你好`
+- 🌐 **Multi-Language Latin Lookups** — Configure `LatinLanguages` setting (e.g., `"en,fr"`) to query multiple Latin-script dictionaries simultaneously
+- ⚙️ **Enhanced Configuration** — New `FrenchApiEndpoint` and `LatinLanguages` settings for flexible language selection
+- 🔄 **Improved Provider Routing** — Smart language detection with prefix override support
 
 ## 🆕 What's New (v1.3.3)
 
@@ -81,7 +90,7 @@
 
 ## 📋 Overview
 
-Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsoft/PowerToys) that allows you to quickly lookup word definitions, phonetics, and synonyms without leaving your keyboard. Simply type `def <word>` to fetch definitions. The plugin supports **English**, **Ukrainian (Українська)**, and **Chinese (中文)** with automatic script detection — just type a word in any supported language and the plugin will prioritize results accordingly.
+Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsoft/PowerToys) that allows you to quickly lookup word definitions, phonetics, and synonyms without leaving your keyboard. Simply type `def <word>` to fetch definitions. The plugin supports **English**, **French (Français)**, **Ukrainian (Українська)**, and **Chinese (中文)** with automatic script detection — just type a word in any supported language and the plugin will prioritize results accordingly. Use language prefixes like `fr:bonjour` or `en:hello` to force a specific dictionary.
 
 <div align="center">
   <img src="data/demo-definition-2.gif" alt="Lookup word definitions" width="650">
@@ -90,9 +99,11 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 ## ✨ Features
 
 - 🔍 **Instant Definitions**: Get definitions in real-time via `dictionaryapi.dev`.
-- 🇺🇦 **Ukrainian Dictionary (Українська)**: Lookup Ukrainian words using Wiktionary https://uk.wiktionary.org as the primary source (e.g. `def слово`).
+- �🇷 **French Dictionary (Français)**: Lookup French words via the Free Dictionary API (e.g. `def fr:bonjour`).
+- ��🇦 **Ukrainian Dictionary (Українська)**: Lookup Ukrainian words using Wiktionary https://uk.wiktionary.org as the primary source (e.g. `def слово`).
 - 🇨🇳 **Chinese Dictionary (中文)**: Offline Chinese-English lookups powered by the embedded CC-CEDICT database (~124,000 entries) — no network needed.
-- 🔄 **Three-Language Parallel Lookup**: All providers are queried simultaneously; results are prioritized based on your query script (Latin, Cyrillic, or Chinese characters).
+- 🔄 **Multi-Language Parallel Lookup**: All configured providers are queried simultaneously; results are prioritized based on your query script (Latin, Cyrillic, or Chinese characters).
+- 🏷️ **Language Prefix**: Force a specific dictionary with prefixes like `fr:mot`, `en:word`, `uk:слово`, `zh:你好`.
 - 🔊 **Pronunciation Audio**: Play phonetic audio directly from your results.
 - 📚 **Phonetics & Synonyms**: View phonetic spelling, synonyms, and antonyms.
 - 📝 **Usage Examples**: See real-world examples of how words are used.
@@ -141,8 +152,8 @@ winget install ruslanlap.DefinitionForCommandPalette
 ### Quick Install (Manual)
 
 1. Download the appropriate ZIP for your system architecture:
-   - [x64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.3/Definition-1.3.3-x64.zip)
-   - [ARM64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.3.3/Definition-1.3.3-ARM64.zip)
+   - [x64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.4.0/Definition-1.4.0-x64.zip)
+   - [ARM64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.4.0/Definition-1.4.0-ARM64.zip)
 
 2. Extract the ZIP to:
    ```
@@ -169,7 +180,11 @@ To verify the plugin is correctly installed:
 1. Activate PowerToys Run (`Alt + Space`).
 2. Type:
    - `def` to see instructions.
-   - `def <word>` to lookup definitions.
+   - `def <word>` to lookup definitions (uses default language).
+   - `def fr:<word>` to lookup a French word.
+   - `def en:<word>` to lookup an English word.
+   - `def uk:<word>` to lookup a Ukrainian word.
+   - `def zh:<word>` to lookup a Chinese word.
 3. Press <kbd>Enter</kbd> to fetch results.
 4. Use <kbd>Ctrl + C</kbd> to copy a definition.
 5. Right-click a result to:
@@ -186,8 +201,10 @@ The plugin supports extensive customization through a `config.json` file that's 
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `Language` | `"en"` | Default language (`"en"`, `"uk"`, or `"zh"`) |
+| `Language` | `"en"` | Default language (`"en"`, `"fr"`, `"uk"`, or `"zh"`) |
 | `ApiEndpoint` | `https://api.dictionaryapi.dev/api/v2/entries/en/` | English dictionary API endpoint |
+| `FrenchApiEndpoint` | `https://api.dictionaryapi.dev/api/v2/entries/fr/` | French dictionary API endpoint |
+| `LatinLanguages` | `"en"` | Comma-separated Latin-script languages to query (e.g. `"en,fr"` for both) |
 | `UkrainianApiEndpoint` | `https://sum.in.ua/s/` | Ukrainian dictionary fallback endpoint (sum.in.ua) |
 | `ChineseApiEndpoint` | `https://www.mdbg.net/chinese/dictionary?...` | Chinese dictionary reference URL |
 | `CacheMaxSize` | 100 | Maximum number of cached word lookups |
@@ -218,7 +235,9 @@ The plugin supports extensive customization through a `config.json` file that's 
 }
 ```
 
-> **Note:** You don't need to change `Language` to use Ukrainian or Chinese. The plugin queries all three providers in parallel and automatically detects the script of your query. Cyrillic input (e.g. `def слово`) will prioritize Ukrainian results, Chinese characters will prioritize Chinese results, and Latin input will prioritize English results.
+> **Note:** You don't need to change `Language` to use Ukrainian or Chinese. The plugin automatically detects the script of your query. Cyrillic input (e.g. `def слово`) will prioritize Ukrainian results, Chinese characters will prioritize Chinese results, and Latin input will query the languages listed in `LatinLanguages`.
+>
+> **Multi-language Latin lookups:** Set `"LatinLanguages": "en,fr"` to query both English and French dictionaries simultaneously for Latin-script words. You can also use prefixes like `fr:bonjour` or `en:hello` to force a specific dictionary regardless of settings.
 
 ## 📁 Data Storage
 
@@ -232,7 +251,7 @@ cd PowerToysRun-Definition/Definition
 dotnet build
 # To package:
 dotnet publish -c Release -r win-x64 --output ./publish
-zip -r Definition-v1.3.1-x64.zip ./publish
+zip -r Definition-v1.4.0-x64.zip ./publish
 ```
 
 ## 📊 Project Structure
@@ -300,10 +319,11 @@ Please make sure to update tests as appropriate.
 
 <details>
 <summary><b>Which languages are supported?</b></summary>
-<p>Three languages are supported out of the box:</p>
+<p>Four languages are supported out of the box:</p>
 <ul>
 <li><strong>English</strong> — via <a href="https://dictionaryapi.dev/">dictionaryapi.dev</a> (free REST API)</li>
-<li><strong>Ukrainian (Українська)</strong> — via <a href="https://goroh.pp.ua/">goroh.pp.ua</a> (primary) + <a href="https://sum.in.ua/">sum.in.ua</a> (fallback)</li>
+<li><strong>French (Français)</strong> — via <a href="https://dictionaryapi.dev/">dictionaryapi.dev</a> (free REST API)</li>
+<li><strong>Ukrainian (Українська)</strong> — via <a href="https://uk.wiktionary.org/">Wiktionary</a> (primary) + <a href="https://goroh.pp.ua/">goroh.pp.ua</a> (fallback)</li>
 <li><strong>Chinese (中文)</strong> — via embedded CC-CEDICT database (~124,000 entries, fully offline)</li>
 </ul>
 </details>
@@ -365,18 +385,20 @@ This section highlights some of the most powerful features of the Definition plu
 
 ## 🌐 Supported Languages
 
-The plugin supports three dictionary sources with automatic script detection:
+The plugin supports four dictionary sources with automatic script detection:
 
 | Language | Source | Method | Internet Required |
 |----------|--------|--------|:-----------------:|
 | **English** | [dictionaryapi.dev](https://dictionaryapi.dev/) | REST API (JSON) | Yes |
-| **Українська** | [goroh.pp.ua](https://goroh.pp.ua/) (primary) + [sum.in.ua](https://sum.in.ua/) (fallback) | HTML scraping | Yes |
+| **Français** | [dictionaryapi.dev](https://dictionaryapi.dev/) | REST API (JSON) | Yes |
+| **Українська** | [Wiktionary](https://uk.wiktionary.org/) (primary) + [goroh.pp.ua](https://goroh.pp.ua/) (fallback) | API + HTML scraping | Yes |
 | **中文** | CC-CEDICT (embedded, ~124,000 entries) | Offline database | No |
 
-**How it works:** When you type `def <word>`, all three providers are queried in parallel. The plugin detects the script of your input and boosts scores for matching results:
+**How it works:** When you type `def <word>`, the plugin detects the script of your input and queries the appropriate providers:
 - Cyrillic input (`def слово`) → Ukrainian results prioritized
 - Chinese characters (`def 你好`) → Chinese results prioritized
-- Latin input (`def hello`) → English results prioritized
+- Latin input (`def hello`) → Queries languages from `LatinLanguages` config (default: English)
+- Language prefix (`def fr:bonjour`) → Forces a specific dictionary
 
 > **Note on Ukrainian:** There is no public REST API for Ukrainian dictionaries. The plugin uses [goroh.pp.ua](https://goroh.pp.ua/) (Горох — українські словники) as the primary source — a comprehensive Ukrainian dictionary with 500,000+ words, definitions, examples, synonyms, and more. Cyrillic words are used directly in the URL (e.g. `def слово` → `https://goroh.pp.ua/Тлумачення/слово`). If goroh.pp.ua is unavailable, [sum.in.ua](https://sum.in.ua/) is used as fallback.
 
