@@ -78,10 +78,10 @@
 ## 🆕 What's New (v1.4.0)
 
 - 🇫🇷 **French Dictionary Support** — Added French language support via Free Dictionary API (`https://freedictionaryapi.com/`)
-- 🏷️ **Language Prefix System** — Force specific dictionaries with prefixes: `fr:bonjour`, `en:hello`, `uk:слово`, `zh:你好`
+- 🤖 **Automatic Language Detection** — Use natural queries like `def world`, `def Enchanté`, `def слово`
 - 🌐 **Multi-Language Latin Lookups** — Configure `LatinLanguages` setting (e.g., `"en,fr"`) to query multiple Latin-script dictionaries simultaneously
 - ⚙️ **Enhanced Configuration** — New `FrenchApiEndpoint` and `LatinLanguages` settings for flexible language selection
-- 🔄 **Improved Provider Routing** — Smart language detection with prefix override support
+- 🔄 **Improved Provider Routing** — Better automatic matching for multilingual input
 
 ## 🆕 What's New (v1.3.3)
 
@@ -90,7 +90,7 @@
 
 ## 📋 Overview
 
-Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsoft/PowerToys) that allows you to quickly lookup word definitions, phonetics, and synonyms without leaving your keyboard. Simply type `def <word>` to fetch definitions. The plugin supports **English**, **French (Français)**, **Ukrainian (Українська)**, and **Chinese (中文)** with automatic script detection — just type a word in any supported language and the plugin will prioritize results accordingly. Use language prefixes like `fr:bonjour` or `en:hello` to force a specific dictionary.
+Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsoft/PowerToys) that allows you to quickly lookup word definitions, phonetics, and synonyms without leaving your keyboard. Simply type `def <word>` to fetch definitions. The plugin supports **English**, **French (Français)**, **Ukrainian (Українська)**, and **Chinese (中文)** with automatic script detection — just type a word in any supported language and the plugin will prioritize results accordingly.
 
 <div align="center">
   <img src="data/demo-definition-2.gif" alt="Lookup word definitions" width="650">
@@ -99,11 +99,11 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 ## ✨ Features
 
 - 🔍 **Instant Definitions**: Get definitions in real-time via `dictionaryapi.dev`.
-- �🇷 **French Dictionary (Français)**: Lookup French words via the Free Dictionary API (e.g. `def fr:bonjour`).
-- ��🇦 **Ukrainian Dictionary (Українська)**: Lookup Ukrainian words using Wiktionary https://uk.wiktionary.org as the primary source (e.g. `def слово`).
+- ��� **French Dictionary (Français)**: Lookup French words via the Free Dictionary API.
+- ��� **Ukrainian Dictionary (Українська)**: Lookup Ukrainian words using Wiktionary https://uk.wiktionary.org as the primary source.
 - 🇨🇳 **Chinese Dictionary (中文)**: Offline Chinese-English lookups powered by the embedded CC-CEDICT database (~124,000 entries) — no network needed.
 - 🔄 **Multi-Language Parallel Lookup**: All configured providers are queried simultaneously; results are prioritized based on your query script (Latin, Cyrillic, or Chinese characters).
-- 🏷️ **Language Prefix**: Force a specific dictionary with prefixes like `fr:mot`, `en:word`, `uk:слово`, `zh:你好`.
+- 🤖 **Automatic Language Detection**: Use natural input like `def world`, `def Enchanté`, or `def слово`.
 - 🔊 **Pronunciation Audio**: Play phonetic audio directly from your results.
 - 📚 **Phonetics & Synonyms**: View phonetic spelling, synonyms, and antonyms.
 - 📝 **Usage Examples**: See real-world examples of how words are used.
@@ -180,11 +180,7 @@ To verify the plugin is correctly installed:
 1. Activate PowerToys Run (`Alt + Space`).
 2. Type:
    - `def` to see instructions.
-   - `def <word>` to lookup definitions (uses default language).
-   - `def fr:<word>` to lookup a French word.
-   - `def en:<word>` to lookup an English word.
-   - `def uk:<word>` to lookup a Ukrainian word.
-   - `def zh:<word>` to lookup a Chinese word.
+   - `def <word>` to lookup definitions automatically based on language/script.
 3. Press <kbd>Enter</kbd> to fetch results.
 4. Use <kbd>Ctrl + C</kbd> to copy a definition.
 5. Right-click a result to:
@@ -204,7 +200,7 @@ The plugin supports extensive customization through a `config.json` file that's 
 | `Language` | `"en"` | Default language (`"en"`, `"fr"`, `"uk"`, or `"zh"`) |
 | `ApiEndpoint` | `https://api.dictionaryapi.dev/api/v2/entries/en/` | English dictionary API endpoint |
 | `FrenchApiEndpoint` | `https://api.dictionaryapi.dev/api/v2/entries/fr/` | French dictionary API endpoint |
-| `LatinLanguages` | `"en"` | Comma-separated Latin-script languages to query (e.g. `"en,fr"` for both) |
+| `LatinLanguages` | `"en,fr"` | Comma-separated Latin-script languages to query (e.g. `"en,fr"` for both) |
 | `UkrainianApiEndpoint` | `https://sum.in.ua/s/` | Ukrainian dictionary fallback endpoint (sum.in.ua) |
 | `ChineseApiEndpoint` | `https://www.mdbg.net/chinese/dictionary?...` | Chinese dictionary reference URL |
 | `CacheMaxSize` | 100 | Maximum number of cached word lookups |
@@ -237,7 +233,7 @@ The plugin supports extensive customization through a `config.json` file that's 
 
 > **Note:** You don't need to change `Language` to use Ukrainian or Chinese. The plugin automatically detects the script of your query. Cyrillic input (e.g. `def слово`) will prioritize Ukrainian results, Chinese characters will prioritize Chinese results, and Latin input will query the languages listed in `LatinLanguages`.
 >
-> **Multi-language Latin lookups:** Set `"LatinLanguages": "en,fr"` to query both English and French dictionaries simultaneously for Latin-script words. You can also use prefixes like `fr:bonjour` or `en:hello` to force a specific dictionary regardless of settings.
+> **Multi-language Latin lookups:** Set `"LatinLanguages": "en,fr"` to query both English and French dictionaries simultaneously for Latin-script words.
 
 ## 📁 Data Storage
 
@@ -397,8 +393,7 @@ The plugin supports four dictionary sources with automatic script detection:
 **How it works:** When you type `def <word>`, the plugin detects the script of your input and queries the appropriate providers:
 - Cyrillic input (`def слово`) → Ukrainian results prioritized
 - Chinese characters (`def 你好`) → Chinese results prioritized
-- Latin input (`def hello`) → Queries languages from `LatinLanguages` config (default: English)
-- Language prefix (`def fr:bonjour`) → Forces a specific dictionary
+- Latin input (`def hello` / `def enchanté`) → Queries languages from `LatinLanguages` config (default: English + French)
 
 > **Note on Ukrainian:** There is no public REST API for Ukrainian dictionaries. The plugin uses [goroh.pp.ua](https://goroh.pp.ua/) (Горох — українські словники) as the primary source — a comprehensive Ukrainian dictionary with 500,000+ words, definitions, examples, synonyms, and more. Cyrillic words are used directly in the URL (e.g. `def слово` → `https://goroh.pp.ua/Тлумачення/слово`). If goroh.pp.ua is unavailable, [sum.in.ua](https://sum.in.ua/) is used as fallback.
 
