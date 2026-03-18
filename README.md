@@ -11,7 +11,21 @@
 </div>
 
 <div align="center">
-  <!-- Badges -->
+  <a href="docs/README.uk.md">
+    <img src="https://img.shields.io/badge/docs-Українська-0057B7" alt="Docs Ukrainian">
+  </a>
+  <a href="README.md">
+    <img src="https://img.shields.io/badge/docs-English-2EA44F" alt="Docs English">
+  </a>
+  <a href="docs/README.fr.md">
+    <img src="https://img.shields.io/badge/docs-Français-1F6FEB" alt="Docs French">
+  </a>
+  <a href="docs/README.zh.md">
+    <img src="https://img.shields.io/badge/docs-中文-E34C26" alt="Docs Chinese">
+  </a>
+</div>
+
+<div align="center">
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/actions/workflows/build-and-release.yml">
     <img src="https://github.com/ruslanlap/PowerToysRun-Definition/actions/workflows/build-and-release.yml/badge.svg" alt="Build Status">
   </a>
@@ -35,8 +49,21 @@
   <a href="https://winstall.app/apps/ruslanlap.DefinitionForCommandPalette">
     <img src="https://img.shields.io/badge/Install%20with-WinGet-blue.svg" alt="Install with WinGet">
   </a>
+</div>
 
-
+<div align="center">
+  <a href="docs/README.uk.md">
+    <img src="https://img.shields.io/badge/docs-Українська-0057B7" alt="Docs Ukrainian">
+  </a>
+  <a href="README.md">
+    <img src="https://img.shields.io/badge/docs-English-2EA44F" alt="Docs English">
+  </a>
+  <a href="docs/README.fr.md">
+    <img src="https://img.shields.io/badge/docs-Français-1F6FEB" alt="Docs French">
+  </a>
+  <a href="docs/README.zh.md">
+    <img src="https://img.shields.io/badge/docs-中文-E34C26" alt="Docs Chinese">
+  </a>
 </div>
 
 <div align="center">
@@ -130,24 +157,6 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 - Windows 10 (build 22621) or later
 - .NET 9.0 Runtime (included with Windows 11 22H2 or later)
 - Internet connection (for API access)
-
-### Install via WinGet
-
-> **WinGet** is Microsoft's official package manager for Windows 10/11. It's like `apt` for Ubuntu or `brew` for macOS - a command-line tool that installs, updates, and manages software automatically.
-
-**Why use WinGet?**
-- ⚡ **One command** — No need to download ZIP files manually
-- 🔄 **Auto-updates** — Get notified when new versions are available
-- 🛡️ **Trusted source** — Packages are verified and digitally signed
-- 🧹 **Clean uninstall** — Removes all files and registry entries properly
-
-```powershell
-winget install ruslanlap.DefinitionForCommandPalette
-```
-
-**Prerequisites for WinGet:**
-- Windows 10 version 1709 (build 16299) or later
-- [WinGet client](https://docs.microsoft.com/en-us/windows/package-manager/winget/) (pre-installed on Windows 11, or install from Microsoft Store/App Installer)
 
 ### Quick Install (Manual)
 
