@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,6 +23,23 @@ namespace Community.PowerToys.Run.Plugin.Definition
         }
 
         public async Task<List<DictionaryEntry>> LookupAsync(string word, CancellationToken token)
+        {
+            var entries = await LookupWordAsync(word, token);
+            if (entries.Count > 0)
+            {
+                return entries;
+            }
+
+            var normalizedWord = NormalizeFrenchWord(word);
+            if (!string.Equals(normalizedWord, word, StringComparison.Ordinal))
+            {
+                entries = await LookupWordAsync(normalizedWord, token);
+            }
+
+            return entries;
+        }
+
+        private async Task<List<DictionaryEntry>> LookupWordAsync(string word, CancellationToken token)
         {
             var requestUrl = $"{ConfigurationManager.Configuration.FrenchApiEndpoint}{Uri.EscapeDataString(word)}";
 
@@ -42,6 +62,23 @@ namespace Community.PowerToys.Run.Plugin.Definition
             var entries = await JsonSerializer.DeserializeAsync<List<DictionaryEntry>>(jsonStream, options, token);
 
             return entries ?? new List<DictionaryEntry>();
+        }
+
+        private static string NormalizeFrenchWord(string word)
+        {
+            if (string.IsNullOrWhiteSpace(word))
+            {
+                return word;
+            }
+
+            var normalized = word
+                .Normalize(NormalizationForm.FormD)
+                .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                .ToArray();
+
+            return new string(normalized)
+                .Normalize(NormalizationForm.FormC)
+                .Replace('\u2019', '\'');
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
         public bool ShowAntonymsInResults { get; set; } = true;
         public string Language { get; set; } = "en";
         public string FrenchApiEndpoint { get; set; } = "https://api.dictionaryapi.dev/api/v2/entries/fr/";
-        public string LatinLanguages { get; set; } = "en";
+        public string LatinLanguages { get; set; } = "en,fr";
         public string UkrainianApiEndpoint { get; set; } = "https://sum.in.ua/s/";
         public string ChineseApiEndpoint { get; set; } = "https://www.mdbg.net/chinese/dictionary?page=worddict&wdrst=0&wdqb=";
     }
@@ -54,11 +54,13 @@ namespace Community.PowerToys.Run.Plugin.Definition
                         WriteIndented = true
                     };
                     _configuration = JsonSerializer.Deserialize<PluginConfiguration>(jsonContent, options);
+                    NormalizeConfiguration();
                     Debug.WriteLine($"[Definition Plugin] Configuration loaded from {ConfigFilePath}");
                 }
                 else
                 {
                     _configuration = new PluginConfiguration();
+                    NormalizeConfiguration();
                     SaveConfiguration();
                     Debug.WriteLine($"[Definition Plugin] Default configuration created at {ConfigFilePath}");
                 }
@@ -86,6 +88,17 @@ namespace Community.PowerToys.Run.Plugin.Definition
             catch (Exception ex)
             {
                 Debug.WriteLine($"[Definition Plugin] Error saving configuration: {ex.Message}");
+            }
+        }
+
+        private static void NormalizeConfiguration()
+        {
+            _configuration ??= new PluginConfiguration();
+
+            if (string.IsNullOrWhiteSpace(_configuration.LatinLanguages)
+                || string.Equals(_configuration.LatinLanguages.Trim(), "en", StringComparison.OrdinalIgnoreCase))
+            {
+                _configuration.LatinLanguages = "en,fr";
             }
         }
 

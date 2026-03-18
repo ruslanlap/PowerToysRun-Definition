@@ -108,30 +108,8 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 return new List<Result> { CreateInfoResult(rawSearch, Name, EmptyQueryMessage) };
             }
 
-            // Parse language prefix (e.g., "fr:bonjour", "en:hello")
-            string forcedLang = null;
-            var termForLookup = searchTerm;
-            var colonIndex = searchTerm.IndexOf(':');
-            if (colonIndex > 0 && colonIndex < searchTerm.Length - 1)
-            {
-                var prefix = searchTerm.Substring(0, colonIndex);
-                if (_dictionaryProviders.ContainsKey(prefix))
-                {
-                    forcedLang = prefix;
-                    termForLookup = searchTerm.Substring(colonIndex + 1).Trim();
-                }
-            }
-
-            if (string.IsNullOrWhiteSpace(termForLookup))
-            {
-                return new List<Result> { CreateInfoResult(rawSearch, Name, EmptyQueryMessage) };
-            }
-
-            // Build cache key that includes the forced language
-            var cacheKey = forcedLang != null ? $"{forcedLang}:{termForLookup}" : termForLookup;
-
             // Check cache first
-            if (TryGetCachedResults(cacheKey, rawSearch, out var cachedResults))
+            if (TryGetCachedResults(searchTerm, rawSearch, out var cachedResults))
             {
                 return cachedResults;
             }
@@ -139,11 +117,11 @@ namespace Community.PowerToys.Run.Plugin.Definition
             // Show loading message for non-delayed execution
             if (!delayedExecution)
             {
-                return new List<Result> { CreateInfoResult(rawSearch, SearchingMessage, $"Searching for '{termForLookup}'") };
+                return new List<Result> { CreateInfoResult(rawSearch, SearchingMessage, $"Searching for '{searchTerm}'") };
             }
 
             // Perform actual API call
-            return ExecuteDelayedQuery(termForLookup, rawSearch, cacheKey, forcedLang);
+            return ExecuteDelayedQuery(searchTerm, rawSearch);
         }
 
         private void CancelPreviousRequest()
@@ -165,15 +143,15 @@ namespace Community.PowerToys.Run.Plugin.Definition
             return false;
         }
 
-        private List<Result> ExecuteDelayedQuery(string searchTerm, string rawSearch, string cacheKey = null, string forcedLang = null)
+        private List<Result> ExecuteDelayedQuery(string searchTerm, string rawSearch)
         {
             try
             {
                 // Use Task.Run to avoid blocking the UI thread
-                var task = Task.Run(async () => await FetchAndProcessResultsAsync(searchTerm, rawSearch, _cancellationTokenSource.Token, forcedLang));
+                var task = Task.Run(async () => await FetchAndProcessResultsAsync(searchTerm, rawSearch, _cancellationTokenSource.Token));
                 var results = task.ConfigureAwait(false).GetAwaiter().GetResult();
 
-                CacheResults(cacheKey ?? searchTerm, results);
+                CacheResults(searchTerm, results);
                 return results;
             }
             catch (OperationCanceledException)
@@ -218,13 +196,21 @@ namespace Community.PowerToys.Run.Plugin.Definition
             {
                 if (c >= 0x0400 && c <= 0x04FF) hasCyrillic = true;
                 else if ((c >= 0x4E00 && c <= 0x9FFF) || (c >= 0x3400 && c <= 0x4DBF)) hasCjk = true;
-                else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) hasLatin = true;
+                else if (IsLatinCharacter(c)) hasLatin = true;
             }
 
             if (hasCyrillic && !hasCjk && !hasLatin) return ScriptType.Cyrillic;
             if (hasCjk && !hasCyrillic && !hasLatin) return ScriptType.Cjk;
             if (hasLatin && !hasCyrillic && !hasCjk) return ScriptType.Latin;
             return ScriptType.Mixed;
+        }
+
+        private static bool IsLatinCharacter(char c)
+        {
+            return (c >= 'a' && c <= 'z')
+                || (c >= 'A' && c <= 'Z')
+                || (c >= 0x00C0 && c <= 0x024F)
+                || (c >= 0x1E00 && c <= 0x1EFF);
         }
 
         private IEnumerable<IDictionaryProvider> GetProvidersForScript(ScriptType script)
@@ -252,23 +238,12 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
         private enum ScriptType { Latin, Cyrillic, Cjk, Mixed }
 
-        private async Task<List<Result>> FetchAndProcessResultsAsync(string searchTerm, string rawSearch, CancellationToken cancellationToken, string forcedLang = null)
+        private async Task<List<Result>> FetchAndProcessResultsAsync(string searchTerm, string rawSearch, CancellationToken cancellationToken)
         {
             return await RetryHelper.RetryAsync(async () =>
             {
-                List<IDictionaryProvider> providers;
-                ScriptType script;
-
-                if (forcedLang != null && _dictionaryProviders.TryGetValue(forcedLang, out var forcedProvider))
-                {
-                    providers = new List<IDictionaryProvider> { forcedProvider };
-                    script = DetectScript(searchTerm);
-                }
-                else
-                {
-                    script = DetectScript(searchTerm);
-                    providers = GetProvidersForScript(script).ToList();
-                }
+                var script = DetectScript(searchTerm);
+                var providers = GetProvidersForScript(script).ToList();
                 
                 Debug.WriteLine($"[Definition Plugin] Script: {script}, using providers: {string.Join(", ", providers.Select(p => p.LanguageCode))}");
 
