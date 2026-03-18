@@ -77,10 +77,10 @@
 
 ## 🆕 What's New (v1.4.0)
 
-- 🇫🇷 **French Dictionary Support** — Added French language support via Free Dictionary API (`https://freedictionaryapi.com/`)
+- 🇫🇷 **French Dictionary Support** — Added French support via Collins French-English dictionary with Wiktionnaire fallback
 - 🤖 **Automatic Language Detection** — Use natural queries like `def world`, `def Enchanté`, `def слово`
 - 🌐 **Multi-Language Latin Lookups** — Configure `LatinLanguages` setting (e.g., `"en,fr"`) to query multiple Latin-script dictionaries simultaneously
-- ⚙️ **Enhanced Configuration** — New `FrenchApiEndpoint` and `LatinLanguages` settings for flexible language selection
+- ⚙️ **Enhanced Configuration** — Added `LatinLanguages` setting for flexible language selection
 - 🔄 **Improved Provider Routing** — Better automatic matching for multilingual input
 
 ## 🆕 What's New (v1.3.3)
@@ -99,7 +99,7 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 ## ✨ Features
 
 - 🔍 **Instant Definitions**: Get definitions in real-time via `dictionaryapi.dev`.
-- ��� **French Dictionary (Français)**: Lookup French words via the Free Dictionary API.
+- ��� **French Dictionary (Français)**: Lookup French words via Collins with Wiktionnaire fallback.
 - ��� **Ukrainian Dictionary (Українська)**: Lookup Ukrainian words using Wiktionary https://uk.wiktionary.org as the primary source.
 - 🇨🇳 **Chinese Dictionary (中文)**: Offline Chinese-English lookups powered by the embedded CC-CEDICT database (~124,000 entries) — no network needed.
 - 🔄 **Multi-Language Parallel Lookup**: All configured providers are queried simultaneously; results are prioritized based on your query script (Latin, Cyrillic, or Chinese characters).
@@ -199,7 +199,6 @@ The plugin supports extensive customization through a `config.json` file that's 
 |---------|---------|-------------|
 | `Language` | `"en"` | Default language (`"en"`, `"fr"`, `"uk"`, or `"zh"`) |
 | `ApiEndpoint` | `https://api.dictionaryapi.dev/api/v2/entries/en/` | English dictionary API endpoint |
-| `FrenchApiEndpoint` | `https://api.dictionaryapi.dev/api/v2/entries/fr/` | French dictionary API endpoint |
 | `LatinLanguages` | `"en,fr"` | Comma-separated Latin-script languages to query (e.g. `"en,fr"` for both) |
 | `UkrainianApiEndpoint` | `https://sum.in.ua/s/` | Ukrainian dictionary fallback endpoint (sum.in.ua) |
 | `ChineseApiEndpoint` | `https://www.mdbg.net/chinese/dictionary?...` | Chinese dictionary reference URL |
@@ -290,7 +289,7 @@ Please make sure to update tests as appropriate.
 
 <details>
 <summary><b>Does the plugin require internet access?</b></summary>
-<p>English and Ukrainian lookups require internet access (dictionaryapi.dev and goroh.pp.ua respectively). Chinese lookups use an embedded offline dictionary and work without internet. All results are cached in memory for subsequent lookups.</p>
+<p>English, French, and Ukrainian lookups require internet access (dictionaryapi.dev, collinsdictionary.com/wiktionary, and goroh.pp.ua respectively). Chinese lookups use an embedded offline dictionary and work without internet. All results are cached in memory for subsequent lookups.</p>
 </details>
 
 <details>
@@ -318,7 +317,7 @@ Please make sure to update tests as appropriate.
 <p>Four languages are supported out of the box:</p>
 <ul>
 <li><strong>English</strong> — via <a href="https://dictionaryapi.dev/">dictionaryapi.dev</a> (free REST API)</li>
-<li><strong>French (Français)</strong> — via <a href="https://dictionaryapi.dev/">dictionaryapi.dev</a> (free REST API)</li>
+<li><strong>French (Français)</strong> — via <a href="https://www.collinsdictionary.com/dictionary/french-english/">Collins French-English Dictionary</a> (primary) + <a href="https://fr.wiktionary.org/">Wiktionnaire</a> (fallback)</li>
 <li><strong>Ukrainian (Українська)</strong> — via <a href="https://uk.wiktionary.org/">Wiktionary</a> (primary) + <a href="https://goroh.pp.ua/">goroh.pp.ua</a> (fallback)</li>
 <li><strong>Chinese (中文)</strong> — via embedded CC-CEDICT database (~124,000 entries, fully offline)</li>
 </ul>
@@ -386,7 +385,7 @@ The plugin supports four dictionary sources with automatic script detection:
 | Language | Source | Method | Internet Required |
 |----------|--------|--------|:-----------------:|
 | **English** | [dictionaryapi.dev](https://dictionaryapi.dev/) | REST API (JSON) | Yes |
-| **Français** | [dictionaryapi.dev](https://dictionaryapi.dev/) | REST API (JSON) | Yes |
+| **Français** | [Collins](https://www.collinsdictionary.com/dictionary/french-english/) (primary) + [Wiktionnaire](https://fr.wiktionary.org/) (fallback) | HTML parsing + MediaWiki API | Yes |
 | **Українська** | [Wiktionary](https://uk.wiktionary.org/) (primary) + [goroh.pp.ua](https://goroh.pp.ua/) (fallback) | API + HTML scraping | Yes |
 | **中文** | CC-CEDICT (embedded, ~124,000 entries) | Offline database | No |
 
@@ -434,6 +433,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [Microsoft PowerToys](https://github.com/microsoft/PowerToys) team for the amazing launcher
 - [dictionaryapi.dev](https://dictionaryapi.dev/) for providing the free English dictionary API
+- [Collins Dictionary](https://www.collinsdictionary.com/dictionary/french-english/) for French-English dictionary content
+- [Wiktionnaire](https://fr.wiktionary.org/) for French fallback definitions
 - [goroh.pp.ua](https://goroh.pp.ua/) for Горох — українські словники (primary Ukrainian dictionary source) NEED API write to developers of goroh.pp.ua to add API to the plugin. 
 - [sum.in.ua](https://sum.in.ua/) for the Словник української мови (Ukrainian dictionary fallback) NOT WORKING.
 - [MDBG.net](https://www.mdbg.net) for providing access to CC-CEDICT Chinese-English dictionary
