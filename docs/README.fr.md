@@ -34,12 +34,13 @@ Le plugin prend en charge des requêtes naturelles sans préfixe de langue :
 
 - `def world`
 - `def enchanté`
+- `def amore`
 - `def слово`
 - `def 你好`
 
 La langue est détectée automatiquement selon l'écriture utilisée :
 
-- alphabet latin → anglais/français (selon `LatinLanguages`)
+- alphabet latin → anglais/français/italien (selon `LatinLanguages`)
 - alphabet cyrillique → ukrainien
 - caractères chinois → chinois
 
@@ -59,6 +60,7 @@ La langue est détectée automatiquement selon l'écriture utilisée :
 |---|---|---|:---:|
 | **English** | [dictionaryapi.dev](https://dictionaryapi.dev/) | API REST (JSON) | Oui |
 | **Français** | [Collins](https://www.collinsdictionary.com/dictionary/french-english/) (principal) + [Wiktionnaire](https://fr.wiktionary.org/) (secours) | HTML + API MediaWiki | Oui |
+| **Italiano** | [Wikizionario](https://it.wiktionary.org/) | API MediaWiki | Oui |
 | **Українська** | [uk.wiktionary.org](https://uk.wiktionary.org/) (principal) + [goroh.pp.ua](https://goroh.pp.ua/) (secours) | API MediaWiki + HTML | Oui |
 | **中文** | Base intégrée CC-CEDICT | Base hors ligne | Non |
 
@@ -92,6 +94,7 @@ La langue est détectée automatiquement selon l'écriture utilisée :
 
 - `def world`
 - `def enchanté`
+- `def amore`
 - `def слово`
 - `def 你好`
 
@@ -104,7 +107,7 @@ Le plugin crée automatiquement `config.json` dans le dossier du plugin.
 | Paramètre | Valeur par défaut | Description |
 |---|---|---|
 | `Language` | `"en"` | Langue par défaut |
-| `LatinLanguages` | `"en,fr"` | Langues latines interrogées en parallèle |
+| `LatinLanguages` | `"en,fr,it"` | Langues latines interrogées en parallèle |
 | `ApiEndpoint` | `https://api.dictionaryapi.dev/api/v2/entries/en/` | Endpoint API anglais |
 | `HttpTimeoutSeconds` | `30` | Délai d'expiration HTTP |
 | `CacheMaxSize` | `100` | Taille maximale du cache |
@@ -122,7 +125,7 @@ Le plugin crée automatiquement `config.json` dans le dossier du plugin.
 ```json
 {
   "Language": "en",
-  "LatinLanguages": "en,fr",
+  "LatinLanguages": "en,fr,it",
   "HttpTimeoutSeconds": 30,
   "CacheMaxSize": 200,
   "EnableAudioPlayback": true,
@@ -137,7 +140,7 @@ Le plugin crée automatiquement `config.json` dans le dossier du plugin.
 
 Si vous n'obtenez aucun résultat :
 
-1. Vérifiez votre connexion Internet (`en`, `fr`, `uk`).
+1. Vérifiez votre connexion Internet (`en`, `fr`, `it`, `uk`).
 2. Testez une variante sans accent (`enchante` au lieu de `enchanté`).
 3. Vérifiez que le plugin est activé dans `PowerToys Run > Plugins`.
 4. Redémarrez PowerToys après une mise à jour du plugin.

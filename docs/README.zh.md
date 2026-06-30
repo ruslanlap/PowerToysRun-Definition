@@ -34,12 +34,13 @@
 
 - `def world`
 - `def enchanté`
+- `def amore`
 - `def слово`
 - `def 你好`
 
 系统会根据输入脚本自动判断优先语言：
 
-- 拉丁字母 → 英语/法语（由 `LatinLanguages` 控制）
+- 拉丁字母 → 英语/法语/意大利语（由 `LatinLanguages` 控制）
 - 西里尔字母 → 乌克兰语
 - 汉字 → 中文
 
@@ -59,6 +60,7 @@
 |---|---|---|:---:|
 | **English** | [dictionaryapi.dev](https://dictionaryapi.dev/) | REST API（JSON） | 是 |
 | **Français** | [Collins](https://www.collinsdictionary.com/dictionary/french-english/)（主）+ [Wiktionnaire](https://fr.wiktionary.org/)（备） | HTML + MediaWiki API | 是 |
+| **Italiano** | [Wikizionario](https://it.wiktionary.org/) | MediaWiki API | 是 |
 | **Українська** | [uk.wiktionary.org](https://uk.wiktionary.org/)（主）+ [goroh.pp.ua](https://goroh.pp.ua/)（备） | MediaWiki API + HTML | 是 |
 | **中文** | 内置 CC-CEDICT 数据库 | 离线数据库 | 否 |
 
@@ -91,6 +93,7 @@
 
 - `def world`
 - `def enchanté`
+- `def amore`
 - `def слово`
 - `def 你好`
 
@@ -103,7 +106,7 @@
 | 配置项 | 默认值 | 说明 |
 |---|---|---|
 | `Language` | `"en"` | 默认语言 |
-| `LatinLanguages` | `"en,fr"` | 拉丁字母并行查询语言 |
+| `LatinLanguages` | `"en,fr,it"` | 拉丁字母并行查询语言 |
 | `ApiEndpoint` | `https://api.dictionaryapi.dev/api/v2/entries/en/` | 英语 API 地址 |
 | `HttpTimeoutSeconds` | `30` | HTTP 超时（秒） |
 | `CacheMaxSize` | `100` | 最大缓存条目数 |
@@ -121,7 +124,7 @@
 ```json
 {
   "Language": "en",
-  "LatinLanguages": "en,fr",
+  "LatinLanguages": "en,fr,it",
   "HttpTimeoutSeconds": 30,
   "CacheMaxSize": 200,
   "EnableAudioPlayback": true,
@@ -136,7 +139,7 @@
 
 如果没有返回结果：
 
-1. 检查网络连接（`en`、`fr`、`uk` 需要联网）。
+1. 检查网络连接（`en`、`fr`、`it`、`uk` 需要联网）。
 2. 尝试去掉重音符号（例如 `enchante` 替代 `enchanté`）。
 3. 在 `PowerToys Run > Plugins` 中确认插件已启用。
 4. 更新后重启 PowerToys 再测试。

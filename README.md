@@ -19,7 +19,7 @@
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
     <img src="https://img.shields.io/github/v/release/ruslanlap/PowerToysRun-Definition?label=latest" alt="Latest Release">
   </a>
-  <img src="https://img.shields.io/badge/version-v1.4.0-brightgreen" alt="Version">
+  <img src="https://img.shields.io/badge/version-v1.5.0-brightgreen" alt="Version">
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/stargazers">
     <img src="https://img.shields.io/github/stars/ruslanlap/PowerToysRun-Definition" alt="GitHub stars">
   </a>
@@ -54,10 +54,10 @@
 </div>
 
 <div align="center">
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.4.0/Definition-1.4.0-x64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.5.0/Definition-1.5.0-x64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-x64-blue?style=for-the-badge&logo=github" alt="Download x64">
   </a>
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.4.0/Definition-1.4.0-ARM64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.5.0/Definition-1.5.0-ARM64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-ARM64-blue?style=for-the-badge&logo=github" alt="Download ARM64">
   </a>
     <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
@@ -97,10 +97,17 @@
 - [📄 License](#-license)
 - [🙏 Acknowledgements](#-acknowledgements)
 - [☕ Support](#-support)
+- [🆕 What's New (v1.5.0)](#-whats-new-v150)
 - [🆕 What's New (v1.4.0)](#-whats-new-v140)
 - [🆕 What's New (v1.3.3)](#-whats-new-v133)
 - [🆕 What's New (v1.3.2)](#-whats-new-v132)
 - [🆕 What's New (v1.3.1)](#-whats-new-v131)
+
+## 🆕 What's New (v1.5.0)
+
+- 🇮🇹 **Italian Dictionary Support** — Added Italian lookups via Wikizionario (`it.wiktionary.org`)
+- 🌐 **Expanded Latin Lookups** — Default `LatinLanguages` now includes English, French, and Italian (`"en,fr,it"`)
+- ⚙️ **Provider Registration** — Italian is now available as a first-class dictionary provider
 
 ## 🆕 What's New (v1.4.0)
 
@@ -117,7 +124,7 @@
 
 ## 📋 Overview
 
-Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsoft/PowerToys) that allows you to quickly lookup word definitions, phonetics, and synonyms without leaving your keyboard. Simply type `def <word>` to fetch definitions. The plugin supports **English**, **French (Français)**, **Ukrainian (Українська)**, and **Chinese (中文)** with automatic script detection — just type a word in any supported language and the plugin will prioritize results accordingly.
+Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsoft/PowerToys) that allows you to quickly lookup word definitions, phonetics, and synonyms without leaving your keyboard. Simply type `def <word>` to fetch definitions. The plugin supports **English**, **French (Français)**, **Italian (Italiano)**, **Ukrainian (Українська)**, and **Chinese (中文)** with automatic script detection — just type a word in any supported language and the plugin will prioritize results accordingly.
 
 <div align="center">
   <img src="data/demo-definition-2.gif" alt="Lookup word definitions" width="650">
@@ -126,8 +133,9 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 ## ✨ Features
 
 - 🔍 **Instant Definitions**: Get definitions in real-time via `dictionaryapi.dev`.
-- ��� **French Dictionary (Français)**: Lookup French words via Collins with Wiktionnaire fallback.
-- ��� **Ukrainian Dictionary (Українська)**: Lookup Ukrainian words using Wiktionary https://uk.wiktionary.org as the primary source.
+- 🇫🇷 **French Dictionary (Français)**: Lookup French words via Collins with Wiktionnaire fallback.
+- 🇮🇹 **Italian Dictionary (Italiano)**: Lookup Italian words via Wikizionario.
+- 🇺🇦 **Ukrainian Dictionary (Українська)**: Lookup Ukrainian words using Wiktionary https://uk.wiktionary.org as the primary source.
 - 🇨🇳 **Chinese Dictionary (中文)**: Offline Chinese-English lookups powered by the embedded CC-CEDICT database (~124,000 entries) — no network needed.
 - 🔄 **Multi-Language Parallel Lookup**: All configured providers are queried simultaneously; results are prioritized based on your query script (Latin, Cyrillic, or Chinese characters).
 - 🤖 **Automatic Language Detection**: Use natural input like `def world`, `def Enchanté`, or `def слово`.
@@ -161,8 +169,8 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 ### Quick Install (Manual)
 
 1. Download the appropriate ZIP for your system architecture:
-   - [x64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.4.0/Definition-1.4.0-x64.zip)
-   - [ARM64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.4.0/Definition-1.4.0-ARM64.zip)
+   - [x64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.5.0/Definition-1.5.0-x64.zip)
+   - [ARM64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.5.0/Definition-1.5.0-ARM64.zip)
 
 2. Extract the ZIP to:
    ```
@@ -206,9 +214,9 @@ The plugin supports extensive customization through a `config.json` file that's 
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `Language` | `"en"` | Default language (`"en"`, `"fr"`, `"uk"`, or `"zh"`) |
+| `Language` | `"en"` | Default language (`"en"`, `"fr"`, `"it"`, `"uk"`, or `"zh"`) |
 | `ApiEndpoint` | `https://api.dictionaryapi.dev/api/v2/entries/en/` | English dictionary API endpoint |
-| `LatinLanguages` | `"en,fr"` | Comma-separated Latin-script languages to query (e.g. `"en,fr"` for both) |
+| `LatinLanguages` | `"en,fr,it"` | Comma-separated Latin-script languages to query (e.g. `"en,fr,it"` for English, French, and Italian) |
 | `UkrainianApiEndpoint` | `https://sum.in.ua/s/` | Ukrainian dictionary fallback endpoint (sum.in.ua) |
 | `ChineseApiEndpoint` | `https://www.mdbg.net/chinese/dictionary?...` | Chinese dictionary reference URL |
 | `CacheMaxSize` | 100 | Maximum number of cached word lookups |
@@ -241,7 +249,7 @@ The plugin supports extensive customization through a `config.json` file that's 
 
 > **Note:** You don't need to change `Language` to use Ukrainian or Chinese. The plugin automatically detects the script of your query. Cyrillic input (e.g. `def слово`) will prioritize Ukrainian results, Chinese characters will prioritize Chinese results, and Latin input will query the languages listed in `LatinLanguages`.
 >
-> **Multi-language Latin lookups:** Set `"LatinLanguages": "en,fr"` to query both English and French dictionaries simultaneously for Latin-script words.
+> **Multi-language Latin lookups:** Set `"LatinLanguages": "en,fr,it"` to query English, French, and Italian dictionaries simultaneously for Latin-script words.
 
 ## 📁 Data Storage
 
@@ -255,7 +263,7 @@ cd PowerToysRun-Definition/Definition
 dotnet build
 # To package:
 dotnet publish -c Release -r win-x64 --output ./publish
-zip -r Definition-v1.4.0-x64.zip ./publish
+zip -r Definition-v1.5.0-x64.zip ./publish
 ```
 
 ## 📊 Project Structure
@@ -298,7 +306,7 @@ Please make sure to update tests as appropriate.
 
 <details>
 <summary><b>Does the plugin require internet access?</b></summary>
-<p>English, French, and Ukrainian lookups require internet access (dictionaryapi.dev, collinsdictionary.com/wiktionary, and goroh.pp.ua respectively). Chinese lookups use an embedded offline dictionary and work without internet. All results are cached in memory for subsequent lookups.</p>
+<p>English, French, Italian, and Ukrainian lookups require internet access (dictionaryapi.dev, collinsdictionary.com/wiktionary, it.wiktionary.org, and uk.wiktionary.org respectively). Chinese lookups use an embedded offline dictionary and work without internet. All results are cached in memory for subsequent lookups.</p>
 </details>
 
 <details>
@@ -323,10 +331,11 @@ Please make sure to update tests as appropriate.
 
 <details>
 <summary><b>Which languages are supported?</b></summary>
-<p>Four languages are supported out of the box:</p>
+<p>Five languages are supported out of the box:</p>
 <ul>
 <li><strong>English</strong> — via <a href="https://dictionaryapi.dev/">dictionaryapi.dev</a> (free REST API)</li>
 <li><strong>French (Français)</strong> — via <a href="https://www.collinsdictionary.com/dictionary/french-english/">Collins French-English Dictionary</a> (primary) + <a href="https://fr.wiktionary.org/">Wiktionnaire</a> (fallback)</li>
+<li><strong>Italian (Italiano)</strong> — via <a href="https://it.wiktionary.org/">Wikizionario</a></li>
 <li><strong>Ukrainian (Українська)</strong> — via <a href="https://uk.wiktionary.org/">Wiktionary</a> (primary) + <a href="https://goroh.pp.ua/">goroh.pp.ua</a> (fallback)</li>
 <li><strong>Chinese (中文)</strong> — via embedded CC-CEDICT database (~124,000 entries, fully offline)</li>
 </ul>

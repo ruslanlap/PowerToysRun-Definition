@@ -68,6 +68,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
             {
                 { "en", new EnglishDictionaryProvider(HttpClient) },
                 { "fr", new FrenchDictionaryProvider(HttpClient) },
+                { "it", new ItalianDictionaryProvider(HttpClient) },
                 { "uk", new UkrainianDictionaryProvider(HttpClient) },
                 { "zh", new ChineseDictionaryProvider(HttpClient) }
             };

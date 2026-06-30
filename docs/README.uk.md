@@ -34,12 +34,13 @@
 
 - `def world`
 - `def enchanté`
+- `def amore`
 - `def слово`
 - `def 你好`
 
 Мова визначається автоматично за скриптом введення:
 
-- латиниця → англійська/французька (за `LatinLanguages`)
+- латиниця → англійська/французька/італійська (за `LatinLanguages`)
 - кирилиця → українська
 - китайські ієрогліфи → китайська
 
@@ -59,6 +60,7 @@
 |---|---|---|:---:|
 | **English** | [dictionaryapi.dev](https://dictionaryapi.dev/) | REST API (JSON) | Так |
 | **Français** | [Collins](https://www.collinsdictionary.com/dictionary/french-english/) (основне) + [Wiktionnaire](https://fr.wiktionary.org/) (резерв) | HTML + MediaWiki API | Так |
+| **Italiano** | [Wikizionario](https://it.wiktionary.org/) | MediaWiki API | Так |
 | **Українська** | [uk.wiktionary.org](https://uk.wiktionary.org/) (основне) + [goroh.pp.ua](https://goroh.pp.ua/) (резерв) | MediaWiki API + HTML | Так |
 | **中文** | Вбудована база CC-CEDICT | Офлайн-база | Ні |
 
@@ -92,6 +94,7 @@
 
 - `def world`
 - `def enchanté`
+- `def amore`
 - `def слово`
 - `def 你好`
 
@@ -104,7 +107,7 @@
 | Параметр | Значення за замовчуванням | Опис |
 |---|---|---|
 | `Language` | `"en"` | Мова за замовчуванням |
-| `LatinLanguages` | `"en,fr"` | Латинські мови для паралельного пошуку |
+| `LatinLanguages` | `"en,fr,it"` | Латинські мови для паралельного пошуку |
 | `ApiEndpoint` | `https://api.dictionaryapi.dev/api/v2/entries/en/` | API для англійської |
 | `HttpTimeoutSeconds` | `30` | Таймаут HTTP-запитів |
 | `CacheMaxSize` | `100` | Максимум записів у кеші |
@@ -122,7 +125,7 @@
 ```json
 {
   "Language": "en",
-  "LatinLanguages": "en,fr",
+  "LatinLanguages": "en,fr,it",
   "HttpTimeoutSeconds": 30,
   "CacheMaxSize": 200,
   "EnableAudioPlayback": true,
@@ -137,7 +140,7 @@
 
 Якщо для слова немає результатів:
 
-1. Перевірте інтернет-з'єднання (для `en`, `fr`, `uk`).
+1. Перевірте інтернет-з'єднання (для `en`, `fr`, `it`, `uk`).
 2. Спробуйте варіант без діакритики (наприклад, `enchante` замість `enchanté`).
 3. Перевірте, чи плагін активний у `PowerToys Run > Plugins`.
 4. Перезапустіть PowerToys після оновлення плагіна.

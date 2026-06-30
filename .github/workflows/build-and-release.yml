@@ -222,7 +222,7 @@ jobs:
       - name: Generate SHA256 checksums
         run: |
           cd release-artifacts
-          VERSION="${{ steps.get_version.outputs.VERSION }}"
+          VERSION="${GITHUB_REF#refs/tags/v}"
           echo "Files in release-artifacts:"
           ls -la
           echo "Generating checksums for all ZIP files:"
@@ -260,10 +260,10 @@ jobs:
           </p>
 
           ## ✨ What's New
-          - 🚀 Performance improvements: Faster lookups and reduced memory usage.
-          - 🐛 Bug fixes: Fixed issues with audio pronunciation and improved error handling.
-          - ✨ New features: Enhanced theme support and better caching mechanisms.
-          - 🔧 PTRUN Compliance: All PowerToys Run linting issues resolved (PTRUN1301, PTRUN1303, PTRUN1401, PTRUN1402).
+          - 🇮🇹 Italian dictionary support via Wikizionario (`it.wiktionary.org`).
+          - 🌐 Expanded default Latin lookups: `LatinLanguages` now defaults to `en,fr,it`.
+          - ⚙️ Italian is registered as a first-class dictionary provider (`it`).
+          - 📚 README and CHANGELOG updated for v${VERSION}.
 
           ## 📥 Installation
           ### Prerequisites
