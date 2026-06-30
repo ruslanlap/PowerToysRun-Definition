@@ -67,23 +67,7 @@
     <img src="https://img.shields.io/github/downloads/ruslanlap/PowerToysRun-Definition/total?style=for-the-badge&logo=github" alt="GitHub all releases">
   </a>
 </div>
-<div align="center">
-  <a href="docs/README.uk.md">
-    <img src="https://img.shields.io/badge/docs-Українська-0057B7" alt="Docs Ukrainian">
-  </a>
-  <a href="README.md">
-    <img src="https://img.shields.io/badge/docs-English-2EA44F" alt="Docs English">
-  </a>
-  <a href="docs/README.fr.md">
-    <img src="https://img.shields.io/badge/docs-Français-1F6FEB" alt="Docs French">
-  </a>
-  <a href="docs/README.it.md">
-    <img src="https://img.shields.io/badge/docs-Italiano-009246" alt="Docs Italian">
-  </a>
-  <a href="docs/README.zh.md">
-    <img src="https://img.shields.io/badge/docs-中文-E34C26" alt="Docs Chinese">
-  </a>
-</div>
+
 ## 📋 Table of Contents
 
 - [📋 Overview](#-overview)
