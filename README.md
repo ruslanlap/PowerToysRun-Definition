@@ -48,6 +48,9 @@
   <a href="docs/README.fr.md">
     <img src="https://img.shields.io/badge/docs-Français-1F6FEB" alt="Docs French">
   </a>
+  <a href="docs/README.it.md">
+    <img src="https://img.shields.io/badge/docs-Italiano-009246" alt="Docs Italian">
+  </a>
   <a href="docs/README.zh.md">
     <img src="https://img.shields.io/badge/docs-中文-E34C26" alt="Docs Chinese">
   </a>
@@ -73,6 +76,9 @@
   </a>
   <a href="docs/README.fr.md">
     <img src="https://img.shields.io/badge/docs-Français-1F6FEB" alt="Docs French">
+  </a>
+  <a href="docs/README.it.md">
+    <img src="https://img.shields.io/badge/docs-Italiano-009246" alt="Docs Italian">
   </a>
   <a href="docs/README.zh.md">
     <img src="https://img.shields.io/badge/docs-中文-E34C26" alt="Docs Chinese">
