@@ -19,19 +19,24 @@ namespace Community.PowerToys.Run.Plugin.Definition
         public string LanguageCode => "it";
         public string DisplayName => "Italiano (Wikizionario)";
 
-        private static readonly string[] PartOfSpeechKeywords =
+        private static readonly Dictionary<string, string> PartOfSpeechMap = new(StringComparer.OrdinalIgnoreCase)
         {
-            "sostantivo",
-            "nome",
-            "verbo",
-            "aggettivo",
-            "avverbio",
-            "pronome",
-            "preposizione",
-            "congiunzione",
-            "interiezione",
-            "articolo",
-            "locuzione"
+            { "sost", "sostantivo" },
+            { "verb", "verbo" },
+            { "agg", "aggettivo" },
+            { "avv", "avverbio" },
+            { "pronome", "pronome" },
+            { "pron dim", "pronome dimostrativo" },
+            { "pron indef", "pronome indefinito" },
+            { "pron interrog", "pronome interrogativo" },
+            { "pron poss", "pronome possessivo" },
+            { "pron rel", "pronome relativo" },
+            { "pron rifl", "pronome riflessivo" },
+            { "prep", "preposizione" },
+            { "cong", "congiunzione" },
+            { "inter", "interiezione" },
+            { "art", "articolo" },
+            { "locut", "locuzione" }
         };
 
         public ItalianDictionaryProvider(HttpClient httpClient)
@@ -108,7 +113,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
         private static string ExtractItalianSection(string wikitext)
         {
             var header = new Regex(
-                @"^==\s*\{\{lingua\|it\}\}\s*==\s*$|^==\s*Italiano\s*==\s*$",
+                @"^==\s*(?:\{\{-it-\}\}|\{\{lingua\|it\}\}|Italiano)\s*==\s*$",
                 RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
             var match = header.Match(wikitext);
@@ -125,7 +130,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
             var start = match.Index + match.Length;
 
             var nextLangHeader = new Regex(
-                @"^==\s*(\{\{lingua\|[a-z\-]+\}\}|[A-ZÀ-Ü][^=]+)\s*==\s*$",
+                @"^==\s*(?:\{\{-[a-z\-]+-\}\}|\{\{lingua\|[a-z\-]+\}\}|[A-ZÀ-Ü][^=]+)\s*==\s*$",
                 RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
             var next = nextLangHeader.Match(wikitext, start);
@@ -138,8 +143,8 @@ namespace Community.PowerToys.Run.Plugin.Definition
         {
             var meanings = new List<Meaning>();
 
-            var headingRegex = new Regex(
-                @"^={3,6}\s*(?<title>[^=]+?)\s*={3,6}$",
+            var sectionRegex = new Regex(
+                @"^={0,6}\s*\{\{\s*-(?<section>[a-z\s\-]+)-.*?\}\}\s*={0,6}$",
                 RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
             string currentPartOfSpeech = null;
@@ -163,42 +168,67 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 if (string.IsNullOrWhiteSpace(line))
                     continue;
 
-                var headingMatch = headingRegex.Match(line);
-                if (headingMatch.Success)
+                var sectionMatch = sectionRegex.Match(line);
+                var isNewSection = sectionMatch.Success || line.StartsWith("=");
+                if (isNewSection)
                 {
                     Commit();
+                    currentPartOfSpeech = null;
+                    currentDefinitions = null;
 
-                    var heading = CleanWikitext(headingMatch.Groups["title"].Value).ToLowerInvariant();
-
-                    if (IsPartOfSpeech(heading))
+                    if (sectionMatch.Success)
                     {
-                        currentPartOfSpeech = heading;
-                        currentDefinitions = new List<DefinitionItem>();
+                        var posAbbrev = sectionMatch.Groups["section"].Value.ToLowerInvariant();
+                        if (PartOfSpeechMap.TryGetValue(posAbbrev, out var fullPosName))
+                        {
+                            currentPartOfSpeech = fullPosName;
+                            currentDefinitions = new List<DefinitionItem>();
+                        }
                     }
-                    else
-                    {
-                        currentPartOfSpeech = null;
-                        currentDefinitions = null;
-                    }
-
                     continue;
                 }
 
                 if (currentDefinitions == null)
                     continue;
 
-                if (!line.StartsWith("#")
-                    || line.StartsWith("#*")
-                    || line.StartsWith("#:"))
+                // Match both '#' and '#*' lines, but exclude sub-lists or examples
+                if (!line.StartsWith("#"))
                 {
                     continue;
                 }
 
-                var definitionText = Regex.Replace(line, @"^#+\s*", "");
+                // Exclude examples, citations, and translations
+                if (line.StartsWith("#**")
+                    || line.StartsWith("#:")
+                    || line.StartsWith("#*'")
+                    || line.StartsWith("#*\"")
+                    || Regex.IsMatch(line, @"^#\*\s*''")
+                    || Regex.IsMatch(line, @"^#\s*''"))
+                {
+                    continue;
+                }
+
+                var definitionText = Regex.Replace(line, @"^#\*\s*|^#\s*", "");
                 var cleanDefinition = CleanWikitext(definitionText);
 
                 if (!string.IsNullOrWhiteSpace(cleanDefinition))
                 {
+                    // Skip grammatical metadata lines like "f sing case" or "m inv"
+                    if (cleanDefinition.Length < 30 && 
+                        (cleanDefinition.Contains("sing") 
+                         || cleanDefinition.Contains("plur") 
+                         || cleanDefinition.Contains("inv") 
+                         || cleanDefinition.Contains("femm") 
+                         || cleanDefinition.Contains("masc")
+                         || cleanDefinition.Contains("sost")
+                         || cleanDefinition == "f" 
+                         || cleanDefinition == "m"
+                         || cleanDefinition == "c"
+                         || cleanDefinition == "t"))
+                    {
+                        continue;
+                    }
+
                     currentDefinitions.Add(new DefinitionItem
                     {
                         Definition = cleanDefinition.Length > 250
@@ -210,15 +240,6 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
             Commit();
             return meanings;
-        }
-
-        private static bool IsPartOfSpeech(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text))
-                return false;
-
-            return PartOfSpeechKeywords.Any(keyword =>
-                text.Contains(keyword, StringComparison.OrdinalIgnoreCase));
         }
 
         private static string CleanWikitext(string text)
