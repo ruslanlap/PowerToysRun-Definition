@@ -495,10 +495,16 @@ namespace Community.PowerToys.Run.Plugin.Definition
             ConfigurationManager.UpdateConfiguration(config =>
             {
                 if (settings.AdditionalOptions.SingleOrDefault(x => x.Key == nameof(PluginConfiguration.CacheMaxSize)) is var cacheOption && cacheOption != null)
-                    int.TryParse(cacheOption.TextValue, out config.CacheMaxSize);
+                {
+                    if (int.TryParse(cacheOption.TextValue, out var cacheMaxSize))
+                        config.CacheMaxSize = cacheMaxSize;
+                }
                 
                 if (settings.AdditionalOptions.SingleOrDefault(x => x.Key == nameof(PluginConfiguration.HttpTimeoutSeconds)) is var timeoutOption && timeoutOption != null)
-                    int.TryParse(timeoutOption.TextValue, out config.HttpTimeoutSeconds);
+                {
+                    if (int.TryParse(timeoutOption.TextValue, out var httpTimeoutSeconds))
+                        config.HttpTimeoutSeconds = httpTimeoutSeconds;
+                }
                 
                 if (settings.AdditionalOptions.SingleOrDefault(x => x.Key == nameof(PluginConfiguration.EnableAudioPlayback)) is var audioOption && audioOption != null)
                     config.EnableAudioPlayback = audioOption.Value;
@@ -535,7 +541,8 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 _context.API.ThemeChanged -= OnThemeChanged;
             }
 
-            _cache.Clear();
+                        // LRUCache doesn't have Clear(), recreate it
+            _cache = new LRUCache(ConfigurationManager.Configuration.CacheMaxSize);
             _cancellationTokenSource?.Cancel();
             _cancellationTokenSource?.Dispose();
             _audioManager?.Dispose();
