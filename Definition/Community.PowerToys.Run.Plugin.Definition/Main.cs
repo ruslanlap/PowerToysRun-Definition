@@ -51,6 +51,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
             client.DefaultRequestHeaders.AcceptLanguage.ParseAdd("en-US,en;q=0.9");
             return client;
         });
+        
         private static HttpClient HttpClient => HttpClientLazy.Value;
 
         private readonly LRUCache _cache = new(ConfigurationManager.Configuration.CacheMaxSize);
@@ -100,11 +101,18 @@ namespace Community.PowerToys.Run.Plugin.Definition
             
             var rawSearch = query.Search ?? string.Empty;
             var searchTerm = rawSearch.Trim().ToLowerInvariant();
-
+            
+            // Parse subcommand (pronunciation, synonyms, antonyms, examples)
+            var (subcommand, searchWord) = ParseSubcommand(searchTerm);
+            if (string.IsNullOrWhiteSpace(searchWord))
+            {
+                return new List<Result> { CreateInfoResult(rawSearch, Name, EmptyQueryMessage) };
+            }
+            
             CancelPreviousRequest();
 
-            // Handle empty query
-            if (string.IsNullOrWhiteSpace(searchTerm))
+            // Handle empty query after subcommand parsing
+            if (string.IsNullOrWhiteSpace(searchWord))
             {
                 return new List<Result> { CreateInfoResult(rawSearch, Name, EmptyQueryMessage) };
             }
@@ -118,11 +126,24 @@ namespace Community.PowerToys.Run.Plugin.Definition
             // Show loading message for non-delayed execution
             if (!delayedExecution)
             {
-                return new List<Result> { CreateInfoResult(rawSearch, SearchingMessage, $"Searching for '{searchTerm}'") };
+                return new List<Result> { CreateInfoResult(rawSearch, SearchingMessage, $"Searching for '{searchWord}'") };
             }
 
             // Perform actual API call
-            return ExecuteDelayedQuery(searchTerm, rawSearch);
+            return ExecuteDelayedQuery(searchWord, rawSearch, subcommand);
+        }
+
+        private static (string Subcommand, string SearchWord) ParseSubcommand(string input)
+        {
+            var parts = input.Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length < 2) return (string.Empty, input.Trim());
+            
+            var potentialSubcommand = parts[0].ToLowerInvariant();
+            var validSubcommands = new HashSet<string> { "pronunciation", "pron", "synonyms", "syn", "antonyms", "ant", "examples", "ex" };
+            
+            return validSubcommands.Contains(potentialSubcommand)
+                ? (potentialSubcommand, parts[1].Trim())
+                : (string.Empty, input.Trim());
         }
 
         private void CancelPreviousRequest()
@@ -144,14 +165,14 @@ namespace Community.PowerToys.Run.Plugin.Definition
             return false;
         }
 
-        private List<Result> ExecuteDelayedQuery(string searchTerm, string rawSearch)
+        private List<Result> ExecuteDelayedQuery(string searchTerm, string rawSearch, string subcommand)
         {
             try
             {
                 // Use Task.Run to avoid blocking the UI thread
                 var task = Task.Run(async () => await FetchAndProcessResultsAsync(searchTerm, rawSearch, _cancellationTokenSource.Token));
                 var results = task.ConfigureAwait(false).GetAwaiter().GetResult();
-
+                
                 CacheResults(searchTerm, results);
                 return results;
             }
@@ -245,7 +266,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
             {
                 var script = DetectScript(searchTerm);
                 var providers = GetProvidersForScript(script).ToList();
-                
+
                 Debug.WriteLine($"[Definition Plugin] Script: {script}, using providers: {string.Join(", ", providers.Select(p => p.LanguageCode))}");
 
                 var tasks = providers.Select(async provider =>
@@ -271,13 +292,16 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
                 var results = ProcessDictionaryEntries(allEntries, rawSearch);
                 
+                // Filter results based on subcommand
+                results = FilterResultsBySubcommand(results, searchTerm);
+
                 foreach (var result in results)
                 {
                     if (result.ContextData is ResultContext)
                     {
                         bool isUkResult = result.SubTitle != null && result.SubTitle.Any(c => c >= 0x0400 && c <= 0x04FF);
                         bool isChineseResult = result.SubTitle != null && result.SubTitle.Any(c => (c >= 0x4E00 && c <= 0x9FFF) || (c >= 0x3400 && c <= 0x4DBF));
-                        
+
                         if (script == ScriptType.Cyrillic && isUkResult) result.Score += 10;
                         if (script == ScriptType.Cjk && isChineseResult) result.Score += 10;
                         if (script == ScriptType.Latin && !isUkResult && !isChineseResult) result.Score += 10;
@@ -288,6 +312,27 @@ namespace Community.PowerToys.Run.Plugin.Definition
             }, cancellationToken, 3, $"Dictionary lookup for '{searchTerm}'");
         }
 
+        private List<Result> FilterResultsBySubcommand(List<Result> results, string searchTerm)
+        {
+            var (subcommand, _) = ParseSubcommand(searchTerm);
+            if (string.IsNullOrEmpty(subcommand))
+                return results; // No subcommand - return all
+
+            return subcommand switch
+            {
+                "pronunciation" or "pron" => results.Where(r =>
+                    r.Title.Contains("[") || r.SubTitle?.Contains("phonetic") == true ||
+                    r.ContextData is ResultContext ctx && !string.IsNullOrEmpty(ctx.AudioUrl)).ToList(),
+                "synonyms" or "syn" => results.Where(r =>
+                    r.Title.Contains("Synonyms") || r.SubTitle?.Contains("synonym") == true).ToList(),
+                "antonyms" or "ant" => results.Where(r =>
+                    r.Title.Contains("Antonyms") || r.SubTitle?.Contains("antonym") == true).ToList(),
+                "examples" or "ex" => results.Where(r =>
+                    r.Title.Contains("Example") || r.SubTitle?.Contains("example") == true).ToList(),
+                _ => results
+            };
+        }
+
         private IDictionaryProvider GetCurrentProvider()
         {
             var lang = ConfigurationManager.Configuration.Language?.ToLowerInvariant() ?? "en";
@@ -295,7 +340,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
             {
                 return provider;
             }
-
+            
             return _dictionaryProviders["en"];
         }
 
@@ -310,46 +355,168 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 results.AddRange(entryResults);
             }
 
-            return results;
+            return results.Any() 
+                ? results 
+                : new List<Result> { CreateResult(rawSearch, _iconManager.InfoIcon, "No definitions found", "No processable definitions in API response.", null, 0) };
+        }
+        #endregion
+
+        #region Result Helpers
+        private Result CreateInfoResult(string rawSearch, string title, string subtitle)
+        {
+            return CreateResult(rawSearch, _iconManager.InfoIcon, title, subtitle, null, 0);
+        }
+
+        private Result CreateErrorResult(string rawSearch, string title, string message)
+        {
+            return CreateResult(rawSearch, _iconManager.ErrorIcon, title, message, null, 0);
+        }
+
+        private Result CreateResult(string rawSearch, string iconPath, string title, string subtitle, ResultContext contextData, int score)
+        {
+            return new Result
+            {
+                QueryTextDisplay = rawSearch,
+                IcoPath = iconPath,
+                Title = title,
+                SubTitle = subtitle,
+                ContextData = contextData,
+                Score = score,
+                Action = _ => false
+            };
         }
         #endregion
 
         #region Context Menu
         public List<ContextMenuResult> LoadContextMenus(Result selectedResult)
         {
-            if (!(selectedResult.ContextData is ResultContext context))
+            if (selectedResult.ContextData is ResultContext context)
             {
-                return new List<ContextMenuResult>();
+                var contextMenuBuilder = new ContextMenuBuilder(Name, _context, _audioManager);
+                return contextMenuBuilder.BuildMenuItems(context, selectedResult);
             }
-
-            var menuBuilder = new ContextMenuBuilder(Name, _context, _audioManager);
-            return menuBuilder.BuildMenuItems(context, selectedResult);
+            return new List<ContextMenuResult>();
         }
         #endregion
 
-        #region Result Creation Helpers
-        private Result CreateInfoResult(string rawSearch, string title, string subTitle) => new()
+        #region Settings
+        public Control CreateSettingPanel()
         {
-            QueryTextDisplay = rawSearch,
-            IcoPath = _iconManager.InfoIcon,
-            Title = title,
-            SubTitle = subTitle,
-            Action = _ => false,
-            ContextData = null
-        };
+            var panel = new StackPanel
+            {
+                Margin = new Thickness(10)
+            };
 
-        private Result CreateErrorResult(string rawSearch, string title, string subTitle) => new()
+            panel.Children.Add(new TextBlock
+            {
+                Text = "No custom settings UI. Please use the built-in Additional Options in PowerToys."
+            });
+
+            var contentControl = new ContentControl
+            {
+                Content = panel
+            };
+
+            return contentControl;
+        }
+
+        public IEnumerable<PluginAdditionalOption> AdditionalOptions
         {
-            QueryTextDisplay = rawSearch,
-            IcoPath = _iconManager.ErrorIcon,
-            Title = title,
-            SubTitle = subTitle,
-            Action = _ => false,
-            ContextData = null
-        };
+            get
+            {
+                var options = new List<PluginAdditionalOption>
+                {
+                    new PluginAdditionalOption
+                    {
+                        Key = nameof(PluginConfiguration.CacheMaxSize),
+                        DisplayLabel = "Cache Size",
+                        DisplayDescription = "Maximum number of cached dictionary entries",
+                        PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Textbox,
+                        TextValue = ConfigurationManager.Configuration.CacheMaxSize.ToString()
+                    },
+                    new PluginAdditionalOption
+                    {
+                        Key = nameof(PluginConfiguration.HttpTimeoutSeconds),
+                        DisplayLabel = "HTTP Timeout (seconds)",
+                        DisplayDescription = "Timeout for dictionary API requests",
+                        PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Textbox,
+                        TextValue = ConfigurationManager.Configuration.HttpTimeoutSeconds.ToString()
+                    },
+                    new PluginAdditionalOption
+                    {
+                        Key = nameof(PluginConfiguration.EnableAudioPlayback),
+                        DisplayLabel = "Enable Audio Playback",
+                        DisplayDescription = "Play pronunciation audio when available",
+                        PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Checkbox,
+                        Value = ConfigurationManager.Configuration.EnableAudioPlayback
+                    },
+                    new PluginAdditionalOption
+                    {
+                        Key = nameof(PluginConfiguration.EnableClipboardOperations),
+                        DisplayLabel = "Enable Clipboard Operations",
+                        DisplayDescription = "Allow copying definitions to clipboard",
+                        PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Checkbox,
+                        Value = ConfigurationManager.Configuration.EnableClipboardOperations
+                    },
+                    new PluginAdditionalOption
+                    {
+                        Key = nameof(PluginConfiguration.ShowExamplesInResults),
+                        DisplayLabel = "Show Examples",
+                        DisplayDescription = "Display usage examples in results",
+                        PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Checkbox,
+                        Value = ConfigurationManager.Configuration.ShowExamplesInResults
+                    },
+                    new PluginAdditionalOption
+                    {
+                        Key = nameof(PluginConfiguration.ShowSynonymsInResults),
+                        DisplayLabel = "Show Synonyms",
+                        DisplayDescription = "Display synonyms in results",
+                        PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Checkbox,
+                        Value = ConfigurationManager.Configuration.ShowSynonymsInResults
+                    },
+                    new PluginAdditionalOption
+                    {
+                        Key = nameof(PluginConfiguration.ShowAntonymsInResults),
+                        DisplayLabel = "Show Antonyms",
+                        DisplayDescription = "Display antonyms in results",
+                        PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Checkbox,
+                        Value = ConfigurationManager.Configuration.ShowAntonymsInResults
+                    }
+                };
+
+                return options;
+            }
+        }
+
+        public void UpdateSettings(PowerLauncherPluginSettings settings)
+        {
+            ConfigurationManager.UpdateConfiguration(config =>
+            {
+                if (settings.AdditionalOptions.SingleOrDefault(x => x.Key == nameof(PluginConfiguration.CacheMaxSize)) is var cacheOption && cacheOption != null)
+                    int.TryParse(cacheOption.TextValue, out config.CacheMaxSize);
+                
+                if (settings.AdditionalOptions.SingleOrDefault(x => x.Key == nameof(PluginConfiguration.HttpTimeoutSeconds)) is var timeoutOption && timeoutOption != null)
+                    int.TryParse(timeoutOption.TextValue, out config.HttpTimeoutSeconds);
+                
+                if (settings.AdditionalOptions.SingleOrDefault(x => x.Key == nameof(PluginConfiguration.EnableAudioPlayback)) is var audioOption && audioOption != null)
+                    config.EnableAudioPlayback = audioOption.Value;
+                
+                if (settings.AdditionalOptions.SingleOrDefault(x => x.Key == nameof(PluginConfiguration.EnableClipboardOperations)) is var clipboardOption && clipboardOption != null)
+                    config.EnableClipboardOperations = clipboardOption.Value;
+                
+                if (settings.AdditionalOptions.SingleOrDefault(x => x.Key == nameof(PluginConfiguration.ShowExamplesInResults)) is var examplesOption && examplesOption != null)
+                    config.ShowExamplesInResults = examplesOption.Value;
+                
+                if (settings.AdditionalOptions.SingleOrDefault(x => x.Key == nameof(PluginConfiguration.ShowSynonymsInResults)) is var synonymsOption && synonymsOption != null)
+                    config.ShowSynonymsInResults = synonymsOption.Value;
+                
+                if (settings.AdditionalOptions.SingleOrDefault(x => x.Key == nameof(PluginConfiguration.ShowAntonymsInResults)) is var antonymsOption && antonymsOption != null)
+                    config.ShowAntonymsInResults = antonymsOption.Value;
+            });
+        }
         #endregion
 
-        #region Disposal
+        #region Cleanup
         public void Dispose()
         {
             Dispose(true);
@@ -358,18 +525,19 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
         protected virtual void Dispose(bool disposing)
         {
-            if (_disposed) return;
+            if (_disposed || !disposing)
+                return;
 
-            if (disposing)
+            if (_context?.API != null)
             {
-                if (_context?.API != null)
-                {
-                    _context.API.ThemeChanged -= OnThemeChanged;
-                }
-                _cancellationTokenSource?.Cancel();
-                _cancellationTokenSource?.Dispose();
-                _audioManager?.Dispose();
+                _context.API.ThemeChanged -= OnThemeChanged;
             }
+
+            _cache.Clear();
+            _cancellationTokenSource?.Cancel();
+            _cancellationTokenSource?.Dispose();
+            _audioManager?.Dispose();
+            HttpClient?.Dispose();
 
             _disposed = true;
         }
