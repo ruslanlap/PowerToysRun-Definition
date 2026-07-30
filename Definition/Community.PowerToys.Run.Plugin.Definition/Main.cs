@@ -56,7 +56,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
         
         private static HttpClient HttpClient => HttpClientLazy.Value;
 
-        private readonly LRUCache _cache = new(ConfigurationManager.Configuration.CacheMaxSize);
+        private LRUCache _cache = new LRUCache(ConfigurationManager.Configuration.CacheMaxSize);
         private readonly AudioManager _audioManager;
         private CancellationTokenSource _cancellationTokenSource;
         private readonly Dictionary<string, IDictionaryProvider> _dictionaryProviders;
