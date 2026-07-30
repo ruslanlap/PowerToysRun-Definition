@@ -19,7 +19,7 @@
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
     <img src="https://img.shields.io/github/v/release/ruslanlap/PowerToysRun-Definition?label=latest" alt="Latest Release">
   </a>
-  <img src="https://img.shields.io/badge/version-v1.5.0-brightgreen" alt="Version">
+  <img src="https://img.shields.io/badge/version-v1.5.1-brightgreen" alt="Version">
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/stargazers">
     <img src="https://img.shields.io/github/stars/ruslanlap/PowerToysRun-Definition" alt="GitHub stars">
   </a>
@@ -57,10 +57,10 @@
 </div>
 
 <div align="center">
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.5.0/Definition-1.5.0-x64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.5.1/Definition-1.5.1-x64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-x64-blue?style=for-the-badge&logo=github" alt="Download x64">
   </a>
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.5.0/Definition-1.5.0-ARM64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.5.1/Definition-1.5.1-ARM64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-ARM64-blue?style=for-the-badge&logo=github" alt="Download ARM64">
   </a>
     <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
@@ -87,13 +87,24 @@
 - [📄 License](#-license)
 - [🙏 Acknowledgements](#-acknowledgements)
 - [☕ Support](#-support)
-- [🆕 What's New (v1.5.0)](#-whats-new-v150)
+- [🆕 What's New (v1.5.1)](#-whats-new-v150)
 - [🆕 What's New (v1.4.0)](#-whats-new-v140)
 - [🆕 What's New (v1.3.3)](#-whats-new-v133)
 - [🆕 What's New (v1.3.2)](#-whats-new-v132)
 - [🆕 What's New (v1.3.1)](#-whats-new-v131)
 
-## 🆕 What's New (v1.5.0)
+## 🆕 What's New (v1.5.1)
+
+- ⌨️ **Subcommand Support** — Quick access to specific word data without full definition lookup:
+  - `def pronunciation <word>` / `def pron <word>` — Show only pronunciation & audio
+  - `def synonyms <word>` / `def syn <word>` — Show only synonyms
+  - `def antonyms <word>` / `def ant <word>` — Show only antonyms
+  - `def examples <word>` / `def ex <word>` — Show only usage examples
+  - Default: `def <word>` shows all (definitions + phonetics + synonyms + antonyms + examples)
+- Works across all supported languages (English, French, Italian, Ukrainian, Chinese)
+- Configurable via existing `ShowSynonymsInResults`, `ShowAntonymsInResults`, `ShowExamplesInResults` settings
+
+## 🆕 What's New (v1.5.1)
 
 - 🇮🇹 **Italian Dictionary Support** — Added Italian lookups via Wikizionario (`it.wiktionary.org`)
 - 🌐 **Expanded Latin Lookups** — Default `LatinLanguages` now includes English, French, and Italian (`"en,fr,it"`)
@@ -159,8 +170,8 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 ### Quick Install (Manual)
 
 1. Download the appropriate ZIP for your system architecture:
-   - [x64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.5.0/Definition-1.5.0-x64.zip)
-   - [ARM64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.5.0/Definition-1.5.0-ARM64.zip)
+   - [x64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.5.1/Definition-1.5.1-x64.zip)
+   - [ARM64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.5.1/Definition-1.5.1-ARM64.zip)
 
 2. Extract the ZIP to:
    ```
@@ -188,6 +199,11 @@ To verify the plugin is correctly installed:
 2. Type:
    - `def` to see instructions.
    - `def <word>` to lookup definitions automatically based on language/script.
+   - **Subcommands** (v1.5.1+):
+     - `def pronunciation <word>` / `def pron <word>` — show only pronunciation + audio
+     - `def synonyms <word>` / `def syn <word>` — show only synonyms
+     - `def antonyms <word>` / `def ant <word>` — show only antonyms
+     - `def examples <word>` / `def ex <word>` — show only usage examples
 3. Press <kbd>Enter</kbd> to fetch results.
 4. Use <kbd>Ctrl + C</kbd> to copy a definition.
 5. Right-click a result to:
@@ -195,6 +211,10 @@ To verify the plugin is correctly installed:
    - Play pronunciation audio
    - Open the word in Wiktionary
    - Search for related words
+
+<div align="center">
+  <img src="data/demo-subcommands.gif" alt="Subcommand Demo" width="650">
+</div>
 
 ## ⚙️ Configuration
 
@@ -253,7 +273,7 @@ cd PowerToysRun-Definition/Definition
 dotnet build
 # To package:
 dotnet publish -c Release -r win-x64 --output ./publish
-zip -r Definition-v1.5.0-x64.zip ./publish
+zip -r Definition-v1.5.1-x64.zip ./publish
 ```
 
 ## 📊 Project Structure
