@@ -49,7 +49,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
             {
                 Timeout = TimeSpan.FromSeconds(ConfigurationManager.Configuration.HttpTimeoutSeconds)
             };
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("PowerToysRun-Definition/1.5.0 (https://github.com/ruslanlap/PowerToysRun-Definition)");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("PowerToysRun-Definition/1.5.2 (https://github.com/ruslanlap/PowerToysRun-Definition)");
             client.DefaultRequestHeaders.AcceptLanguage.ParseAdd("en-US,en;q=0.9");
             return client;
         });
@@ -132,7 +132,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
             }
 
             // Perform actual API call
-            return ExecuteDelayedQuery(searchWord, rawSearch, subcommand);
+            return ExecuteDelayedQuery(searchWord, rawSearch, subcommand, searchTerm);
         }
 
         private static (string Subcommand, string SearchWord) ParseSubcommand(string input)
@@ -167,15 +167,15 @@ namespace Community.PowerToys.Run.Plugin.Definition
             return false;
         }
 
-        private List<Result> ExecuteDelayedQuery(string searchTerm, string rawSearch, string subcommand)
+        private List<Result> ExecuteDelayedQuery(string searchTerm, string rawSearch, string subcommand, string cacheKey)
         {
             try
             {
                 // Use Task.Run to avoid blocking the UI thread
-                var task = Task.Run(async () => await FetchAndProcessResultsAsync(searchTerm, rawSearch, _cancellationTokenSource.Token));
+                var task = Task.Run(async () => await FetchAndProcessResultsAsync(searchTerm, rawSearch, subcommand, _cancellationTokenSource.Token));
                 var results = task.ConfigureAwait(false).GetAwaiter().GetResult();
                 
-                CacheResults(searchTerm, results);
+                CacheResults(cacheKey, results);
                 return results;
             }
             catch (OperationCanceledException)
@@ -262,7 +262,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
         private enum ScriptType { Latin, Cyrillic, Cjk, Mixed }
 
-        private async Task<List<Result>> FetchAndProcessResultsAsync(string searchTerm, string rawSearch, CancellationToken cancellationToken)
+        private async Task<List<Result>> FetchAndProcessResultsAsync(string searchTerm, string rawSearch, string subcommand, CancellationToken cancellationToken)
         {
             return await RetryHelper.RetryAsync(async () =>
             {
@@ -295,7 +295,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 var results = ProcessDictionaryEntries(allEntries, rawSearch);
                 
                 // Filter results based on subcommand
-                results = FilterResultsBySubcommand(results, searchTerm);
+                results = FilterResultsBySubcommand(results, subcommand);
 
                 foreach (var result in results)
                 {
@@ -314,9 +314,8 @@ namespace Community.PowerToys.Run.Plugin.Definition
             }, cancellationToken, 3, $"Dictionary lookup for '{searchTerm}'");
         }
 
-        private List<Result> FilterResultsBySubcommand(List<Result> results, string searchTerm)
+        private static List<Result> FilterResultsBySubcommand(List<Result> results, string subcommand)
         {
-            var (subcommand, _) = ParseSubcommand(searchTerm);
             if (string.IsNullOrEmpty(subcommand))
                 return results; // No subcommand - return all
 
