@@ -1,0 +1,26 @@
+name: Release Please
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          release-type: simple
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          target-branch: master
+
+  # After release-please creates a tag, the existing build-and-release.yml
+  # workflow picks it up automatically (triggered by tag push "v*")
+  # to build x64/ARM64 binaries and upload them to the GitHub Release.

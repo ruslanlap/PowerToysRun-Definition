@@ -1,0 +1,33 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "bootstrap-sha": "5bb1d079a4b2d8d4b1d5a3e7f9c0b2a4d6e8f1a3",
+  "release-type": "simple",
+  "bump-minor-pre-major": false,
+  "bump-patch-for-minor-pre-major": false,
+  "draft": false,
+  "prerelease": false,
+  "packages": {
+    ".": {
+      "package-name": "Definition",
+      "changelog-path": "CHANGELOG.md",
+      "changelog-type": "github",
+      "changelog-sections": [
+        { "type": "feat", "section": "✨ Features", "hidden": false },
+        { "type": "fix", "section": "🐛 Bug Fixes", "hidden": false },
+        { "type": "perf", "section": "⚡ Performance", "hidden": false },
+        { "type": "docs", "section": "📚 Documentation", "hidden": false },
+        { "type": "refactor", "section": "♻️ Code Refactoring", "hidden": false },
+        { "type": "build", "section": "📦 Build System", "hidden": false },
+        { "type": "ci", "section": "🔧 CI/CD", "hidden": false },
+        { "type": "chore", "section": "🔨 Maintenance", "hidden": true },
+        { "type": "test", "section": "🧪 Tests", "hidden": false },
+        { "type": "revert", "section": "⏪ Reverts", "hidden": false }
+      ],
+      "extra-files": [
+        "Definition/Community.PowerToys.Run.Plugin.Definition/plugin.json",
+        "README.md"
+      ],
+      "versioning": "default"
+    }
+  }
+}
