@@ -34,6 +34,8 @@ namespace Community.PowerToys.Run.Plugin.Definition
     {
         public string Definition { get; set; }
         public string Example { get; set; }
+        public List<string> Synonyms { get; set; } = new();
+        public List<string> Antonyms { get; set; } = new();
     }
 
     internal class LicenseInfo

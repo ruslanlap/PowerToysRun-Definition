@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented in this file.
 
+## [1.5.3] - 2026-07-31
+
+### Fixed
+- Return dedicated pronunciation results instead of matching definition titles that contain phonetics.
+- Collect synonyms and antonyms from both meaning-level and definition-level API fields.
+- Honor explicit pron, syn, ant, and ex commands for arbitrary words, even when their default result category is hidden.
+- Show a category-specific message when the dictionary has no requested data.
+- Add regression coverage for every long and short subcommand alias.
+
 ## [1.5.2] - 2026-07-30
 
 ### Fixed
@@ -26,6 +35,7 @@ All notable changes to this project are documented in this file.
 - Automatic language detection and multi-language Latin lookups.
 - `LatinLanguages` configuration setting.
 
+[1.5.3]: https://github.com/ruslanlap/PowerToysRun-Definition/releases/tag/v1.5.3
 [1.5.2]: https://github.com/ruslanlap/PowerToysRun-Definition/releases/tag/v1.5.2
 [1.5.0]: https://github.com/ruslanlap/PowerToysRun-Definition/releases/tag/v1.5.0
 [1.4.0]: https://github.com/ruslanlap/PowerToysRun-Definition/releases/tag/v1.4.0

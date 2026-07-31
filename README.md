@@ -19,7 +19,7 @@
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
     <img src="https://img.shields.io/github/v/release/ruslanlap/PowerToysRun-Definition?label=latest" alt="Latest Release">
   </a>
-  <img src="https://img.shields.io/badge/version-v1.5.2-brightgreen" alt="Version">
+  <img src="https://img.shields.io/badge/version-v1.5.3-brightgreen" alt="Version">
   <a href="https://github.com/ruslanlap/PowerToysRun-Definition/stargazers">
     <img src="https://img.shields.io/github/stars/ruslanlap/PowerToysRun-Definition" alt="GitHub stars">
   </a>
@@ -57,10 +57,10 @@
 </div>
 
 <div align="center">
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.5.2/Definition-1.5.2-x64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.5.3/Definition-1.5.3-x64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-x64-blue?style=for-the-badge&logo=github" alt="Download x64">
   </a>
-  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.5.2/Definition-1.5.2-ARM64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.5.3/Definition-1.5.3-ARM64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-ARM64-blue?style=for-the-badge&logo=github" alt="Download ARM64">
   </a>
     <a href="https://github.com/ruslanlap/PowerToysRun-Definition/releases/latest">
@@ -87,11 +87,21 @@
 - [📄 License](#-license)
 - [🙏 Acknowledgements](#-acknowledgements)
 - [☕ Support](#-support)
+- [🆕 What's New (v1.5.3)](#-whats-new-v153)
 - [🆕 What's New (v1.5.2)](#-whats-new-v152)
 - [🆕 What's New (v1.4.0)](#-whats-new-v140)
 - [🆕 What's New (v1.3.3)](#-whats-new-v133)
 - [🆕 What's New (v1.3.2)](#-whats-new-v132)
 - [🆕 What's New (v1.3.1)](#-whats-new-v131)
+
+## 🆕 What's New (v1.5.3)
+
+- 🔎 **Reliable subcommands for arbitrary words** — pron, syn, ant, and ex now select only their exact result category.
+- 🗣️ **Dedicated pronunciation results** — Phonetic text and audio are presented independently from definitions.
+- 📚 **Complete related-word data** — Synonyms and antonyms are collected from both meaning-level and definition-level API fields.
+- ⚙️ **Explicit commands override display toggles** — A requested category is returned even when hidden from the default lookup.
+- 💬 **Clear empty states** — The plugin explains when a word has no requested pronunciation, synonyms, antonyms, or examples.
+- 🧪 **Regression coverage** — Tests cover every long and short alias with words beyond hello and happy.
 
 ## 🆕 What's New (v1.5.2)
 
@@ -170,8 +180,8 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 ### Quick Install (Manual)
 
 1. Download the appropriate ZIP for your system architecture:
-   - [x64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.5.2/Definition-1.5.2-x64.zip)
-   - [ARM64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.5.2/Definition-1.5.2-ARM64.zip)
+   - [x64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.5.3/Definition-1.5.3-x64.zip)
+   - [ARM64 version](https://github.com/ruslanlap/PowerToysRun-Definition/releases/download/v1.5.3/Definition-1.5.3-ARM64.zip)
 
 2. Extract the ZIP to:
    ```
@@ -273,7 +283,7 @@ cd PowerToysRun-Definition/Definition
 dotnet build
 # To package:
 dotnet publish -c Release -r win-x64 --output ./publish
-zip -r Definition-v1.5.2-x64.zip ./publish
+zip -r Definition-v1.5.3-x64.zip ./publish
 ```
 
 ## 📊 Project Structure

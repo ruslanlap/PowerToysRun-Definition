@@ -49,7 +49,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
             {
                 Timeout = TimeSpan.FromSeconds(ConfigurationManager.Configuration.HttpTimeoutSeconds)
             };
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("PowerToysRun-Definition/1.5.2 (https://github.com/ruslanlap/PowerToysRun-Definition)");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("PowerToysRun-Definition/1.5.3 (https://github.com/ruslanlap/PowerToysRun-Definition)");
             client.DefaultRequestHeaders.AcceptLanguage.ParseAdd("en-US,en;q=0.9");
             return client;
         });
@@ -292,10 +292,14 @@ namespace Community.PowerToys.Run.Plugin.Definition
                     return new List<Result> { CreateInfoResult(rawSearch, $"No definitions found for '{searchTerm}'", "Check spelling or try another word.") };
                 }
 
-                var results = ProcessDictionaryEntries(allEntries, rawSearch);
+                var results = ProcessDictionaryEntries(allEntries, rawSearch, subcommand);
                 
                 // Filter results based on subcommand
                 results = FilterResultsBySubcommand(results, subcommand);
+                if (!results.Any())
+                {
+                    return new List<Result> { CreateInfoResult(rawSearch, $"No {GetSubcommandDisplayName(subcommand)} found for '{searchTerm}'", "Try another word or use the default definition lookup.") };
+                }
 
                 foreach (var result in results)
                 {
@@ -314,6 +318,18 @@ namespace Community.PowerToys.Run.Plugin.Definition
             }, cancellationToken, 3, $"Dictionary lookup for '{searchTerm}'");
         }
 
+        private static string GetSubcommandDisplayName(string subcommand)
+        {
+            return subcommand switch
+            {
+                "pronunciation" or "pron" => "pronunciation",
+                "synonyms" or "syn" => "synonyms",
+                "antonyms" or "ant" => "antonyms",
+                "examples" or "ex" => "examples",
+                _ => "matching results"
+            };
+        }
+
         private static List<Result> FilterResultsBySubcommand(List<Result> results, string subcommand)
         {
             if (string.IsNullOrEmpty(subcommand))
@@ -322,14 +338,13 @@ namespace Community.PowerToys.Run.Plugin.Definition
             return subcommand switch
             {
                 "pronunciation" or "pron" => results.Where(r =>
-                    r.Title.Contains("[") || r.SubTitle?.Contains("phonetic") == true ||
-                    r.ContextData is ResultContext ctx && !string.IsNullOrEmpty(ctx.AudioUrl)).ToList(),
+                    r.Title.StartsWith("Pronunciation:", StringComparison.OrdinalIgnoreCase)).ToList(),
                 "synonyms" or "syn" => results.Where(r =>
-                    r.Title.Contains("Synonyms") || r.SubTitle?.Contains("synonym") == true).ToList(),
+                    r.Title.StartsWith("Synonyms (", StringComparison.OrdinalIgnoreCase)).ToList(),
                 "antonyms" or "ant" => results.Where(r =>
-                    r.Title.Contains("Antonyms") || r.SubTitle?.Contains("antonym") == true).ToList(),
+                    r.Title.StartsWith("Antonyms (", StringComparison.OrdinalIgnoreCase)).ToList(),
                 "examples" or "ex" => results.Where(r =>
-                    r.Title.Contains("Example") || r.SubTitle?.Contains("example") == true).ToList(),
+                    r.Title.StartsWith("Example (", StringComparison.OrdinalIgnoreCase)).ToList(),
                 _ => results
             };
         }
@@ -345,14 +360,14 @@ namespace Community.PowerToys.Run.Plugin.Definition
             return _dictionaryProviders["en"];
         }
 
-        private List<Result> ProcessDictionaryEntries(List<DictionaryEntry> entries, string rawSearch)
+        private List<Result> ProcessDictionaryEntries(List<DictionaryEntry> entries, string rawSearch, string subcommand)
         {
             var results = new List<Result>();
             var resultProcessor = new ResultProcessor(_iconManager);
 
             foreach (var entry in entries.Where(e => e != null))
             {
-                var entryResults = resultProcessor.ProcessEntry(entry, rawSearch);
+                var entryResults = resultProcessor.ProcessEntry(entry, rawSearch, subcommand);
                 results.AddRange(entryResults);
             }
 

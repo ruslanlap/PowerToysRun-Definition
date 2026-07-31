@@ -14,7 +14,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
             _iconManager = iconManager;
         }
 
-        public List<Result> ProcessEntry(DictionaryEntry entry, string rawSearch)
+        public List<Result> ProcessEntry(DictionaryEntry entry, string rawSearch, string subcommand = "")
         {
             var results = new List<Result>();
             var sourceUrl = entry.SourceUrls?.FirstOrDefault(s => !string.IsNullOrWhiteSpace(s));
@@ -22,20 +22,36 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
             var titlePrefix = FormatTitlePrefix(entry.Word, phoneticInfo.Text);
 
+            if (!string.IsNullOrWhiteSpace(phoneticInfo.Text) || !string.IsNullOrWhiteSpace(phoneticInfo.AudioUrl))
+            {
+                var pronunciationText = !string.IsNullOrWhiteSpace(phoneticInfo.Text)
+                    ? phoneticInfo.Text
+                    : "Audio pronunciation available";
+                var pronunciationContext = new ResultContext
+                {
+                    TextToCopy = pronunciationText,
+                    AudioUrl = phoneticInfo.AudioUrl,
+                    SourceUrl = sourceUrl,
+                    Word = entry.Word
+                };
+
+                results.Add(CreateResult(rawSearch, _iconManager.InfoIcon, $"Pronunciation: {entry.Word}", pronunciationText, pronunciationContext, 95));
+            }
+
             foreach (var meaning in entry.Meanings?.Where(m => m != null) ?? Enumerable.Empty<Meaning>())
             {
                 var partOfSpeech = meaning.PartOfSpeech ?? "unknown";
                 var titleWithPOS = $"{titlePrefix} ({partOfSpeech})";
 
-                results.AddRange(ProcessDefinitions(meaning, titleWithPOS, phoneticInfo.AudioUrl, sourceUrl, entry.Word, rawSearch));
+                results.AddRange(ProcessDefinitions(meaning, titleWithPOS, phoneticInfo.AudioUrl, sourceUrl, entry.Word, rawSearch, subcommand));
                 
-                // Only add synonyms/antonyms if enabled in configuration
-                if (ConfigurationManager.Configuration.ShowSynonymsInResults)
+                // Explicit subcommands override the default visibility settings.
+                if (ConfigurationManager.Configuration.ShowSynonymsInResults || IsSubcommand(subcommand, "synonyms", "syn"))
                 {
                     results.AddRange(ProcessSynonyms(meaning, partOfSpeech, sourceUrl, entry.Word, rawSearch));
                 }
                 
-                if (ConfigurationManager.Configuration.ShowAntonymsInResults)
+                if (ConfigurationManager.Configuration.ShowAntonymsInResults || IsSubcommand(subcommand, "antonyms", "ant"))
                 {
                     results.AddRange(ProcessAntonyms(meaning, partOfSpeech, sourceUrl, entry.Word, rawSearch));
                 }
@@ -62,7 +78,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 : $"{word} [{phoneticText}]";
         }
 
-        private List<Result> ProcessDefinitions(Meaning meaning, string titleWithPOS, string audioUrl, string sourceUrl, string word, string rawSearch)
+        private List<Result> ProcessDefinitions(Meaning meaning, string titleWithPOS, string audioUrl, string sourceUrl, string word, string rawSearch, string subcommand)
         {
             var results = new List<Result>();
             var definitions = meaning.Definitions?
@@ -81,8 +97,9 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
                 results.Add(CreateResult(rawSearch, _iconManager.DefinitionIcon, titleWithPOS, definition.Definition, contextData, 100));
 
-                // Only add examples if enabled in configuration
-                if (ConfigurationManager.Configuration.ShowExamplesInResults && !string.IsNullOrWhiteSpace(definition.Example))
+                // Explicit example commands override the default visibility setting.
+                if ((ConfigurationManager.Configuration.ShowExamplesInResults || IsSubcommand(subcommand, "examples", "ex"))
+                    && !string.IsNullOrWhiteSpace(definition.Example))
                 {
                     var exampleContext = new ResultContext 
                     { 
@@ -100,8 +117,16 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
         private List<Result> ProcessSynonyms(Meaning meaning, string partOfSpeech, string sourceUrl, string word, string rawSearch)
         {
-            var validSynonyms = meaning.Synonyms?.Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
-            if (validSynonyms?.Any() != true) return new List<Result>();
+            var definitionSynonyms = meaning.Definitions?
+                .Where(d => d != null)
+                .SelectMany(d => d.Synonyms ?? Enumerable.Empty<string>())
+                ?? Enumerable.Empty<string>();
+            var validSynonyms = (meaning.Synonyms ?? Enumerable.Empty<string>())
+                .Concat(definitionSynonyms)
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .Distinct()
+                .ToList();
+            if (validSynonyms.Count == 0) return new List<Result>();
 
             var synonymsText = string.Join(", ", validSynonyms);
             var contextData = new ResultContext { TextToCopy = synonymsText, SourceUrl = sourceUrl, Word = word };
@@ -114,8 +139,16 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
         private List<Result> ProcessAntonyms(Meaning meaning, string partOfSpeech, string sourceUrl, string word, string rawSearch)
         {
-            var validAntonyms = meaning.Antonyms?.Where(a => !string.IsNullOrWhiteSpace(a)).ToList();
-            if (validAntonyms?.Any() != true) return new List<Result>();
+            var definitionAntonyms = meaning.Definitions?
+                .Where(d => d != null)
+                .SelectMany(d => d.Antonyms ?? Enumerable.Empty<string>())
+                ?? Enumerable.Empty<string>();
+            var validAntonyms = (meaning.Antonyms ?? Enumerable.Empty<string>())
+                .Concat(definitionAntonyms)
+                .Where(a => !string.IsNullOrWhiteSpace(a))
+                .Distinct()
+                .ToList();
+            if (validAntonyms.Count == 0) return new List<Result>();
 
             var antonymsText = string.Join(", ", validAntonyms);
             var contextData = new ResultContext { TextToCopy = antonymsText, SourceUrl = sourceUrl, Word = word };
@@ -124,6 +157,12 @@ namespace Community.PowerToys.Run.Plugin.Definition
             {
                 CreateResult(rawSearch, _iconManager.AntonymIcon, $"Antonyms ({partOfSpeech})", antonymsText, contextData, 75)
             };
+        }
+
+        private static bool IsSubcommand(string subcommand, string longName, string shortName)
+        {
+            return string.Equals(subcommand, longName, System.StringComparison.OrdinalIgnoreCase)
+                || string.Equals(subcommand, shortName, System.StringComparison.OrdinalIgnoreCase);
         }
 
         private static Result CreateResult(string rawSearch, string iconPath, string title, string subTitle, ResultContext contextData, int score)
