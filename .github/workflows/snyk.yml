@@ -16,11 +16,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: snyk/actions/setup@v1
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/dotnet@v1
+      - uses: actions/setup-dotnet@v4
         with:
-          command: test
-          args: --file=Definition/Definition.sln
+          dotnet-version: '9.0.x'
+      - name: Restore dependencies
+        run: dotnet restore Definition/Definition.sln -p:EnableWindowsTargeting=true
+      - uses: snyk/actions/setup@v1
+      - name: Snyk scan
+        run: snyk test --file=Definition/Community.PowerToys.Run.Plugin.Definition/Community.PowerToys.Run.Plugin.Definition.csproj
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
