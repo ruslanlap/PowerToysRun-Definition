@@ -23,6 +23,7 @@ jobs:
         run: dotnet restore Definition/Definition.sln -p:EnableWindowsTargeting=true
       - uses: snyk/actions/setup@v1
       - name: Snyk scan
-        run: snyk test --file=Definition/Community.PowerToys.Run.Plugin.Definition/Community.PowerToys.Run.Plugin.Definition.csproj
+        working-directory: Definition/Community.PowerToys.Run.Plugin.Definition
+        run: snyk test
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
