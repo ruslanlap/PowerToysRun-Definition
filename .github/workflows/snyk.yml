@@ -21,5 +21,6 @@ jobs:
         uses: snyk/actions/dotnet@v1
         with:
           command: test
+          args: --file=Definition/Definition.sln
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
