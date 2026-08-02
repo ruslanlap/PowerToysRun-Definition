@@ -1,6 +1,5 @@
 using ManagedCommon;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -49,7 +48,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
             {
                 Timeout = TimeSpan.FromSeconds(ConfigurationManager.Configuration.HttpTimeoutSeconds)
             };
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("PowerToysRun-Definition/1.5.3 (https://github.com/ruslanlap/PowerToysRun-Definition)");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("PowerToysRun-Definition/1.5.4 (https://github.com/ruslanlap/PowerToysRun-Definition)");
             client.DefaultRequestHeaders.AcceptLanguage.ParseAdd("en-US,en;q=0.9");
             return client;
         });
@@ -57,6 +56,9 @@ namespace Community.PowerToys.Run.Plugin.Definition
         private static HttpClient HttpClient => HttpClientLazy.Value;
 
         private LRUCache _cache = new LRUCache(ConfigurationManager.Configuration.CacheMaxSize);
+
+        private static readonly HashSet<string> ValidSubcommands = new(StringComparer.OrdinalIgnoreCase)
+            { "pronunciation", "pron", "synonyms", "syn", "antonyms", "ant", "examples", "ex" };
         private readonly AudioManager _audioManager;
         private CancellationTokenSource _cancellationTokenSource;
         private readonly Dictionary<string, IDictionaryProvider> _dictionaryProviders;
@@ -113,12 +115,6 @@ namespace Community.PowerToys.Run.Plugin.Definition
             
             CancelPreviousRequest();
 
-            // Handle empty query after subcommand parsing
-            if (string.IsNullOrWhiteSpace(searchWord))
-            {
-                return new List<Result> { CreateInfoResult(rawSearch, Name, EmptyQueryMessage) };
-            }
-
             // Check cache first
             if (TryGetCachedResults(searchTerm, rawSearch, out var cachedResults))
             {
@@ -139,12 +135,9 @@ namespace Community.PowerToys.Run.Plugin.Definition
         {
             var parts = input.Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length < 2) return (string.Empty, input.Trim());
-            
-            var potentialSubcommand = parts[0].ToLowerInvariant();
-            var validSubcommands = new HashSet<string> { "pronunciation", "pron", "synonyms", "syn", "antonyms", "ant", "examples", "ex" };
-            
-            return validSubcommands.Contains(potentialSubcommand)
-                ? (potentialSubcommand, parts[1].Trim())
+
+            return ValidSubcommands.Contains(parts[0])
+                ? (parts[0].ToLowerInvariant(), parts[1].Trim())
                 : (string.Empty, input.Trim());
         }
 
@@ -347,17 +340,6 @@ namespace Community.PowerToys.Run.Plugin.Definition
                     r.Title.StartsWith("Example (", StringComparison.OrdinalIgnoreCase)).ToList(),
                 _ => results
             };
-        }
-
-        private IDictionaryProvider GetCurrentProvider()
-        {
-            var lang = ConfigurationManager.Configuration.Language?.ToLowerInvariant() ?? "en";
-            if (_dictionaryProviders.TryGetValue(lang, out var provider))
-            {
-                return provider;
-            }
-            
-            return _dictionaryProviders["en"];
         }
 
         private List<Result> ProcessDictionaryEntries(List<DictionaryEntry> entries, string rawSearch, string subcommand)
