@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented in this file.
 
+## [1.5.4](https://github.com/ruslanlap/PowerToysRun-Definition/compare/v1.5.3...v1.5.4) (2026-08-02)
+
+
+### Bug Fixes
+
+* remove dead code, deduplicate ValidSubcommands — v1.5.4 ([ffcbaa3](https://github.com/ruslanlap/PowerToysRun-Definition/commit/ffcbaa3cd8950720aceda32287bb46c03312ca6e))
+* remove dead code, deduplicate ValidSubcommands ([#13](https://github.com/ruslanlap/PowerToysRun-Definition/issues/13)) ([6972d68](https://github.com/ruslanlap/PowerToysRun-Definition/commit/6972d68ab9ae324c5a96293ef0666a71e57c1f9e))
+* remove empty snyk.yml causing CI failures ([a6948a3](https://github.com/ruslanlap/PowerToysRun-Definition/commit/a6948a38fa1e2e326ccf3af5285caad59fee4de7))
+
 ## [1.5.3] - 2026-07-31
 
 ### Fixed
