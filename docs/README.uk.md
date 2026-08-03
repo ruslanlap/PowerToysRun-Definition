@@ -1,13 +1,13 @@
 # 🔍 PowerToys Run: Плагін Definition
 
 <div align="center">
-  <img src="data/definition.logo.png" alt="Логотип плагіна Definition" width="128" height="128">
+  <img src="../data/definition.logo.png" alt="Логотип плагіна Definition" width="128" height="128">
 </div>
 
 <div align="center">
   <h1>Definition</h1>
   <p>Пошук визначень слів, фонетики та синонімів безпосередньо у PowerToys Run.</p>
-  <img src="data/demo-definition.gif" alt="Демонстрація плагіна Definition" width="650">
+  <img src="../data/demo-definition.gif" alt="Демонстрація плагіна Definition" width="650">
 </div>
 
 
@@ -39,19 +39,19 @@
 </div>
 
 <div align="center">
-  <a href="docs/README.uk.md">
+  <a href="README.uk.md">
     <img src="https://img.shields.io/badge/docs-Українська-0057B7" alt="Документація Українська">
   </a>
-  <a href="README.md">
+  <a href="../README.md">
     <img src="https://img.shields.io/badge/docs-English-2EA44F" alt="Документація Англійська">
   </a>
-  <a href="docs/README.fr.md">
+  <a href="README.fr.md">
     <img src="https://img.shields.io/badge/docs-Français-1F6FEB" alt="Документація Французька">
   </a>
-  <a href="docs/README.it.md">
+  <a href="README.it.md">
     <img src="https://img.shields.io/badge/docs-Italiano-009246" alt="Документація Італійська">
   </a>
-  <a href="docs/README.zh.md">
+  <a href="README.zh.md">
     <img src="https://img.shields.io/badge/docs-中文-E34C26" alt="Документація Китайська">
   </a>
 </div>
@@ -128,7 +128,7 @@
 Definition — це плагін для [Microsoft PowerToys Run](https://github.com/microsoft/PowerToys), що дозволяє швидко шукати визначення слів, фонетику та синоніми, не відриваючись від клавіатури. Просто введіть `def <word>`, щоб отримати визначення. Плагін підтримує **англійську**, **французьку (Français)**, **італійську (Italiano)**, **українську (Українська)** та **китайську (中文)** з автоматичним визначенням письма — достатньо ввести слово будь-якою підтримуваною мовою, і плагін пріоритетно відсортує результати.
 
 <div align="center">
-  <img src="data/demo-definition-2.gif" alt="Пошук визначень слів" width="650">
+  <img src="../data/demo-definition-2.gif" alt="Пошук визначень слів" width="650">
 </div>
 
 ## ✨ Можливості
@@ -155,7 +155,7 @@ Definition — це плагін для [Microsoft PowerToys Run](https://github
 ## 🎬 Демонстрація
 
 <div align="center">
-  <img src="data/demo-definition.gif" alt="Демонстрація плагіна Definition" width="650">
+  <img src="../data/demo-definition.gif" alt="Демонстрація плагіна Definition" width="650">
 </div>
 
 ## 🚀 Встановлення
@@ -213,7 +213,7 @@ Definition — це плагін для [Microsoft PowerToys Run](https://github
    - Шукати споріднені слова
 
 <div align="center">
-  <img src="data/demo-subcommands.gif" alt="Демонстрація підкоманд" width="650">
+  <img src="../data/demo-subcommands.gif" alt="Демонстрація підкоманд" width="650">
 </div>
 
 ## ⚙️ Конфігурація
@@ -379,14 +379,14 @@ PowerToysRun-Definition/
 
 <div align="center">
   <figure>
-    <img src="data/demo8.png" width="800" alt="Інтеграція з Wiktionary">
+    <img src="../data/demo8.png" width="800" alt="Інтеграція з Wiktionary">
     <figcaption>
       <strong>Інтеграція з Wiktionary</strong> - Отримуйте вичерпну інформацію про слово, відкриваючи будь-яке слово у Wiktionary безпосередньо з контекстного меню. Доступ до додаткових значень, перекладів, етимологій та споріднених термінів.
     </figcaption>
   </figure>
 
   <figure>
-    <img src="data/demo9.png" width="800" alt="Розширене контекстне меню">
+    <img src="../data/demo9.png" width="800" alt="Розширене контекстне меню">
     <figcaption><strong>Багате контекстне меню</strong> - Плагін пропонує потужне контекстне меню з кількома діями.
       Копіюйте визначення, відтворюйте аудіо вимови, відкривайте URL-адреси джерел та шукайте споріднені слова.
       Клацніть правою кнопкою миші на будь-якому результаті, щоб скористатися цими функціями.
@@ -428,27 +428,27 @@ PowerToysRun-Definition/
 
 <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:20px;">
   <figure style="margin:0;">
-    <img src="data/demo1.png" width="300" alt="Визначення слова">
+    <img src="../data/demo1.png" width="300" alt="Визначення слова">
     <figcaption style="text-align:center;">Визначення слова</figcaption>
   </figure>
   <figure style="margin:0;">
-    <img src="data/demo2.png" width="300" alt="Відображення фонетики">
+    <img src="../data/demo2.png" width="300" alt="Відображення фонетики">
     <figcaption style="text-align:center;">Відображення фонетики</figcaption>
   </figure>
   <figure style="margin:0;">
-    <img src="data/demo3.png" width="300" alt="Контекстне меню">
+    <img src="../data/demo3.png" width="300" alt="Контекстне меню">
     <figcaption style="text-align:center;">Контекстне меню</figcaption>
   </figure>
   <figure style="margin:0;">
-    <img src="data/demo4.png" width="300" alt="Функція антонімів">
+    <img src="../data/demo4.png" width="300" alt="Функція антонімів">
     <figcaption style="text-align:center;">Функція антонімів</figcaption>
   </figure>
   <figure style="margin:0;">
-    <img src="data/demo5.png" width="300" alt="Аудіо вимови">
+    <img src="../data/demo5.png" width="300" alt="Аудіо вимови">
     <figcaption style="text-align:center;">Аудіо вимови</figcaption>
   </figure>
   <figure style="margin:0;">
-    <img src="data/demo6.png" width="300" alt="Відкладене виконання">
+    <img src="../data/demo6.png" width="300" alt="Відкладене виконання">
     <figcaption style="text-align:center;">Відкладене виконання</figcaption>
   </figure>
 </div>

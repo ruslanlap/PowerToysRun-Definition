@@ -1,13 +1,13 @@
 # 🔍 PowerToys Run：Definition 词典插件
 
 <div align="center">
-  <img src="data/definition.logo.png" alt="Definition Plugin Logo" width="128" height="128">
+  <img src="../data/definition.logo.png" alt="Definition Plugin Logo" width="128" height="128">
 </div>
 
 <div align="center">
   <h1>Definition</h1>
   <p>直接在 PowerToys Run 中查询单词释义、音标和同义词。</p>
-  <img src="data/demo-definition.gif" alt="Definition Plugin Demo" width="650">
+  <img src="../data/demo-definition.gif" alt="Definition Plugin Demo" width="650">
 </div>
 
 
@@ -39,19 +39,19 @@
 </div>
 
 <div align="center">
-  <a href="docs/README.uk.md">
+  <a href="README.uk.md">
     <img src="https://img.shields.io/badge/docs-Українська-0057B7" alt="Docs Ukrainian">
   </a>
-  <a href="README.md">
+  <a href="../README.md">
     <img src="https://img.shields.io/badge/docs-English-2EA44F" alt="Docs English">
   </a>
-  <a href="docs/README.fr.md">
+  <a href="README.fr.md">
     <img src="https://img.shields.io/badge/docs-Français-1F6FEB" alt="Docs French">
   </a>
-  <a href="docs/README.it.md">
+  <a href="README.it.md">
     <img src="https://img.shields.io/badge/docs-Italiano-009246" alt="Docs Italian">
   </a>
-  <a href="docs/README.zh.md">
+  <a href="README.zh.md">
     <img src="https://img.shields.io/badge/docs-中文-E34C26" alt="Docs Chinese">
   </a>
 </div>
@@ -128,7 +128,7 @@
 Definition 是一个 [Microsoft PowerToys Run](https://github.com/microsoft/PowerToys) 插件，可让你无需离开键盘即可快速查询单词释义、音标和同义词。只需输入 `def <word>` 即可获取释义。该插件支持**英语**、**法语（Français）**、**意大利语（Italiano）**、**乌克兰语（Українська）**和**中文**，并具备自动文字检测功能——只需输入任何支持语言的单词，插件就会自动优先返回相应结果。
 
 <div align="center">
-  <img src="data/demo-definition-2.gif" alt="Lookup word definitions" width="650">
+  <img src="../data/demo-definition-2.gif" alt="Lookup word definitions" width="650">
 </div>
 
 ## ✨ 功能特性
@@ -155,7 +155,7 @@ Definition 是一个 [Microsoft PowerToys Run](https://github.com/microsoft/Powe
 ## 🎬 演示
 
 <div align="center">
-  <img src="data/demo-definition.gif" alt="Definition Plugin Demo" width="650">
+  <img src="../data/demo-definition.gif" alt="Definition Plugin Demo" width="650">
 </div>
 
 ## 🚀 安装
@@ -213,7 +213,7 @@ Definition 是一个 [Microsoft PowerToys Run](https://github.com/microsoft/Powe
    - 搜索相关单词
 
 <div align="center">
-  <img src="data/demo-subcommands.gif" alt="Subcommand Demo" width="650">
+  <img src="../data/demo-subcommands.gif" alt="Subcommand Demo" width="650">
 </div>
 
 ## ⚙️ 配置
@@ -379,14 +379,14 @@ PowerToysRun-Definition/
 
 <div align="center">
   <figure>
-    <img src="data/demo8.png" width="800" alt="Wiktionary Integration">
+    <img src="../data/demo8.png" width="800" alt="Wiktionary Integration">
     <figcaption>
       <strong>Wiktionary 集成</strong> - 通过上下文菜单直接在 Wiktionary 中打开任何单词，访问全面的单词信息。获取更多释义、翻译、词源和相关词条。
     </figcaption>
   </figure>
   
   <figure>
-    <img src="data/demo9.png" width="800" alt="Advanced Context Menu">
+    <img src="../data/demo9.png" width="800" alt="Advanced Context Menu">
     <figcaption><strong>丰富的上下文菜单</strong> - 该插件提供了功能强大的上下文菜单，包含多种操作。
       复制释义、播放发音音频、打开来源 URL，以及搜索相关单词。
       右键点击任何结果即可访问这些功能。
@@ -428,27 +428,27 @@ PowerToysRun-Definition/
 
 <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:20px;">
   <figure style="margin:0;">
-    <img src="data/demo1.png" width="300" alt="Word Definition">
+    <img src="../data/demo1.png" width="300" alt="Word Definition">
     <figcaption style="text-align:center;">单词释义</figcaption>
   </figure>
   <figure style="margin:0;">
-    <img src="data/demo2.png" width="300" alt="Phonetics Display">
+    <img src="../data/demo2.png" width="300" alt="Phonetics Display">
     <figcaption style="text-align:center;">音标显示</figcaption>
   </figure>
   <figure style="margin:0;">
-    <img src="data/demo3.png" width="300" alt="Context Menu">
+    <img src="../data/demo3.png" width="300" alt="Context Menu">
     <figcaption style="text-align:center;">上下文菜单</figcaption>
   </figure>
   <figure style="margin:0;">
-    <img src="data/demo4.png" width="300" alt="Antonyms Feature">
+    <img src="../data/demo4.png" width="300" alt="Antonyms Feature">
     <figcaption style="text-align:center;">反义词功能</figcaption>
   </figure>
   <figure style="margin:0;">
-    <img src="data/demo5.png" width="300" alt="Audio Pronunciation">
+    <img src="../data/demo5.png" width="300" alt="Audio Pronunciation">
     <figcaption style="text-align:center;">音频发音</figcaption>
   </figure>
   <figure style="margin:0;">
-    <img src="data/demo6.png" width="300" alt="Delayed Execution">
+    <img src="../data/demo6.png" width="300" alt="Delayed Execution">
     <figcaption style="text-align:center;">延迟执行</figcaption>
   </figure>
 </div>

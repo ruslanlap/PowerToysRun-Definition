@@ -1,13 +1,13 @@
 # 🔍 PowerToys Run: Plugin Definition
 
 <div align="center">
-  <img src="data/definition.logo.png" alt="Logo del Plugin Definition" width="128" height="128">
+  <img src="../data/definition.logo.png" alt="Logo del Plugin Definition" width="128" height="128">
 </div>
 
 <div align="center">
   <h1>Definition</h1>
   <p>Cerca definizioni di parole, fonetica e sinonimi direttamente in PowerToys Run.</p>
-  <img src="data/demo-definition.gif" alt="Demo del Plugin Definition" width="650">
+  <img src="../data/demo-definition.gif" alt="Demo del Plugin Definition" width="650">
 </div>
 
 
@@ -39,19 +39,19 @@
 </div>
 
 <div align="center">
-  <a href="docs/README.uk.md">
+  <a href="README.uk.md">
     <img src="https://img.shields.io/badge/docs-Українська-0057B7" alt="Docs Ucraino">
   </a>
-  <a href="README.md">
+  <a href="../README.md">
     <img src="https://img.shields.io/badge/docs-English-2EA44F" alt="Docs Inglese">
   </a>
-  <a href="docs/README.fr.md">
+  <a href="README.fr.md">
     <img src="https://img.shields.io/badge/docs-Français-1F6FEB" alt="Docs Francese">
   </a>
-  <a href="docs/README.it.md">
+  <a href="README.it.md">
     <img src="https://img.shields.io/badge/docs-Italiano-009246" alt="Docs Italiano">
   </a>
-  <a href="docs/README.zh.md">
+  <a href="README.zh.md">
     <img src="https://img.shields.io/badge/docs-中文-E34C26" alt="Docs Cinese">
   </a>
 </div>
@@ -128,7 +128,7 @@
 Definition è un plugin per [Microsoft PowerToys Run](https://github.com/microsoft/PowerToys) che permette di cercare rapidamente definizioni di parole, fonetica e sinonimi senza lasciare la tastiera. Basta digitare `def <word>` per ottenere le definizioni. Il plugin supporta **Inglese**, **Francese (Français)**, **Italiano (Italiano)**, **Ucraino (Українська)** e **Cinese (中文)** con rilevamento automatico dell'alfabeto — digita una parola in una qualsiasi delle lingue supportate e il plugin darà priorità ai risultati di conseguenza.
 
 <div align="center">
-  <img src="data/demo-definition-2.gif" alt="Cerca definizioni di parole" width="650">
+  <img src="../data/demo-definition-2.gif" alt="Cerca definizioni di parole" width="650">
 </div>
 
 ## ✨ Funzionalità
@@ -155,7 +155,7 @@ Definition è un plugin per [Microsoft PowerToys Run](https://github.com/microso
 ## 🎬 Demo
 
 <div align="center">
-  <img src="data/demo-definition.gif" alt="Demo del Plugin Definition" width="650">
+  <img src="../data/demo-definition.gif" alt="Demo del Plugin Definition" width="650">
 </div>
 
 ## 🚀 Installazione
@@ -213,7 +213,7 @@ Per verificare che il plugin sia installato correttamente:
    - Cercare parole correlate
 
 <div align="center">
-  <img src="data/demo-subcommands.gif" alt="Demo dei Sottocomandi" width="650">
+  <img src="../data/demo-subcommands.gif" alt="Demo dei Sottocomandi" width="650">
 </div>
 
 ## ⚙️ Configurazione
@@ -379,14 +379,14 @@ Questa sezione mette in evidenza alcune delle funzionalità più potenti del plu
 
 <div align="center">
   <figure>
-    <img src="data/demo8.png" width="800" alt="Integrazione con Wiktionary">
+    <img src="../data/demo8.png" width="800" alt="Integrazione con Wiktionary">
     <figcaption>
       <strong>Integrazione con Wiktionary</strong> - Accedi a informazioni complete sulle parole aprendo qualsiasi parola in Wiktionary direttamente dal menu di contesto. Ottieni l'accesso a significati aggiuntivi, traduzioni, etimologie e termini correlati.
     </figcaption>
   </figure>
   
   <figure>
-    <img src="data/demo9.png" width="800" alt="Menu di Contesto Avanzato">
+    <img src="../data/demo9.png" width="800" alt="Menu di Contesto Avanzato">
     <figcaption><strong>Menu di Contesto Ricco</strong> - Il plugin offre un potente menu di contesto con più azioni. 
       Copia definizioni, riproduci l'audio della pronuncia, apri gli URL di origine e cerca parole correlate. 
       Fai clic destro su qualsiasi risultato per accedere a queste funzionalità.
@@ -428,27 +428,27 @@ Il plugin supporta quattro fonti di dizionari con rilevamento automatico dell'al
 
 <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:20px;">
   <figure style="margin:0;">
-    <img src="data/demo1.png" width="300" alt="Definizione di Parola">
+    <img src="../data/demo1.png" width="300" alt="Definizione di Parola">
     <figcaption style="text-align:center;">Definizione di Parola</figcaption>
   </figure>
   <figure style="margin:0;">
-    <img src="data/demo2.png" width="300" alt="Visualizzazione Fonetica">
+    <img src="../data/demo2.png" width="300" alt="Visualizzazione Fonetica">
     <figcaption style="text-align:center;">Visualizzazione Fonetica</figcaption>
   </figure>
   <figure style="margin:0;">
-    <img src="data/demo3.png" width="300" alt="Menu di Contesto">
+    <img src="../data/demo3.png" width="300" alt="Menu di Contesto">
     <figcaption style="text-align:center;">Menu di Contesto</figcaption>
   </figure>
   <figure style="margin:0;">
-    <img src="data/demo4.png" width="300" alt="Funzione Contrari">
+    <img src="../data/demo4.png" width="300" alt="Funzione Contrari">
     <figcaption style="text-align:center;">Funzione Contrari</figcaption>
   </figure>
   <figure style="margin:0;">
-    <img src="data/demo5.png" width="300" alt="Pronuncia Audio">
+    <img src="../data/demo5.png" width="300" alt="Pronuncia Audio">
     <figcaption style="text-align:center;">Pronuncia Audio</figcaption>
   </figure>
   <figure style="margin:0;">
-    <img src="data/demo6.png" width="300" alt="Esecuzione Ritardata">
+    <img src="../data/demo6.png" width="300" alt="Esecuzione Ritardata">
     <figcaption style="text-align:center;">Esecuzione Ritardata</figcaption>
   </figure>
 </div>
