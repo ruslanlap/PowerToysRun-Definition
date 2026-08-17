@@ -87,6 +87,8 @@
 - [📄 License](#-license)
 - [🙏 Acknowledgements](#-acknowledgements)
 - [☕ Support](#-support)
+- [🆕 What's New (v1.7.0)](#-whats-new-v170)
+- [🆕 What's New (v1.6.0)](#-whats-new-v160)
 - [🆕 What's New (v1.5.4)](#-whats-new-v154)
 - [🆕 What's New (v1.5.3)](#-whats-new-v153)
 - [🆕 What's New (v1.5.2)](#-whats-new-v152)
@@ -94,6 +96,18 @@
 - [🆕 What's New (v1.3.3)](#-whats-new-v133)
 - [🆕 What's New (v1.3.2)](#-whats-new-v132)
 - [🆕 What's New (v1.3.1)](#-whats-new-v131)
+
+## 🆕 What's New (v1.7.0)
+
+- 🐛 **Fixed "Did you mean…?" spelling suggestions** — Removed trailing `*` from Datamuse `sp=` parameter that was breaking fuzzy matching; added deduplication; preserved subcommand context when correcting queries (e.g., `syn recieve` → `syn receive`).
+- 🛡️ **Robust suggestion pipeline** — Unit tests cover parsing, HTTP errors, garbage JSON, long input, and custom max suggestions.
+
+## 🆕 What's New (v1.6.0)
+
+- 💡 **"Did you mean…?" spelling suggestions** — When a word isn't found, the plugin suggests up to 25 similar spellings via Datamuse API (free, no key required). Click a suggestion to search it instantly.
+- ⚙️ **Configurable suggestion count** — New "Max \"Did you mean...\" Suggestions" setting (1–25, default 10).
+- 🔑 **Optional Datamuse API key** — Textbox in settings for future-proofing if rate limits are ever introduced.
+- 📚 **Documentation** — Feature added to README Features list and Settings table.
 
 ## 🆕 What's New (v1.5.4)
 
