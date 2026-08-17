@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented in this file.
 
+## [1.6.0](https://github.com/ruslanlap/PowerToysRun-Definition/compare/v1.5.5...v1.6.0) (2026-08-17)
+
+
+### Features
+
+* "Did you mean...?" spelling suggestions when no definitions found ([#17](https://github.com/ruslanlap/PowerToysRun-Definition/issues/17)) ([446c9f6](https://github.com/ruslanlap/PowerToysRun-Definition/commit/446c9f6127b7a44c65b725f8ecbfbb6b428611ff))
+
 ## [1.5.5](https://github.com/ruslanlap/PowerToysRun-Definition/compare/v1.5.4...v1.5.5) (2026-08-17)
 
 
