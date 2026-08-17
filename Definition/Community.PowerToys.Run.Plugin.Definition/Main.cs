@@ -62,6 +62,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
         private readonly AudioManager _audioManager;
         private CancellationTokenSource _cancellationTokenSource;
         private readonly Dictionary<string, IDictionaryProvider> _dictionaryProviders;
+        private readonly SuggestionProvider _suggestionProvider;
         #endregion
 
         #region Initialization
@@ -77,6 +78,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 { "uk", new UkrainianDictionaryProvider(HttpClient) },
                 { "zh", new ChineseDictionaryProvider(HttpClient) }
             };
+            _suggestionProvider = new SuggestionProvider(HttpClient);
         }
 
         public void Init(PluginInitContext context)
@@ -253,6 +255,40 @@ namespace Community.PowerToys.Run.Plugin.Definition
             return providers.Count > 0 ? providers : _dictionaryProviders.Values.Where(p => p.LanguageCode == "en");
         }
 
+
+        private async Task<List<Result>> BuildNotFoundResultsAsync(string searchTerm, string rawSearch, CancellationToken token)
+        {
+            var results = new List<Result> { CreateInfoResult(rawSearch, $"No definitions found for '{searchTerm}'", "Check spelling or try another word.") };
+            try
+            {
+                var suggestions = await _suggestionProvider.GetSuggestionsAsync(searchTerm, ConfigurationManager.Configuration.MaxSuggestions, token);
+                foreach (var s in suggestions)
+                {
+                    results.Add(new Result
+                    {
+                        QueryTextDisplay = rawSearch,
+                        IcoPath = _iconManager.InfoIcon,
+                        Title = $"Did you mean: {s}?",
+                        SubTitle = "Search this spelling",
+                        ToolTipData = new ToolTipData($"Did you mean: {s}?", "Search this spelling"),
+                        Action = _ =>
+                        {
+                            // Re-run the query with the suggested spelling
+                            _context?.API?.ChangeQuery($"{_context.CurrentPluginMetadata.ActionKeyword} {s}", true);
+                            return false;
+                        },
+                        Score = 50
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Definition Plugin] Suggestions failed for '{searchTerm}': {ex.Message}");
+            }
+
+            return results;
+        }
+
         private enum ScriptType { Latin, Cyrillic, Cjk, Mixed }
 
         private async Task<List<Result>> FetchAndProcessResultsAsync(string searchTerm, string rawSearch, string subcommand, CancellationToken cancellationToken)
@@ -282,7 +318,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
                 if (!allEntries.Any())
                 {
-                    return new List<Result> { CreateInfoResult(rawSearch, $"No definitions found for '{searchTerm}'", "Check spelling or try another word.") };
+                    return await BuildNotFoundResultsAsync(searchTerm, rawSearch, cancellationToken);
                 }
 
                 var results = ProcessDictionaryEntries(allEntries, rawSearch, subcommand);
@@ -474,6 +510,14 @@ namespace Community.PowerToys.Run.Plugin.Definition
                     },
                     new PluginAdditionalOption
                     {
+                        Key = nameof(PluginConfiguration.MaxSuggestions),
+                        DisplayLabel = "Max \"Did you mean...\" Suggestions",
+                        DisplayDescription = "Number of spelling suggestions to show when no definitions are found (1-25)",
+                        PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Textbox,
+                        TextValue = ConfigurationManager.Configuration.MaxSuggestions.ToString()
+                    },
+                    new PluginAdditionalOption
+                    {
                         Key = nameof(PluginConfiguration.ShowAntonymsInResults),
                         DisplayLabel = "Show Antonyms",
                         DisplayDescription = "Display antonyms in results",
@@ -490,6 +534,11 @@ namespace Community.PowerToys.Run.Plugin.Definition
         {
             ConfigurationManager.UpdateConfiguration(config =>
             {
+                if (settings.AdditionalOptions.SingleOrDefault(x => x.Key == nameof(PluginConfiguration.MaxSuggestions)) is var maxSugOption && maxSugOption != null && int.TryParse(maxSugOption.TextValue, out var maxSug) && maxSug > 0)
+                {
+                    config.MaxSuggestions = Math.Min(maxSug, 25);
+                }
+
                 if (settings.AdditionalOptions.SingleOrDefault(x => x.Key == nameof(PluginConfiguration.CacheMaxSize)) is var cacheOption && cacheOption != null)
                 {
                     if (int.TryParse(cacheOption.TextValue, out var cacheMaxSize))
