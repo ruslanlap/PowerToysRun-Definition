@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented in this file.
 
+## [1.5.5](https://github.com/ruslanlap/PowerToysRun-Definition/compare/v1.5.4...v1.5.5) (2026-08-17)
+
+
+### Bug Fixes
+
+* install snyk via npm pinned to 1.1297.0 (CDN 403 on pinned binary download) ([53e9b24](https://github.com/ruslanlap/PowerToysRun-Definition/commit/53e9b24b3847f5d5d6d39afd5b7c5b91f3d2b824))
+* pin snyk CLI to 1.1297.0 (PackageOverrides.txt ENOENT regression in 1.1306.x) ([f00d945](https://github.com/ruslanlap/PowerToysRun-Definition/commit/f00d945181adf3c1e96d5fa82fa033137f156801))
+
 ## [1.5.4](https://github.com/ruslanlap/PowerToysRun-Definition/compare/v1.5.3...v1.5.4) (2026-08-02)
 
 
