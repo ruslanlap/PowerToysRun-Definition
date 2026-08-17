@@ -405,3 +405,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Build artifacts
+Definition/Publish/
