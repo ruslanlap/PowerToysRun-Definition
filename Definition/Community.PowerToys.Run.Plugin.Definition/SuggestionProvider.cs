@@ -22,9 +22,9 @@ namespace Community.PowerToys.Run.Plugin.Definition
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
-        public async Task<List<string>> GetSuggestionsAsync(string word, CancellationToken token)
+        public async Task<List<string>> GetSuggestionsAsync(string word, int max, CancellationToken token)
         {
-            if (string.IsNullOrWhiteSpace(word) || word.Length > 50)
+            if (string.IsNullOrWhiteSpace(word) || word.Length > 50 || max <= 0)
             {
                 return new List<string>();
             }
@@ -32,7 +32,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
             try
             {
                 // sp=word* — fuzzy spell check; max=5 keeps it fast
-                var url = $"{DatamuseApiBase}{Uri.EscapeDataString(word)}*&max=5";
+                var url = $"{DatamuseApiBase}{Uri.EscapeDataString(word)}*&max={Math.Min(max, 25)}";
                 using var response = await _httpClient.GetAsync(url, token);
                 if (!response.IsSuccessStatusCode)
                 {
@@ -44,7 +44,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 return doc.RootElement.EnumerateArray()
                     .Select(e => e.TryGetProperty("word", out var w) ? w.GetString() : null)
                     .Where(w => !string.IsNullOrWhiteSpace(w) && !string.Equals(w, word, StringComparison.OrdinalIgnoreCase))
-                    .Take(5)
+                    .Take(max)
                     .ToList()!;
             }
             catch (Exception)

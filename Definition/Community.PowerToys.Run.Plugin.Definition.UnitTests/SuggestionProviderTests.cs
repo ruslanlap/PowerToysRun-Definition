@@ -40,7 +40,7 @@ namespace Community.PowerToys.Run.Plugin.Definition.UnitTests
         public async Task ParsesWordsAndSkipsOriginal()
         {
             var provider = Make(HttpStatusCode.OK, "[{\"word\":\"run\"},{\"word\":\"serendipiti\"},{\"word\":\"run\"}]");
-            var result = await provider.GetSuggestionsAsync("serendipityy", CancellationToken.None);
+            var result = await provider.GetSuggestionsAsync("serendipityy", 5, CancellationToken.None);
 
             CollectionAssert.AreEqual(new[] { "run", "serendipiti" }, result.ToList());
         }
@@ -49,21 +49,30 @@ namespace Community.PowerToys.Run.Plugin.Definition.UnitTests
         public async Task EmptyOnHttpError()
         {
             var provider = Make(HttpStatusCode.NotFound, "[]");
-            Assert.AreEqual(0, (await provider.GetSuggestionsAsync("x", CancellationToken.None)).Count);
+            Assert.AreEqual(0, (await provider.GetSuggestionsAsync("x", 5, CancellationToken.None)).Count);
         }
 
         [TestMethod]
         public async Task EmptyOnGarbageJson()
         {
             var provider = Make(HttpStatusCode.OK, "<html>not json</html>");
-            Assert.AreEqual(0, (await provider.GetSuggestionsAsync("x", CancellationToken.None)).Count);
+            Assert.AreEqual(0, (await provider.GetSuggestionsAsync("x", 5, CancellationToken.None)).Count);
         }
 
         [TestMethod]
         public async Task EmptyOnTooLongWord()
         {
             var provider = Make(HttpStatusCode.OK, "[]");
-            Assert.AreEqual(0, (await provider.GetSuggestionsAsync(new string('a', 51), CancellationToken.None)).Count);
+            Assert.AreEqual(0, (await provider.GetSuggestionsAsync(new string('a', 51), 5, CancellationToken.None)).Count);
+        }
+
+        [TestMethod]
+        public async Task RespectsCustomMax()
+        {
+            var json = "[" + string.Join(",", Enumerable.Range(0, 12).Select(i => $"{{\"word\":\"w{i}\"}}")) + "]";
+            var provider = Make(HttpStatusCode.OK, json);
+            var result = await provider.GetSuggestionsAsync("qq", 10, CancellationToken.None);
+            Assert.AreEqual(10, result.Count);
         }
     }
 }

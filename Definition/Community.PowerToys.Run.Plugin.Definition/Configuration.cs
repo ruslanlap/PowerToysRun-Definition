@@ -24,6 +24,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
         public string LatinLanguages { get; set; } = "en,fr,it";
         public string UkrainianApiEndpoint { get; set; } = "https://sum.in.ua/s/";
         public string ChineseApiEndpoint { get; set; } = "https://www.mdbg.net/chinese/dictionary?page=worddict&wdrst=0&wdqb=";
+        public int MaxSuggestions { get; set; } = 10;
     }
 
     internal static class ConfigurationManager

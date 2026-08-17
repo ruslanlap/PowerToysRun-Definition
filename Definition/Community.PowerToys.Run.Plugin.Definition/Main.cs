@@ -261,7 +261,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
             var results = new List<Result> { CreateInfoResult(rawSearch, $"No definitions found for '{searchTerm}'", "Check spelling or try another word.") };
             try
             {
-                var suggestions = await _suggestionProvider.GetSuggestionsAsync(searchTerm, token);
+                var suggestions = await _suggestionProvider.GetSuggestionsAsync(searchTerm, ConfigurationManager.Configuration.MaxSuggestions, token);
                 foreach (var s in suggestions)
                 {
                     results.Add(new Result
@@ -510,6 +510,14 @@ namespace Community.PowerToys.Run.Plugin.Definition
                     },
                     new PluginAdditionalOption
                     {
+                        Key = nameof(PluginConfiguration.MaxSuggestions),
+                        DisplayLabel = "Max \"Did you mean...\" Suggestions",
+                        DisplayDescription = "Number of spelling suggestions to show when no definitions are found (1-25)",
+                        PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Textbox,
+                        TextValue = ConfigurationManager.Configuration.MaxSuggestions.ToString()
+                    },
+                    new PluginAdditionalOption
+                    {
                         Key = nameof(PluginConfiguration.ShowAntonymsInResults),
                         DisplayLabel = "Show Antonyms",
                         DisplayDescription = "Display antonyms in results",
@@ -526,6 +534,11 @@ namespace Community.PowerToys.Run.Plugin.Definition
         {
             ConfigurationManager.UpdateConfiguration(config =>
             {
+                if (settings.AdditionalOptions.SingleOrDefault(x => x.Key == nameof(PluginConfiguration.MaxSuggestions)) is var maxSugOption && maxSugOption != null && int.TryParse(maxSugOption.TextValue, out var maxSug) && maxSug > 0)
+                {
+                    config.MaxSuggestions = Math.Min(maxSug, 25);
+                }
+
                 if (settings.AdditionalOptions.SingleOrDefault(x => x.Key == nameof(PluginConfiguration.CacheMaxSize)) is var cacheOption && cacheOption != null)
                 {
                     if (int.TryParse(cacheOption.TextValue, out var cacheMaxSize))
