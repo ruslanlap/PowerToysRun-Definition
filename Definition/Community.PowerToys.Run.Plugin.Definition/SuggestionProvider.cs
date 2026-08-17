@@ -16,10 +16,12 @@ namespace Community.PowerToys.Run.Plugin.Definition
     {
         private const string DatamuseApiBase = "https://api.datamuse.com/words?sp=";
         private readonly HttpClient _httpClient;
+        private readonly string _apiKey;
 
-        public SuggestionProvider(HttpClient httpClient)
+        public SuggestionProvider(HttpClient httpClient, string apiKey = "")
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _apiKey = apiKey;
         }
 
         public async Task<List<string>> GetSuggestionsAsync(string word, int max, CancellationToken token)
@@ -31,9 +33,14 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
             try
             {
-                // sp=word* — fuzzy spell check; max=5 keeps it fast
+                // sp=word* — fuzzy spell check; max keeps it fast
                 var url = $"{DatamuseApiBase}{Uri.EscapeDataString(word)}*&max={Math.Min(max, 25)}";
-                using var response = await _httpClient.GetAsync(url, token);
+                using var request = new HttpRequestMessage(HttpMethod.Get, url);
+                if (!string.IsNullOrWhiteSpace(_apiKey))
+                {
+                    request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _apiKey);
+                }
+                using var response = await _httpClient.SendAsync(request, token);
                 if (!response.IsSuccessStatusCode)
                 {
                     return new List<string>();

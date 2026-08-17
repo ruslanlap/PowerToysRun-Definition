@@ -78,7 +78,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 { "uk", new UkrainianDictionaryProvider(HttpClient) },
                 { "zh", new ChineseDictionaryProvider(HttpClient) }
             };
-            _suggestionProvider = new SuggestionProvider(HttpClient);
+            _suggestionProvider = new SuggestionProvider(HttpClient, ConfigurationManager.Configuration.DatamuseApiKey);
         }
 
         public void Init(PluginInitContext context)
@@ -510,6 +510,14 @@ namespace Community.PowerToys.Run.Plugin.Definition
                     },
                     new PluginAdditionalOption
                     {
+                        Key = nameof(PluginConfiguration.DatamuseApiKey),
+                        DisplayLabel = "Datamuse API Key (optional)",
+                        DisplayDescription = "Optional API key for Datamuse if rate limits are hit (currently free unlimited)",
+                        PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Textbox,
+                        TextValue = ConfigurationManager.Configuration.DatamuseApiKey
+                    },
+                    new PluginAdditionalOption
+                    {
                         Key = nameof(PluginConfiguration.MaxSuggestions),
                         DisplayLabel = "Max \"Did you mean...\" Suggestions",
                         DisplayDescription = "Number of spelling suggestions to show when no definitions are found (1-25)",
@@ -534,6 +542,11 @@ namespace Community.PowerToys.Run.Plugin.Definition
         {
             ConfigurationManager.UpdateConfiguration(config =>
             {
+                if (settings.AdditionalOptions.SingleOrDefault(x => x.Key == nameof(PluginConfiguration.DatamuseApiKey)) is var apiKeyOption && apiKeyOption != null)
+                {
+                    config.DatamuseApiKey = apiKeyOption.TextValue?.Trim() ?? "";
+                }
+
                 if (settings.AdditionalOptions.SingleOrDefault(x => x.Key == nameof(PluginConfiguration.MaxSuggestions)) is var maxSugOption && maxSugOption != null && int.TryParse(maxSugOption.TextValue, out var maxSug) && maxSug > 0)
                 {
                     config.MaxSuggestions = Math.Min(maxSug, 25);
