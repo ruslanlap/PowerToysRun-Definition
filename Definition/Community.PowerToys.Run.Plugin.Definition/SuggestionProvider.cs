@@ -34,7 +34,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
             try
             {
                 // sp=word* — fuzzy spell check; max keeps it fast
-                var url = $"{DatamuseApiBase}{Uri.EscapeDataString(word)}*&max={Math.Min(max, 25)}";
+                var url = $"{DatamuseApiBase}{Uri.EscapeDataString(word)}&max={Math.Min(max, 25)}";
                 using var request = new HttpRequestMessage(HttpMethod.Get, url);
                 if (!string.IsNullOrWhiteSpace(_apiKey))
                 {
@@ -51,6 +51,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 return doc.RootElement.EnumerateArray()
                     .Select(e => e.TryGetProperty("word", out var w) ? w.GetString() : null)
                     .Where(w => !string.IsNullOrWhiteSpace(w) && !string.Equals(w, word, StringComparison.OrdinalIgnoreCase))
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
                     .Take(max)
                     .ToList()!;
             }

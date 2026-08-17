@@ -256,7 +256,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
         }
 
 
-        private async Task<List<Result>> BuildNotFoundResultsAsync(string searchTerm, string rawSearch, CancellationToken token)
+        private async Task<List<Result>> BuildNotFoundResultsAsync(string searchTerm, string rawSearch, string subcommand, CancellationToken token)
         {
             var results = new List<Result> { CreateInfoResult(rawSearch, $"No definitions found for '{searchTerm}'", "Check spelling or try another word.") };
             try
@@ -318,7 +318,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
                 if (!allEntries.Any())
                 {
-                    return await BuildNotFoundResultsAsync(searchTerm, rawSearch, cancellationToken);
+                    return await BuildNotFoundResultsAsync(searchTerm, rawSearch, subcommand, cancellationToken);
                 }
 
                 var results = ProcessDictionaryEntries(allEntries, rawSearch, subcommand);
