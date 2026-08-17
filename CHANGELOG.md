@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented in this file.
 
+## [1.7.0](https://github.com/ruslanlap/PowerToysRun-Definition/compare/v1.6.0...v1.7.0) (2026-08-17)
+
+
+### Features
+
+* optional Datamuse API key config (future-proofing if rate limits change) ([948e5c3](https://github.com/ruslanlap/PowerToysRun-Definition/commit/948e5c33be874c999dfdbe968519c85efef3850c))
+
+
+### Bug Fixes
+
+* address Devin/Codex review bugs ([7a9b685](https://github.com/ruslanlap/PowerToysRun-Definition/commit/7a9b68529d93763fb1dce3533b17c2dd3a95a223))
+
 ## [1.6.0](https://github.com/ruslanlap/PowerToysRun-Definition/compare/v1.5.5...v1.6.0) (2026-08-17)
 
 
