@@ -150,7 +150,7 @@ Definition is a plugin for [Microsoft PowerToys Run](https://github.com/microsof
 
 ## ✨ Features
 
-- 💡 **"Did you mean…?" spelling suggestions** — When a word isn't found, the plugin suggests up to 25 similar spellings (Datamuse API, no key needed). Click a suggestion to search it instantly. [v1.6.0]
+- 💡 **"Did you mean…?" spelling suggestions** — When a word isn't found, the plugin suggests up to 25 similar spellings (Datamuse API, no key needed; optional API key supported if rate limits ever hit). Click a suggestion to search it instantly. [v1.6.0]
 - 🔍 **Instant Definitions**: Get definitions in real-time via `dictionaryapi.dev`.
 - 🇫🇷 **French Dictionary (Français)**: Lookup French words via Collins with Wiktionnaire fallback.
 - 🇮🇹 **Italian Dictionary (Italiano)**: Lookup Italian words via Wikizionario.
@@ -259,6 +259,7 @@ The plugin supports extensive customization through a `config.json` file that's 
 | `ShowSynonymsInResults` | true | Show synonyms |
 | `ShowAntonymsInResults` | true | Show antonyms |
 | `MaxSuggestions` | 10 | Number of "Did you mean…?" spelling suggestions when no definitions are found (1–25) |
+| `DatamuseApiKey` | `""` | Optional API key for Datamuse if rate limits are hit (currently free unlimited) |
 
 ### Example Configuration
 
