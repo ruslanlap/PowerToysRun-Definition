@@ -20,6 +20,10 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
           target-branch: master
+          # GITHUB_TOKEN-created tags do not trigger the tag-built
+          # build-and-release.yml, so releases ship without binaries.
+          # A PAT-created tag fires it.
+          token: ${{ secrets.RP_PAT }}
 
   # After release-please creates a tag, the existing build-and-release.yml
   # workflow picks it up automatically (triggered by tag push "v*")
