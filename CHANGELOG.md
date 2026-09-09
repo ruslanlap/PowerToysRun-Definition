@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented in this file.
 
+## [1.7.1](https://github.com/ruslanlap/PowerToysRun-Definition/compare/v1.7.0...v1.7.1) (2026-09-09)
+
+
+### Bug Fixes
+
+* trigger release after dictionary api migration ([#20](https://github.com/ruslanlap/PowerToysRun-Definition/issues/20)) ([59b728d](https://github.com/ruslanlap/PowerToysRun-Definition/commit/59b728dc099dda24fdf9bfa7e3ca3184cd3f5e06))
+
 ## [Unreleased]
 
 ### Fixed
