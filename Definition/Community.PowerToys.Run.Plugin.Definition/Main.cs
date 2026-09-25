@@ -56,7 +56,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
         private static HttpClient HttpClient => HttpClientLazy.Value;
 
         private LRUCache _cache = new LRUCache(ConfigurationManager.Configuration.CacheMaxSize);
-        private (int CacheMaxSize, int CacheExpirationMinutes, string ApiEndpoint, string UkrainianApiEndpoint, string ChineseApiEndpoint, string Language, string LatinLanguages, int MaxSuggestions, string DatamuseApiKey, int MaxResultsPerMeaning, bool ShowExamplesInResults, bool ShowSynonymsInResults, bool ShowAntonymsInResults) _cacheConfiguration;
+        private (int CacheMaxSize, int CacheExpirationMinutes, int HttpTimeoutSeconds, string ApiEndpoint, string UkrainianApiEndpoint, string ChineseApiEndpoint, string Language, string LatinLanguages, int MaxSuggestions, string DatamuseApiKey, int MaxResultsPerMeaning, bool ShowExamplesInResults, bool ShowSynonymsInResults, bool ShowAntonymsInResults) _cacheConfiguration;
 
         private static readonly HashSet<string> ValidSubcommands = new(StringComparer.OrdinalIgnoreCase)
             { "pronunciation", "pron", "synonyms", "syn", "antonyms", "ant", "examples", "ex" };
@@ -106,10 +106,11 @@ namespace Community.PowerToys.Run.Plugin.Definition
             // Reload configuration to pick up changes
             ConfigurationManager.ReloadConfiguration();
             var configuration = ConfigurationManager.Configuration;
-            // ponytail: value-tuple signature covers every result-affecting setting; add a field here if one starts affecting results
+            // ponytail: value-tuple signature covers every result-affecting setting (incl. HttpTimeoutSeconds — it drives the Datamuse fallback); add a field here if one starts affecting results
             var cacheConfiguration = (
                 configuration.CacheMaxSize,
                 configuration.CacheExpirationMinutes,
+                configuration.HttpTimeoutSeconds,
                 configuration.ApiEndpoint,
                 configuration.UkrainianApiEndpoint,
                 configuration.ChineseApiEndpoint,
