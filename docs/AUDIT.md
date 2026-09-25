@@ -4,8 +4,8 @@ This audit covers settings, caching, lookups, cancellation, external actions, an
 
 | Priority | Finding and reproduction | Impact | Status |
 | --- | --- | --- | --- |
-| High | Set `CacheMaxSize=0` in PowerToys or `config.json`, then perform a lookup that returns a result. | Inserting into the LRU cache attempts to remove an empty node and fails. | Fixed: settings accept only positive values; file values are normalized. |
-| High | Set `HttpTimeoutSeconds=0` or a negative value. | Lookup fails because the timeout is invalid. | Fixed: settings accept only positive values; file values are normalized. |
+| High | Set `CacheMaxSize=0` in PowerToys or `config.json`, then perform a lookup that returns a result. | Inserting into the LRU cache attempts to remove an empty node and fails. | Fixed: settings accept only positive values; invalid file values are normalized at load time (runtime only — the file itself is not rewritten until settings are saved). |
+| High | Set `HttpTimeoutSeconds=0` or a negative value. | Lookup fails because the timeout is invalid. | Fixed: settings accept only positive values; invalid file values are normalized at load time (runtime only). |
 | High | Start a slow lookup, then enter a new query. | Providers could turn cancellation into an empty result and display “not found”; an obsolete result could enter the cache. | Fixed: capture and propagate the cancellation token, then check it before caching. |
 | High | Return a `file:` source or audio URL from an API and activate it. | The shell or media player could open a local resource. | Fixed: only `http` and `https` URLs are accepted, including at action time. |
 | Medium | Set `LatinLanguages="en"` in `config.json`. | Loading the file replaced this choice with `en,fr,it`. | Fixed: an explicit English-only choice is preserved. |
