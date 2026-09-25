@@ -100,9 +100,12 @@ namespace Community.PowerToys.Run.Plugin.Definition
             _configuration ??= new PluginConfiguration();
 
             _configuration.ApiEndpoint = NormalizeEnglishApiEndpoint(_configuration.ApiEndpoint);
+            if (_configuration.CacheMaxSize <= 0) _configuration.CacheMaxSize = 100;
+            _configuration.CacheMaxSize = Math.Min(_configuration.CacheMaxSize, 1000);
+            if (_configuration.HttpTimeoutSeconds <= 0) _configuration.HttpTimeoutSeconds = 30;
+            _configuration.HttpTimeoutSeconds = Math.Min(_configuration.HttpTimeoutSeconds, 300);
 
-            if (string.IsNullOrWhiteSpace(_configuration.LatinLanguages)
-                || string.Equals(_configuration.LatinLanguages.Trim(), "en", StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(_configuration.LatinLanguages))
             {
                 _configuration.LatinLanguages = "en,fr,it";
             }
@@ -130,6 +133,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
         public static void UpdateConfiguration(Action<PluginConfiguration> updateAction)
         {
             updateAction(_configuration);
+            NormalizeConfiguration();
             SaveConfiguration();
         }
     }

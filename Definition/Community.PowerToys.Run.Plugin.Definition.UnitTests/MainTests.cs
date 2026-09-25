@@ -204,5 +204,42 @@ namespace Community.PowerToys.Run.Plugin.Definition.UnitTests
 
             Assert.IsTrue(results.Any(r => r.Title == "Pronunciation: hello" && r.SubTitle == "huh-loh"));
         }
+
+        [TestMethod]
+        public void Configuration_should_repair_invalid_limits_and_preserve_english_only()
+        {
+            var field = typeof(ConfigurationManager).GetField("_configuration", BindingFlags.NonPublic | BindingFlags.Static);
+            var normalize = typeof(ConfigurationManager).GetMethod("NormalizeConfiguration", BindingFlags.NonPublic | BindingFlags.Static);
+            var original = field.GetValue(null);
+            try
+            {
+                var config = new PluginConfiguration { CacheMaxSize = 0, HttpTimeoutSeconds = -1, LatinLanguages = "en" };
+                field.SetValue(null, config);
+                normalize.Invoke(null, null);
+                Assert.IsTrue(config.CacheMaxSize > 0);
+                Assert.IsTrue(config.HttpTimeoutSeconds > 0);
+                Assert.AreEqual("en", config.LatinLanguages);
+
+                config.CacheMaxSize = int.MaxValue;
+                config.HttpTimeoutSeconds = int.MaxValue;
+                normalize.Invoke(null, null);
+                Assert.AreEqual(1000, config.CacheMaxSize);
+                Assert.AreEqual(300, config.HttpTimeoutSeconds);
+            }
+            finally
+            {
+                field.SetValue(null, original);
+            }
+        }
+
+        [DataTestMethod]
+        [DataRow("https://example.com/audio.mp3", true)]
+        [DataRow("http://example.com", true)]
+        [DataRow("file:///C:/Windows/System32/calc.exe", false)]
+        [DataRow("javascript:alert(1)", false)]
+        public void UrlHelper_should_accept_only_web_urls(string url, bool expected)
+        {
+            Assert.AreEqual(expected, UrlHelper.IsHttpUrl(url));
+        }
     }
 }
