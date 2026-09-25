@@ -49,7 +49,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
         private void AddAudioMenuItem(List<ContextMenuResult> menuItems, ResultContext context)
         {
-            if (!ConfigurationManager.Configuration.EnableAudioPlayback || !Uri.IsWellFormedUriString(context.AudioUrl, UriKind.Absolute)) return;
+            if (!ConfigurationManager.Configuration.EnableAudioPlayback || !UrlHelper.IsHttpUrl(context.AudioUrl)) return;
 
             menuItems.Add(new ContextMenuResult
             {
@@ -75,7 +75,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
         private void AddSourceUrlMenuItem(List<ContextMenuResult> menuItems, ResultContext context)
         {
-            if (!Uri.IsWellFormedUriString(context.SourceUrl, UriKind.Absolute)) return;
+            if (!UrlHelper.IsHttpUrl(context.SourceUrl)) return;
 
             menuItems.Add(new ContextMenuResult
             {
@@ -122,4 +122,4 @@ namespace Community.PowerToys.Run.Plugin.Definition
             }
         }
     }
-} 
+}

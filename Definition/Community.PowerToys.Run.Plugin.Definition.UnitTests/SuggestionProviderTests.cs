@@ -74,5 +74,14 @@ namespace Community.PowerToys.Run.Plugin.Definition.UnitTests
             var result = await provider.GetSuggestionsAsync("qq", 10, CancellationToken.None);
             Assert.AreEqual(10, result.Count);
         }
+
+        [TestMethod]
+        public async Task Cancellation_is_propagated()
+        {
+            var provider = Make(HttpStatusCode.OK, "[]");
+            using var source = new CancellationTokenSource();
+            source.Cancel();
+            await Assert.ThrowsExceptionAsync<OperationCanceledException>(() => provider.GetSuggestionsAsync("word", 5, source.Token));
+        }
     }
 }

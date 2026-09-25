@@ -9,7 +9,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
         {
             try
             {
-                if (!Uri.IsWellFormedUriString(url, UriKind.Absolute)) return false;
+                if (!IsHttpUrl(url)) return false;
 
                 Debug.WriteLine($"[Definition Plugin] Opening URL: {url}");
                 Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
@@ -21,5 +21,9 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 return false;
             }
         }
+
+        public static bool IsHttpUrl(string url) =>
+            Uri.TryCreate(url, UriKind.Absolute, out var uri)
+            && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
     }
-} 
+}

@@ -1,13 +1,15 @@
 name: Build and Release Definition Plugin
 
 on:
+  pull_request:
+    branches: [master]
   push:
     tags:
       - 'v*'
 
 # Permissions for GITHUB_TOKEN (principle of least privilege)
 permissions:
-  contents: write  # Needed for creating releases
+  contents: read
   issues: read
   pull-requests: read
 
@@ -17,7 +19,18 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - run: dotnet test Definition/Definition.sln -c Release -p:Platform=x64
+
   build:
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: windows-latest
     strategy:
       matrix:
@@ -187,6 +200,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
     
     steps:
       - name: Checkout code
@@ -260,10 +275,9 @@ jobs:
           </p>
 
           ## ✨ What's New
-          - 🇮🇹 Italian dictionary support via Wikizionario (`it.wiktionary.org`).
-          - 🌐 Expanded default Latin lookups: `LatinLanguages` now defaults to `en,fr,it`.
-          - ⚙️ Italian is registered as a first-class dictionary provider (`it`).
-          - 📚 README and CHANGELOG updated for v${VERSION}.
+          - Fixed invalid settings, stale cached results, and cancellation handling.
+          - Restricted source and audio links to HTTP and HTTPS.
+          - Added Windows test checks before release packaging.
 
           ## 📥 Installation
           ### Prerequisites

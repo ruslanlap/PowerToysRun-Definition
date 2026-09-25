@@ -46,7 +46,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
             var handler = new HttpClientHandler();
             var client = new HttpClient(handler)
             {
-                Timeout = TimeSpan.FromSeconds(ConfigurationManager.Configuration.HttpTimeoutSeconds)
+                Timeout = Timeout.InfiniteTimeSpan
             };
             client.DefaultRequestHeaders.UserAgent.ParseAdd("PowerToysRun-Definition/1.5.4 (https://github.com/ruslanlap/PowerToysRun-Definition)");
             client.DefaultRequestHeaders.AcceptLanguage.ParseAdd("en-US,en;q=0.9");
@@ -56,6 +56,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
         private static HttpClient HttpClient => HttpClientLazy.Value;
 
         private LRUCache _cache = new LRUCache(ConfigurationManager.Configuration.CacheMaxSize);
+        private string _cacheConfiguration;
 
         private static readonly HashSet<string> ValidSubcommands = new(StringComparer.OrdinalIgnoreCase)
             { "pronunciation", "pron", "synonyms", "syn", "antonyms", "ant", "examples", "ex" };
@@ -78,7 +79,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 { "uk", new UkrainianDictionaryProvider(HttpClient) },
                 { "zh", new ChineseDictionaryProvider(HttpClient) }
             };
-            _suggestionProvider = new SuggestionProvider(HttpClient, ConfigurationManager.Configuration.DatamuseApiKey);
+            _suggestionProvider = new SuggestionProvider(HttpClient);
         }
 
         public void Init(PluginInitContext context)
@@ -104,6 +105,13 @@ namespace Community.PowerToys.Run.Plugin.Definition
         {
             // Reload configuration to pick up changes
             ConfigurationManager.ReloadConfiguration();
+            var configuration = ConfigurationManager.Configuration;
+            var cacheConfiguration = JsonSerializer.Serialize(configuration);
+            if (_cacheConfiguration != cacheConfiguration)
+            {
+                _cache = new LRUCache(configuration.CacheMaxSize);
+                _cacheConfiguration = cacheConfiguration;
+            }
             
             var rawSearch = query.Search ?? string.Empty;
             var searchTerm = rawSearch.Trim().ToLowerInvariant();
@@ -115,7 +123,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 return new List<Result> { CreateInfoResult(rawSearch, Name, EmptyQueryMessage) };
             }
             
-            CancelPreviousRequest();
+            var token = CancelPreviousRequest();
 
             // Check cache first
             if (TryGetCachedResults(searchTerm, rawSearch, out var cachedResults))
@@ -130,7 +138,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
             }
 
             // Perform actual API call
-            return ExecuteDelayedQuery(searchWord, rawSearch, subcommand, searchTerm);
+            return ExecuteDelayedQuery(searchWord, rawSearch, subcommand, searchTerm, token);
         }
 
         private static (string Subcommand, string SearchWord) ParseSubcommand(string input)
@@ -143,11 +151,12 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 : (string.Empty, input.Trim());
         }
 
-        private void CancelPreviousRequest()
+        private CancellationToken CancelPreviousRequest()
         {
             _cancellationTokenSource?.Cancel();
             _cancellationTokenSource?.Dispose();
             _cancellationTokenSource = new CancellationTokenSource();
+            return _cancellationTokenSource.Token;
         }
 
         private bool TryGetCachedResults(string searchTerm, string rawSearch, out List<Result> results)
@@ -162,16 +171,24 @@ namespace Community.PowerToys.Run.Plugin.Definition
             return false;
         }
 
-        private List<Result> ExecuteDelayedQuery(string searchTerm, string rawSearch, string subcommand, string cacheKey)
+        private List<Result> ExecuteDelayedQuery(string searchTerm, string rawSearch, string subcommand, string cacheKey, CancellationToken token)
         {
             try
             {
+                using var timeoutSource = CancellationTokenSource.CreateLinkedTokenSource(token);
+                timeoutSource.CancelAfter(TimeSpan.FromSeconds(ConfigurationManager.Configuration.HttpTimeoutSeconds));
                 // Use Task.Run to avoid blocking the UI thread
-                var task = Task.Run(async () => await FetchAndProcessResultsAsync(searchTerm, rawSearch, subcommand, _cancellationTokenSource.Token));
+                var task = Task.Run(async () => await FetchAndProcessResultsAsync(searchTerm, rawSearch, subcommand, timeoutSource.Token));
                 var results = task.ConfigureAwait(false).GetAwaiter().GetResult();
                 
+                token.ThrowIfCancellationRequested();
+                timeoutSource.Token.ThrowIfCancellationRequested();
                 CacheResults(cacheKey, results);
                 return results;
+            }
+            catch (OperationCanceledException) when (!token.IsCancellationRequested)
+            {
+                return new List<Result> { CreateErrorResult(rawSearch, NetworkErrorTitle, "Dictionary request timed out.") };
             }
             catch (OperationCanceledException)
             {
@@ -286,6 +303,8 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 Debug.WriteLine($"[Definition Plugin] Suggestions failed for '{searchTerm}': {ex.Message}");
             }
 
+            token.ThrowIfCancellationRequested();
+
             return results;
         }
 
@@ -306,6 +325,10 @@ namespace Community.PowerToys.Run.Plugin.Definition
                     {
                         return await provider.LookupAsync(searchTerm, cancellationToken);
                     }
+                    catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                    {
+                        throw;
+                    }
                     catch (Exception ex)
                     {
                         Debug.WriteLine($"[Definition Plugin] Provider {provider.LanguageCode} FAILED for '{searchTerm}': {ex.GetType().Name}: {ex.Message}");
@@ -314,6 +337,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 }).ToList();
                 
                 var resultsList = await Task.WhenAll(tasks);
+                cancellationToken.ThrowIfCancellationRequested();
                 var allEntries = resultsList.SelectMany(e => e ?? Enumerable.Empty<DictionaryEntry>()).ToList();
 
                 if (!allEntries.Any())
@@ -554,13 +578,13 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
                 if (settings.AdditionalOptions.SingleOrDefault(x => x.Key == nameof(PluginConfiguration.CacheMaxSize)) is var cacheOption && cacheOption != null)
                 {
-                    if (int.TryParse(cacheOption.TextValue, out var cacheMaxSize))
+                    if (int.TryParse(cacheOption.TextValue, out var cacheMaxSize) && cacheMaxSize > 0)
                         config.CacheMaxSize = cacheMaxSize;
                 }
                 
                 if (settings.AdditionalOptions.SingleOrDefault(x => x.Key == nameof(PluginConfiguration.HttpTimeoutSeconds)) is var timeoutOption && timeoutOption != null)
                 {
-                    if (int.TryParse(timeoutOption.TextValue, out var httpTimeoutSeconds))
+                    if (int.TryParse(timeoutOption.TextValue, out var httpTimeoutSeconds) && httpTimeoutSeconds > 0)
                         config.HttpTimeoutSeconds = httpTimeoutSeconds;
                 }
                 
@@ -599,12 +623,9 @@ namespace Community.PowerToys.Run.Plugin.Definition
                 _context.API.ThemeChanged -= OnThemeChanged;
             }
 
-                        // LRUCache doesn't have Clear(), recreate it
-            _cache = new LRUCache(ConfigurationManager.Configuration.CacheMaxSize);
             _cancellationTokenSource?.Cancel();
             _cancellationTokenSource?.Dispose();
             _audioManager?.Dispose();
-            HttpClient?.Dispose();
 
             _disposed = true;
         }

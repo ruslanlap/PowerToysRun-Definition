@@ -33,7 +33,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
 
             try
             {
-                if (!Uri.IsWellFormedUriString(url, UriKind.Absolute)) return false;
+                if (!UrlHelper.IsHttpUrl(url)) return false;
 
                 Debug.WriteLine($"[Definition Plugin] Playing audio from: {url}");
 
@@ -128,4 +128,4 @@ namespace Community.PowerToys.Run.Plugin.Definition
             _disposed = true;
         }
     }
-} 
+}
