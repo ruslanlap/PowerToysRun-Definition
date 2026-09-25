@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented in this file.
 
+## [1.7.3](https://github.com/ruslanlap/PowerToysRun-Definition/compare/v1.7.2...v1.7.3) (2026-09-25)
+
+
+### Bug Fixes
+
+* address Copilot review findings from [#22](https://github.com/ruslanlap/PowerToysRun-Definition/issues/22) ([#24](https://github.com/ruslanlap/PowerToysRun-Definition/issues/24)) ([56f22e5](https://github.com/ruslanlap/PowerToysRun-Definition/commit/56f22e5b76bdbabec019f38b9b97a25e7f7529f3))
+
 ## [1.7.2](https://github.com/ruslanlap/PowerToysRun-Definition/compare/v1.7.1...v1.7.2) (2026-09-25)
 
 
