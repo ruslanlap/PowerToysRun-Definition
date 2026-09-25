@@ -7,7 +7,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -56,7 +55,7 @@ namespace Community.PowerToys.Run.Plugin.Definition
         private static HttpClient HttpClient => HttpClientLazy.Value;
 
         private LRUCache _cache = new LRUCache(ConfigurationManager.Configuration.CacheMaxSize);
-        private string _cacheConfiguration;
+        private (int CacheMaxSize, int CacheExpirationMinutes, string ApiEndpoint, string UkrainianApiEndpoint, string ChineseApiEndpoint, string Language, string LatinLanguages, int MaxSuggestions, string DatamuseApiKey, int MaxResultsPerMeaning, bool ShowExamplesInResults, bool ShowSynonymsInResults, bool ShowAntonymsInResults) _cacheConfiguration;
 
         private static readonly HashSet<string> ValidSubcommands = new(StringComparer.OrdinalIgnoreCase)
             { "pronunciation", "pron", "synonyms", "syn", "antonyms", "ant", "examples", "ex" };
@@ -106,7 +105,21 @@ namespace Community.PowerToys.Run.Plugin.Definition
             // Reload configuration to pick up changes
             ConfigurationManager.ReloadConfiguration();
             var configuration = ConfigurationManager.Configuration;
-            var cacheConfiguration = JsonSerializer.Serialize(configuration);
+            // ponytail: value-tuple signature covers every result-affecting setting; add a field here if one starts affecting results
+            var cacheConfiguration = (
+                configuration.CacheMaxSize,
+                configuration.CacheExpirationMinutes,
+                configuration.ApiEndpoint,
+                configuration.UkrainianApiEndpoint,
+                configuration.ChineseApiEndpoint,
+                configuration.Language,
+                configuration.LatinLanguages,
+                configuration.MaxSuggestions,
+                configuration.DatamuseApiKey,
+                configuration.MaxResultsPerMeaning,
+                configuration.ShowExamplesInResults,
+                configuration.ShowSynonymsInResults,
+                configuration.ShowAntonymsInResults);
             if (_cacheConfiguration != cacheConfiguration)
             {
                 _cache = new LRUCache(configuration.CacheMaxSize);
@@ -177,8 +190,8 @@ namespace Community.PowerToys.Run.Plugin.Definition
             {
                 using var timeoutSource = CancellationTokenSource.CreateLinkedTokenSource(token);
                 timeoutSource.CancelAfter(TimeSpan.FromSeconds(ConfigurationManager.Configuration.HttpTimeoutSeconds));
-                // Use Task.Run to avoid blocking the UI thread
-                var task = Task.Run(async () => await FetchAndProcessResultsAsync(searchTerm, rawSearch, subcommand, timeoutSource.Token));
+                // ponytail: IDelayedExecutionPlugin contract requires sync completion here; revisit with the deferred Task.Run cleanup (docs/AUDIT.md)
+                var task = Task.Run(() => FetchAndProcessResultsAsync(searchTerm, rawSearch, subcommand, timeoutSource.Token));
                 var results = task.ConfigureAwait(false).GetAwaiter().GetResult();
                 
                 token.ThrowIfCancellationRequested();
