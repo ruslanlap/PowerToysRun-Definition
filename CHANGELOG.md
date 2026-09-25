@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented in this file.
 
+## [1.7.4](https://github.com/ruslanlap/PowerToysRun-Definition/compare/v1.7.3...v1.7.4) (2026-09-25)
+
+
+### Bug Fixes
+
+* include HttpTimeoutSeconds in the cache signature ([#26](https://github.com/ruslanlap/PowerToysRun-Definition/issues/26)) ([2daea78](https://github.com/ruslanlap/PowerToysRun-Definition/commit/2daea7805a2d9291f445d0f8fb1e0738c6936d8c))
+
 ## [1.7.3](https://github.com/ruslanlap/PowerToysRun-Definition/compare/v1.7.2...v1.7.3) (2026-09-25)
 
 
