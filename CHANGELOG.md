@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented in this file.
 
+## [1.7.2](https://github.com/ruslanlap/PowerToysRun-Definition/compare/v1.7.1...v1.7.2) (2026-09-25)
+
+
+### Bug Fixes
+
+* harden lookups, settings, and release checks ([#22](https://github.com/ruslanlap/PowerToysRun-Definition/issues/22)) ([a28f62e](https://github.com/ruslanlap/PowerToysRun-Definition/commit/a28f62ef9e07e10f0e9e7099cf3dc309e51640ac))
+
 ## [1.7.1](https://github.com/ruslanlap/PowerToysRun-Definition/compare/v1.7.0...v1.7.1) (2026-09-09)
 
 
